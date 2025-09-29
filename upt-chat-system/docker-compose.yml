@@ -1,0 +1,155 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: upt-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: upt_admin_password
+      MONGO_INITDB_DATABASE: upt_chat_system
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./docker/mongodb/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - upt-network
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    container_name: upt-api-gateway
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      MONGODB_URI: mongodb://admin:upt_admin_password@mongodb:27017/upt_chat_system?authSource=admin
+      JWT_SECRET: upt_jwt_secret_key_change_in_production
+      JWT_EXPIRES_IN: 7d
+      RATE_LIMIT_MAX: 100
+      RATE_LIMIT_WINDOW_MS: 60000
+      ALLOWED_ORIGINS: http://localhost:3000,http://localhost:4200
+      LOG_LEVEL: info
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    volumes:
+      - ./services/api-gateway/src:/usr/src/app/src
+      - /usr/src/app/node_modules
+    networks:
+      - upt-network
+    command: npm run start:dev
+
+  # Chat Service (Placeholder - será desarrollado)
+  chat-service:
+    build:
+      context: ./services/chat-service
+      dockerfile: Dockerfile
+    container_name: upt-chat-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      MONGODB_URI: mongodb://admin:upt_admin_password@mongodb:27017/upt_chat_system?authSource=admin
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongodb
+    networks:
+      - upt-network
+    profiles:
+      - full-stack
+
+  # NLP Service (Placeholder - será desarrollado)
+  nlp-service:
+    build:
+      context: ./services/nlp-service
+      dockerfile: Dockerfile
+    container_name: upt-nlp-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3002
+      MONGODB_URI: mongodb://admin:upt_admin_password@mongodb:27017/upt_chat_system?authSource=admin
+    ports:
+      - "3002:3002"
+    depends_on:
+      - mongodb
+    networks:
+      - upt-network
+    profiles:
+      - full-stack
+
+  # Knowledge Base Service (Placeholder)
+  knowledge-base-service:
+    build:
+      context: ./services/knowledge-base-service
+      dockerfile: Dockerfile
+    container_name: upt-knowledge-base
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3003
+      MONGODB_URI: mongodb://admin:upt_admin_password@mongodb:27017/upt_chat_system?authSource=admin
+    ports:
+      - "3003:3003"
+    depends_on:
+      - mongodb
+    networks:
+      - upt-network
+    profiles:
+      - full-stack
+
+  # Analytics Service (Placeholder)
+  analytics-service:
+    build:
+      context: ./services/analytics-service
+      dockerfile: Dockerfile
+    container_name: upt-analytics
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3004
+      MONGODB_URI: mongodb://admin:upt_admin_password@mongodb:27017/upt_chat_system?authSource=admin
+    ports:
+      - "3004:3004"
+    depends_on:
+      - mongodb
+    networks:
+      - upt-network
+    profiles:
+      - full-stack
+
+  # Notification Service (Placeholder)
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    container_name: upt-notifications
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3005
+      MONGODB_URI: mongodb://admin:upt_admin_password@mongodb:27017/upt_chat_system?authSource=admin
+    ports:
+      - "3005:3005"
+    depends_on:
+      - mongodb
+    networks:
+      - upt-network
+    profiles:
+      - full-stack
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  upt-network:
+    driver: bridge
