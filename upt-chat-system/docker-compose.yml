@@ -14,7 +14,7 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
-      - ./docker/mongodb/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./docker/mongodb/init-mongo-optimized.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     networks:
       - upt-network
 
