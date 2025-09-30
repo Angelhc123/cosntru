@@ -1,0 +1,14 @@
+{
+  "name": "notification-service",
+  "version": "0.0.1",
+  "description": "Microservicio de notificaciones UPT Chat System",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "echo 'Notification Service - Pendiente de implementación'",
+    "start": "echo 'Notification Service - Pendiente de implementación'",
+    "start:dev": "echo 'Notification Service - Pendiente de implementación'"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

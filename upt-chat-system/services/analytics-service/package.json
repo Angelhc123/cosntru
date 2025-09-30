@@ -1,0 +1,14 @@
+{
+  "name": "analytics-service",
+  "version": "0.0.1",
+  "description": "Microservicio de análisis y métricas UPT Chat System",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "echo 'Analytics Service - Pendiente de implementación'",
+    "start": "echo 'Analytics Service - Pendiente de implementación'",
+    "start:dev": "echo 'Analytics Service - Pendiente de implementación'"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

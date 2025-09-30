@@ -1,0 +1,14 @@
+{
+  "name": "chat-service",
+  "version": "0.0.1",
+  "description": "Microservicio de gestión de conversaciones UPT Chat System",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "echo 'Chat Service - Pendiente de implementación'",
+    "start": "echo 'Chat Service - Pendiente de implementación'",
+    "start:dev": "echo 'Chat Service - Pendiente de implementación'"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

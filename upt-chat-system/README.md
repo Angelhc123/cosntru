@@ -12,11 +12,12 @@
 
 Sistema de microservicios desarrollado para la Universidad Privada de Tacna que implementa un agente interactivo con procesamiento de lenguaje natural (NLP) para optimizar los procesos de soporte técnico universitario.
 
-### 📊 Estado del Proyecto - 35% Completado
+### 📊 Estado del Proyecto - 45% Completado
 - ✅ **Avance 1**: Arquitectura Base + API Gateway (100% completado)
 - ✅ **Avance 2**: Base de Datos optimizada con datos UPT (100% completado)
-- 🔄 **Avance 3**: Chat Service + WebSockets (planificado)
-- 📋 **Avance 4**: NLP Service + DialogFlow (planificado)
+- ✅ **Avance 3**: Estructura de Microservicios (100% completado)
+- 🔄 **Avance 4**: Chat Service + WebSockets (planificado)
+- 📋 **Avance 5**: NLP Service + DialogFlow (planificado)
 
 📚 **[Ver documentación detallada de avances →](./docs/avances/README.md)**
 

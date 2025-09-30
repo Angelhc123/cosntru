@@ -1,0 +1,14 @@
+{
+  "name": "nlp-service",
+  "version": "0.0.1",
+  "description": "Microservicio de procesamiento de lenguaje natural UPT Chat System",
+  "private": true,
+  "license": "MIT",
+  "main": "main.py",
+  "scripts": {
+    "start": "echo 'NLP Service - Pendiente de implementación'",
+    "dev": "echo 'NLP Service - Pendiente de implementación'"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

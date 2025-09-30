@@ -1,0 +1,14 @@
+{
+  "name": "knowledge-base-service",
+  "version": "0.0.1",
+  "description": "Microservicio de base de conocimiento UPT Chat System",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "echo 'Knowledge Base Service - Pendiente de implementación'",
+    "start": "echo 'Knowledge Base Service - Pendiente de implementación'",
+    "start:dev": "echo 'Knowledge Base Service - Pendiente de implementación'"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
