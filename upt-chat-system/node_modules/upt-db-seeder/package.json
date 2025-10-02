@@ -1,0 +1,40 @@
+{
+  "name": "upt-db-seeder",
+  "version": "1.0.0",
+  "description": "Servicio para inicializar y poblar la base de datos MongoDB en Railway",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "seed": "node src/seeders/seed-all.js",
+    "seed:users": "node src/seeders/seed-users.js",
+    "seed:chat-sessions": "node src/seeders/seed-chat-sessions.js",
+    "seed:knowledge-base": "node src/seeders/seed-knowledge-base.js",
+    "clear": "node src/seeders/clear-database.js",
+    "health": "node src/health-check.js"
+  },
+  "dependencies": {
+    "mongodb": "^6.3.0",
+    "mongoose": "^8.0.3",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "mongodb",
+    "seeder",
+    "upt",
+    "railway",
+    "database"
+  ],
+  "author": "UPT Development Team",
+  "license": "MIT"
+}

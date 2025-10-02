@@ -1,22 +1,28 @@
 version: '3.8'
 
 services:
-  # MongoDB Database
-  mongodb:
-    image: mongo:7.0
-    container_name: upt-mongodb
+  # DB Seeder Service (para poblar MongoDB Atlas)
+  db-seeder:
+    build:
+      context: ./services/db-seeder
+      dockerfile: Dockerfile
+    container_name: upt-db-seeder
     restart: unless-stopped
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: upt_admin_password
-      MONGO_INITDB_DATABASE: upt_chat_system
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3001
+      MONGODB_URI: ${MONGODB_URI}
+      LOG_LEVEL: info
     ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-      - ./docker/mongodb/init-mongo-optimized.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - "3001:3001"
     networks:
       - upt-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # API Gateway
   api-gateway:
@@ -26,19 +32,20 @@ services:
     container_name: upt-api-gateway
     restart: unless-stopped
     environment:
-      NODE_ENV: development
+      NODE_ENV: ${NODE_ENV:-development}
       PORT: 3000
-      MONGODB_URI: mongodb://admin:upt_admin_password@mongodb:27017/upt_chat_system?authSource=admin
-      JWT_SECRET: upt_jwt_secret_key_change_in_production
+      MONGODB_URI: ${MONGODB_URI}
+      JWT_SECRET: ${JWT_SECRET:-upt_jwt_secret_key_change_in_production}
       JWT_EXPIRES_IN: 7d
       RATE_LIMIT_MAX: 100
       RATE_LIMIT_WINDOW_MS: 60000
-      ALLOWED_ORIGINS: http://localhost:3000,http://localhost:4200
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:4200}
       LOG_LEVEL: info
     ports:
       - "3000:3000"
     depends_on:
-      - mongodb
+      db-seeder:
+        condition: service_healthy
     volumes:
       - ./services/api-gateway/src:/usr/src/app/src
       - /usr/src/app/node_modules
@@ -54,19 +61,20 @@ services:
     container_name: upt-chat-service
     restart: unless-stopped
     environment:
-      NODE_ENV: development
-      PORT: 3001
-      MONGODB_URI: mongodb://admin:upt_admin_password@mongodb:27017/upt_chat_system?authSource=admin
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3002
+      MONGODB_URI: ${MONGODB_URI}
     ports:
-      - "3001:3001"
+      - "3002:3002"
     depends_on:
-      - mongodb
+      db-seeder:
+        condition: service_healthy
     networks:
       - upt-network
     profiles:
       - full-stack
 
-  # NLP Service (Placeholder - será desarrollado)
+  # NLP Service (Placeholder - será desarrollado en Python)
   nlp-service:
     build:
       context: ./services/nlp-service
@@ -74,13 +82,14 @@ services:
     container_name: upt-nlp-service
     restart: unless-stopped
     environment:
-      NODE_ENV: development
-      PORT: 3002
-      MONGODB_URI: mongodb://admin:upt_admin_password@mongodb:27017/upt_chat_system?authSource=admin
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3003
+      MONGODB_URI: ${MONGODB_URI}
     ports:
-      - "3002:3002"
+      - "3003:3003"
     depends_on:
-      - mongodb
+      db-seeder:
+        condition: service_healthy
     networks:
       - upt-network
     profiles:
@@ -94,13 +103,14 @@ services:
     container_name: upt-knowledge-base
     restart: unless-stopped
     environment:
-      NODE_ENV: development
-      PORT: 3003
-      MONGODB_URI: mongodb://admin:upt_admin_password@mongodb:27017/upt_chat_system?authSource=admin
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3004
+      MONGODB_URI: ${MONGODB_URI}
     ports:
-      - "3003:3003"
+      - "3004:3004"
     depends_on:
-      - mongodb
+      db-seeder:
+        condition: service_healthy
     networks:
       - upt-network
     profiles:
@@ -114,13 +124,14 @@ services:
     container_name: upt-analytics
     restart: unless-stopped
     environment:
-      NODE_ENV: development
-      PORT: 3004
-      MONGODB_URI: mongodb://admin:upt_admin_password@mongodb:27017/upt_chat_system?authSource=admin
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3005
+      MONGODB_URI: ${MONGODB_URI}
     ports:
-      - "3004:3004"
+      - "3005:3005"
     depends_on:
-      - mongodb
+      db-seeder:
+        condition: service_healthy
     networks:
       - upt-network
     profiles:
@@ -134,21 +145,20 @@ services:
     container_name: upt-notifications
     restart: unless-stopped
     environment:
-      NODE_ENV: development
-      PORT: 3005
-      MONGODB_URI: mongodb://admin:upt_admin_password@mongodb:27017/upt_chat_system?authSource=admin
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3006
+      MONGODB_URI: ${MONGODB_URI}
     ports:
-      - "3005:3005"
+      - "3006:3006"
     depends_on:
-      - mongodb
+      db-seeder:
+        condition: service_healthy
     networks:
       - upt-network
     profiles:
       - full-stack
 
-volumes:
-  mongodb_data:
-    driver: local
+# Volumes removidos - usando MongoDB Atlas
 
 networks:
   upt-network:

@@ -21,8 +21,9 @@
     "services/*"
   ],
   "scripts": {
-    "install:all": "npm run install:api-gateway && npm run install:services",
+    "install:all": "npm run install:api-gateway && npm run install:db-seeder && npm run install:services",
     "install:api-gateway": "cd services/api-gateway && npm install",
+    "install:db-seeder": "cd services/db-seeder && npm install",
     "install:services": "npm run install:chat-service && npm run install:nlp-service && npm run install:knowledge-base && npm run install:analytics && npm run install:notifications",
     "install:chat-service": "cd services/chat-service && npm install || echo 'Chat service not initialized yet'",
     "install:nlp-service": "cd services/nlp-service && npm install || echo 'NLP service not initialized yet'",
@@ -30,8 +31,11 @@
     "install:analytics": "cd services/analytics-service && npm install || echo 'Analytics service not initialized yet'",
     "install:notifications": "cd services/notification-service && npm install || echo 'Notification service not initialized yet'",
     "dev:api-gateway": "cd services/api-gateway && npm run start:dev",
+    "dev:db-seeder": "cd services/db-seeder && npm run dev",
+    "seed:database": "cd services/db-seeder && npm run seed",
     "build:api-gateway": "cd services/api-gateway && npm run build",
     "start:api-gateway": "cd services/api-gateway && npm run start",
+    "start:db-seeder": "cd services/db-seeder && npm start",
     "test:api-gateway": "cd services/api-gateway && npm run test",
     "lint:api-gateway": "cd services/api-gateway && npm run lint",
     "docker:build": "docker-compose build",
