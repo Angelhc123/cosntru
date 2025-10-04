@@ -9,36 +9,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserResponseDto = exports.LoginUserDto = exports.CreateUserDto = void 0;
+exports.UserResponseDto = exports.LoginUserDto = void 0;
 const class_validator_1 = require("class-validator");
-const user_entity_1 = require("../../domain/entities/user.entity");
-class CreateUserDto {
-    email;
-    firstName;
-    lastName;
-    userType;
-}
-exports.CreateUserDto = CreateUserDto;
-__decorate([
-    (0, class_validator_1.IsEmail)({}, { message: 'Debe proporcionar un email válido' }),
-    __metadata("design:type", String)
-], CreateUserDto.prototype, "email", void 0);
-__decorate([
-    (0, class_validator_1.IsNotEmpty)({ message: 'El nombre es requerido' }),
-    (0, class_validator_1.IsString)({ message: 'El nombre debe ser una cadena de texto' }),
-    (0, class_validator_1.MinLength)(2, { message: 'El nombre debe tener al menos 2 caracteres' }),
-    __metadata("design:type", String)
-], CreateUserDto.prototype, "firstName", void 0);
-__decorate([
-    (0, class_validator_1.IsNotEmpty)({ message: 'El apellido es requerido' }),
-    (0, class_validator_1.IsString)({ message: 'El apellido debe ser una cadena de texto' }),
-    (0, class_validator_1.MinLength)(2, { message: 'El apellido debe tener al menos 2 caracteres' }),
-    __metadata("design:type", String)
-], CreateUserDto.prototype, "lastName", void 0);
-__decorate([
-    (0, class_validator_1.IsEnum)(user_entity_1.UserType, { message: 'Tipo de usuario inválido' }),
-    __metadata("design:type", String)
-], CreateUserDto.prototype, "userType", void 0);
 class LoginUserDto {
     email;
     password;

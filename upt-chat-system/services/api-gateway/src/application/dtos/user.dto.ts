@@ -1,23 +1,10 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsString, MinLength } from 'class-validator';
 import { UserType } from '../../domain/entities/user.entity';
 
-export class CreateUserDto {
-  @IsEmail({}, { message: 'Debe proporcionar un email válido' })
-  email: string;
-
-  @IsNotEmpty({ message: 'El nombre es requerido' })
-  @IsString({ message: 'El nombre debe ser una cadena de texto' })
-  @MinLength(2, { message: 'El nombre debe tener al menos 2 caracteres' })
-  firstName: string;
-
-  @IsNotEmpty({ message: 'El apellido es requerido' })
-  @IsString({ message: 'El apellido debe ser una cadena de texto' })
-  @MinLength(2, { message: 'El apellido debe tener al menos 2 caracteres' })
-  lastName: string;
-
-  @IsEnum(UserType, { message: 'Tipo de usuario inválido' })
-  userType: UserType;
-}
+/**
+ * NOTA: CreateUserDto fue eliminado
+ * Este sistema NO crea usuarios, solo consulta la BD existente de UPT
+ */
 
 export class LoginUserDto {
   @IsEmail({}, { message: 'Debe proporcionar un email válido' })

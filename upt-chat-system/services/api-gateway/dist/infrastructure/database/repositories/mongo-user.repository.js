@@ -37,7 +37,20 @@ let MongoUserRepository = class MongoUserRepository {
         const userDocs = await this.userModel.find(query).exec();
         return userDocs.map(doc => this.toDomain(doc));
     }
-    async create(user) {
+    async findByEmailInUptDatabase(email) {
+        return this.findByEmail(email);
+    }
+    async syncUserFromUpt(user) {
+        const existing = await this.userModel.findOne({ email: user.email }).exec();
+        if (existing) {
+            existing.firstName = user.firstName;
+            existing.lastName = user.lastName;
+            existing.userType = user.userType;
+            existing.isActive = user.isActive;
+            existing.updatedAt = new Date();
+            const updated = await existing.save();
+            return this.toDomain(updated);
+        }
         const userDoc = new this.userModel({
             email: user.email,
             firstName: user.firstName,
@@ -50,7 +63,7 @@ let MongoUserRepository = class MongoUserRepository {
         const savedDoc = await userDoc.save();
         return this.toDomain(savedDoc);
     }
-    async update(id, userData) {
+    async updateLocalUserCache(id, userData) {
         const updateData = {};
         if (userData.firstName)
             updateData.firstName = userData.firstName;

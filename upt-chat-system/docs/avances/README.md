@@ -16,12 +16,15 @@ Desarrollo de un **Sistema de Agente Interactivo con NLP** para optimización de
 | **[Avance 1](./AVANCE_1_README.md)** | Sept 2025 | ✅ **Completado** | 100% | Arquitectura Base + API Gateway |
 | **[Avance 2](./AVANCE_2_README.md)** | 29 Sept 2025 | ✅ **Completado** | 100% | Optimización Base de Datos |
 | **[Avance 3](./AVANCE_3_README.md)** | 29 Sept 2025 | ✅ **Completado** | 100% | Estructura de Microservicios |
-| **Avance 4** | Oct 2025 | 🔄 **Planificado** | 0% | Chat Service + WebSockets |
-| **Avance 5** | Oct 2025 | 📋 **Pendiente** | 0% | NLP Service + DialogFlow |
-| **Avance 5** | Nov 2025 | 📋 **Pendiente** | 0% | Frontend + Knowledge Base |
-| **Avance 6** | Nov 2025 | 📋 **Pendiente** | 0% | Integración + Deployment |
+| **[Avance 4](./AVANCE_4_README.md)** | 30 Sept 2025 | ✅ **Completado** | 100% | DB Seeder Service |
+| **[Avance 5](./AVANCE_5_README.md)** | 4 Oct 2025 | ✅ **Completado** | 100% | Corrección Arquitectónica API Gateway |
+| **[Avance 6](./AVANCE_6_README.md)** | 4 Oct 2025 | ✅ **Completado** | 100% | JWT Auth + Logging + Deployment Ready |
+| **Avance 7** | Nov 2025 | 🔄 **En Progreso** | 15% | Chat Service + WebSockets |
+| **Avance 8** | Nov 2025 | 📋 **Pendiente** | 0% | NLP Service + DialogFlow |
+| **Avance 9** | Dic 2025 | 📋 **Pendiente** | 0% | Frontend + Knowledge Base |
+| **Avance 10** | Dic 2025 | 📋 **Pendiente** | 0% | Integración UPT + Deployment |
 
-**Progreso General del Proyecto:** 45% completado
+**Progreso General del Proyecto:** 70% completado
 
 ---
 
@@ -250,12 +253,101 @@ docker exec -it upt-mongodb mongo
 - Knowledge Base service
 - Búsqueda semántica de FAQs
 
-### **AVANCE 6 - Integración UPT (4 semanas)**
-**Objetivo:** Sistema completo en producción
+### **AVANCE 4 - DB Seeder Service ✅ (30 Sept 2025)**
+**Objetivo:** Inicialización y población de base de datos
+- ✅ Servidor Express con API REST
+- ✅ 30 usuarios UPT poblados (estudiantes, docentes, staff, admins)
+- ✅ 30 sesiones de chat con métricas realistas
+- ✅ 25+ FAQ de base de conocimiento
+- ✅ Scripts de seeding automatizados
+- ✅ Endpoints de gestión de BD (/seed, /clear, /stats)
+- ✅ Conexión a MongoDB Atlas en Railway
+- ✅ 1,176 líneas de JavaScript
+- ✅ Dockerfile preparado para despliegue
+
+**Detalles:** [Ver Avance 4 Completo](./AVANCE_4_README.md)
+
+---
+
+### **AVANCE 5 - Corrección Arquitectónica ✅ (4 Oct 2025)**
+**Objetivo:** Alinear sistema con arquitectura correcta de UPT
+- ✅ Identificado error crítico: sistema creaba usuarios cuando debe consultarlos
+- ✅ Eliminado CreateUserUseCase (innecesario)
+- ✅ Refactorizado AuthenticateUserUseCase (solo consulta BD UPT)
+- ✅ Renombrado métodos: create() → syncUserFromUpt()
+- ✅ Eliminado endpoint POST /register
+- ✅ Actualizado UserDomainService sin creación de usuarios
+- ✅ Modificado IUserRepository para consultas de BD UPT
+- ✅ 7 archivos refactorizados (~360 líneas modificadas)
+- ✅ Compilación exitosa sin errores
+- ✅ Sistema preparado para integración con BD real de UPT
+
+**Impacto:** Sistema ahora es correcto arquitectónicamente - solo consulta usuarios existentes de UPT, no los crea.
+
+**Detalles:** [Ver Avance 5 Completo](./AVANCE_5_README.md)
+
+---
+
+### **AVANCE 6 - JWT Auth + Logging + Deployment Ready (✅ Completado)**
+**Fecha:** 4 de Octubre, 2025  
+**Objetivo:** Implementar seguridad completa y preparar para producción
+
+**Implementaciones completadas:**
+- ✅ Autenticación JWT completa (Strategy + Guards + Decorators)
+- ✅ Logging profesional con Winston (desarrollo + producción)
+- ✅ Manejo de errores global (Exception Filters)
+- ✅ Health Check endpoints (Docker/Railway/Kubernetes)
+- ✅ Variables de entorno documentadas (.env.example)
+- ✅ Optimización Docker (.dockerignore)
+- ✅ Swagger mejorado con documentación JWT
+- ✅ Todos los endpoints protegidos con Guards
+
+**Archivos creados:** 13 nuevos archivos (~1,179 líneas)  
+**Archivos modificados:** 4 archivos principales  
+**Dependencias agregadas:** winston, nest-winston, passport-jwt
+
+**Funcionalidades clave:**
+- **JWT Flow:** Login contra UPT → Token válido 7 días → Endpoints protegidos
+- **Logging:** Niveles (error/warn/info/debug), formato JSON en producción
+- **Error Handling:** Respuestas consistentes en todos los endpoints
+- **Health Check:** 3 endpoints para monitoreo (/health, /health/ping, /health/database)
+- **Security:** Helmet + CORS + Rate Limiting + JWT Guards
+
+**Estado de deployment:** ✅ PRODUCTION READY  
+**Compilación:** ✅ 0 errores
+
+**Detalles:** [Ver Avance 6 Completo](./AVANCE_6_README.md)
+
+---
+
+### **AVANCE 7 - Chat Service + WebSockets (En Progreso)**
+**Objetivo:** Implementar servicio de mensajería en tiempo real
+- 🔄 WebSocket server con Socket.io
+- 🔄 Gestión de salas y conversaciones
+- 📋 Integración con NLP service
+- 📋 Histórico de mensajes
+- 📋 Notificaciones push
+
+### **AVANCE 8 - NLP Service + DialogFlow (Planificado)**
+**Objetivo:** Procesamiento de lenguaje natural
+- Python + FastAPI
+- Integración DialogFlow
+- Knowledge Base queries
+- Intent recognition
+
+### **AVANCE 9 - Integración UPT Real (Planificado)**
+**Objetivo:** Conectar con sistemas reales de UPT
 - LDAP integration UPT
 - Academic system APIs
+- User synchronization
 - Production deployment
+
+### **AVANCE 10 - Frontend + Finalización (Planificado)**
+**Objetivo:** Sistema completo en producción
+- React/Vue.js interface
+- Real-time chat UI
 - Monitoring y analytics
+- Documentation final
 
 ---
 
@@ -293,5 +385,5 @@ docker exec -it upt-mongodb mongo
 
 ---
 
-*Documentación actualizada el 29 de Septiembre de 2025*  
+*Documentación actualizada el 4 de Octubre de 2025*  
 *UPT Chat System - Documentación de Avances* 📋

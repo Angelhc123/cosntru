@@ -33,7 +33,36 @@ export class MongoUserRepository implements IUserRepository {
     return userDocs.map(doc => this.toDomain(doc));
   }
 
-  async create(user: User): Promise<User> {
+  /**
+   * Consulta usuario directamente de la base de datos de UPT
+   * Este método representa la conexión a la BD real de UPT
+   */
+  async findByEmailInUptDatabase(email: string): Promise<User | null> {
+    // TODO: Aquí iría la consulta a la BD real de UPT
+    // Por ahora usamos la misma implementación local como placeholder
+    return this.findByEmail(email);
+  }
+
+  /**
+   * Sincroniza un usuario de la BD UPT al caché local (solo para performance)
+   * NO crea usuarios nuevos, solo cachea información de UPT
+   */
+  async syncUserFromUpt(user: User): Promise<User> {
+    // Buscar si ya existe en caché local
+    const existing = await this.userModel.findOne({ email: user.email }).exec();
+    
+    if (existing) {
+      // Actualizar caché existente
+      existing.firstName = user.firstName;
+      existing.lastName = user.lastName;
+      existing.userType = user.userType;
+      existing.isActive = user.isActive;
+      existing.updatedAt = new Date();
+      const updated = await existing.save();
+      return this.toDomain(updated);
+    }
+    
+    // Crear entrada en caché local (NO es creación de usuario UPT)
     const userDoc = new this.userModel({
       email: user.email,
       firstName: user.firstName,
@@ -48,7 +77,10 @@ export class MongoUserRepository implements IUserRepository {
     return this.toDomain(savedDoc);
   }
 
-  async update(id: string, userData: Partial<User>): Promise<User> {
+  /**
+   * Actualiza caché local del usuario (NO modifica usuario en BD UPT)
+   */
+  async updateLocalUserCache(id: string, userData: Partial<User>): Promise<User> {
     const updateData: any = {};
     
     if (userData.firstName) updateData.firstName = userData.firstName;

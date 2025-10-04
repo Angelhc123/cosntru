@@ -7,256 +7,225 @@ import {
   HttpStatus, 
   HttpException,
   UseGuards,
-  Req
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiSecurity } from '@nestjs/swagger';
 import { 
-  CreateUserUseCase, 
   AuthenticateUserUseCase, 
   GetUserProfileUseCase,
   ValidateUserForChatUseCase,
   GetUsersByTypeUseCase
 } from '../../application/use-cases/user.use-cases';
-import { CreateUserDto, LoginUserDto, UserResponseDto } from '../../application/dtos/user.dto';
+import { LoginUserDto, UserResponseDto } from '../../application/dtos/user.dto';
 import { UserType } from '../../domain/entities/user.entity';
+import { JwtAuthGuard } from '../../infrastructure/auth/guards/jwt-auth.guard';
+import { CurrentUser } from '../../infrastructure/auth/decorators/current-user.decorator';
+import type { CurrentUserDto } from '../../infrastructure/auth/decorators/current-user.decorator';
+import { AppLoggerService } from '../../infrastructure/logging/logger.service';
 
 /**
  * Controller: Users
  * Maneja las operaciones HTTP relacionadas con usuarios del sistema UPT
+ * NOTA: Este controlador NO crea usuarios, solo consulta la BD existente de UPT
  */
 @ApiTags('Users')
-@Controller('api/v1/users')
+@Controller('users')
 export class UsersController {
   constructor(
-    private readonly createUserUseCase: CreateUserUseCase,
     private readonly authenticateUserUseCase: AuthenticateUserUseCase,
     private readonly getUserProfileUseCase: GetUserProfileUseCase,
     private readonly validateUserForChatUseCase: ValidateUserForChatUseCase,
-    private readonly getUsersByTypeUseCase: GetUsersByTypeUseCase
-  ) {}
-
-  @Post('register')
-  @ApiOperation({ summary: 'Registrar un nuevo usuario en el sistema UPT' })
-  @ApiResponse({ 
-    status: 201, 
-    description: 'Usuario creado exitosamente',
-    type: UserResponseDto
-  })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Datos de entrada inválidos' 
-  })
-  @ApiResponse({ 
-    status: 409, 
-    description: 'El email ya está registrado' 
-  })
-  async register(@Body() createUserDto: CreateUserDto): Promise<{
-    status: string;
-    message: string;
-    data: UserResponseDto;
-  }> {
-    try {
-      const user = await this.createUserUseCase.execute(createUserDto);
-      
-      return {
-        status: 'success',
-        message: 'Usuario registrado exitosamente',
-        data: user
-      };
-    } catch (error) {
-      if (error.message.includes('ya está registrado')) {
-        throw new HttpException(
-          {
-            status: 'error',
-            message: error.message,
-            errorCode: 'EMAIL_ALREADY_EXISTS'
-          },
-          HttpStatus.CONFLICT
-        );
-      }
-      
-      throw new HttpException(
-        {
-          status: 'error',
-          message: error.message,
-          errorCode: 'VALIDATION_ERROR'
-        },
-        HttpStatus.BAD_REQUEST
-      );
-    }
+    private readonly getUsersByTypeUseCase: GetUsersByTypeUseCase,
+    private readonly logger: AppLoggerService,
+  ) {
+    this.logger.setContext('UsersController');
   }
 
+  /**
+   * POST /api/v1/users/login
+   * 
+   * Autentica un usuario contra el sistema UPT y genera un JWT token.
+   * 
+   * Este endpoint:
+   * 1. Valida credenciales contra BD/LDAP de UPT
+   * 2. Genera JWT token válido por 7 días
+   * 3. Retorna token + información del usuario
+   * 
+   * El token debe ser enviado en endpoints protegidos:
+   * Authorization: Bearer <access_token>
+   */
   @Post('login')
-  @ApiOperation({ summary: 'Autenticar usuario en el sistema' })
+  @ApiOperation({ 
+    summary: 'Autenticar usuario UPT',
+    description: 'Valida credenciales contra sistema UPT y genera JWT token válido por 7 días',
+  })
   @ApiResponse({ 
     status: 200, 
-    description: 'Usuario autenticado exitosamente' 
+    description: 'Usuario autenticado exitosamente',
+    schema: {
+      example: {
+        user: {
+          id: '507f1f77bcf86cd799439011',
+          email: 'estudiante@upt.edu.pe',
+          firstName: 'Juan',
+          lastName: 'Pérez',
+          userType: 'student',
+          isActive: true,
+        },
+        access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        token_type: 'Bearer',
+        expires_in: '7d',
+      },
+    },
   })
   @ApiResponse({ 
     status: 401, 
     description: 'Credenciales inválidas' 
   })
-  async login(@Body() loginDto: LoginUserDto): Promise<{
-    status: string;
-    message: string;
-    data?: {
-      user: UserResponseDto;
-      token: string;
-    };
-  }> {
-    try {
-      const result = await this.authenticateUserUseCase.execute(loginDto);
-      
-      if (!result) {
-        throw new HttpException(
-          {
-            status: 'error',
-            message: 'Credenciales inválidas',
-            errorCode: 'INVALID_CREDENTIALS'
-          },
-          HttpStatus.UNAUTHORIZED
-        );
-      }
-
-      return {
-        status: 'success',
-        message: 'Usuario autenticado exitosamente',
-        data: result
-      };
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      
+  async login(@Body() loginDto: LoginUserDto) {
+    this.logger.debug(`Intento de login para: ${loginDto.email}`);
+    
+    const result = await this.authenticateUserUseCase.execute(loginDto);
+    
+    if (!result) {
+      this.logger.warn(`Login fallido para: ${loginDto.email}`);
       throw new HttpException(
-        {
-          status: 'error',
-          message: 'Error interno del servidor',
-          errorCode: 'INTERNAL_ERROR'
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        'Credenciales inválidas. Verifica tu email y contraseña.',
+        HttpStatus.UNAUTHORIZED
       );
     }
+
+    this.logger.log(`Login exitoso para: ${loginDto.email}`);
+    return result;
   }
 
+  /**
+   * GET /api/v1/users/profile/:id
+   * 
+   * Obtiene el perfil de un usuario por ID.
+   * Requiere autenticación JWT.
+   */
   @Get('profile/:id')
-  @ApiOperation({ summary: 'Obtener perfil de usuario' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ 
+    summary: 'Obtener perfil de usuario',
+    description: 'Obtiene información detallada del perfil de un usuario. Requiere autenticación.',
+  })
   @ApiResponse({ 
     status: 200, 
     description: 'Perfil obtenido exitosamente',
     type: UserResponseDto
   })
   @ApiResponse({ 
+    status: 401, 
+    description: 'No autorizado - Token inválido o expirado' 
+  })
+  @ApiResponse({ 
     status: 404, 
     description: 'Usuario no encontrado' 
   })
-  async getProfile(@Param('id') userId: string): Promise<{
-    status: string;
-    message: string;
-    data?: UserResponseDto;
-  }> {
-    try {
-      const user = await this.getUserProfileUseCase.execute(userId);
-      
-      if (!user) {
-        throw new HttpException(
-          {
-            status: 'error',
-            message: 'Usuario no encontrado',
-            errorCode: 'USER_NOT_FOUND'
-          },
-          HttpStatus.NOT_FOUND
-        );
-      }
-
-      return {
-        status: 'success',
-        message: 'Perfil obtenido exitosamente',
-        data: user
-      };
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      
+  async getProfile(
+    @Param('id') userId: string,
+    @CurrentUser() currentUser: CurrentUserDto,
+  ): Promise<UserResponseDto> {
+    this.logger.debug(`Usuario ${currentUser.email} solicitando perfil de: ${userId}`);
+    
+    const user = await this.getUserProfileUseCase.execute(userId);
+    
+    if (!user) {
       throw new HttpException(
-        {
-          status: 'error',
-          message: 'Error interno del servidor',
-          errorCode: 'INTERNAL_ERROR'
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        'Usuario no encontrado',
+        HttpStatus.NOT_FOUND
       );
     }
+
+    return user;
   }
 
+  /**
+   * GET /api/v1/users/validate-for-chat/:id
+   * 
+   * Valida si un usuario tiene permisos para usar el chat.
+   * Requiere autenticación JWT.
+   */
   @Get('validate-for-chat/:id')
-  @ApiOperation({ summary: 'Validar si usuario puede usar el chat' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ 
+    summary: 'Validar permisos de chat',
+    description: 'Verifica si un usuario puede iniciar sesiones de chat',
+  })
   @ApiResponse({ 
     status: 200, 
-    description: 'Validación completada' 
+    description: 'Validación completada',
+    schema: {
+      example: {
+        canChat: true,
+      },
+    },
   })
-  async validateForChat(@Param('id') userId: string): Promise<{
-    status: string;
-    message: string;
-    data: {
-      canChat: boolean;
-    };
-  }> {
-    try {
-      const canChat = await this.validateUserForChatUseCase.execute(userId);
-      
-      return {
-        status: 'success',
-        message: 'Validación completada',
-        data: { canChat }
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          status: 'error',
-          message: 'Error interno del servidor',
-          errorCode: 'INTERNAL_ERROR'
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
+  @ApiResponse({ 
+    status: 401, 
+    description: 'No autorizado' 
+  })
+  async validateForChat(
+    @Param('id') userId: string,
+    @CurrentUser() currentUser: CurrentUserDto,
+  ): Promise<{ canChat: boolean }> {
+    this.logger.debug(`Validando permisos de chat para usuario: ${userId}`);
+    
+    const canChat = await this.validateUserForChatUseCase.execute(userId);
+    
+    return { canChat };
   }
 
+  /**
+   * GET /api/v1/users/by-type/:type
+   * 
+   * Obtiene lista de usuarios por tipo (student, teacher, admin, staff).
+   * Requiere autenticación JWT.
+   */
   @Get('by-type/:type')
-  @ApiOperation({ summary: 'Obtener usuarios por tipo' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ 
+    summary: 'Obtener usuarios por tipo',
+    description: 'Lista usuarios filtrados por tipo: student, teacher, admin, staff',
+  })
   @ApiResponse({ 
     status: 200, 
-    description: 'Usuarios obtenidos exitosamente' 
+    description: 'Usuarios obtenidos exitosamente',
+    schema: {
+      example: {
+        users: [
+          {
+            id: '507f1f77bcf86cd799439011',
+            email: 'estudiante@upt.edu.pe',
+            firstName: 'Juan',
+            lastName: 'Pérez',
+            userType: 'student',
+            isActive: true,
+          },
+        ],
+        count: 1,
+      },
+    },
   })
-  async getUsersByType(@Param('type') userType: UserType): Promise<{
-    status: string;
-    message: string;
-    data: {
-      users: UserResponseDto[];
-      count: number;
+  @ApiResponse({ 
+    status: 401, 
+    description: 'No autorizado' 
+  })
+  async getUsersByType(
+    @Param('type') userType: UserType,
+    @CurrentUser() currentUser: CurrentUserDto,
+  ): Promise<{ users: UserResponseDto[]; count: number }> {
+    this.logger.debug(`Usuario ${currentUser.email} solicitando usuarios tipo: ${userType}`);
+    
+    const users = await this.getUsersByTypeUseCase.execute(userType);
+    
+    return {
+      users,
+      count: users.length,
     };
-  }> {
-    try {
-      const users = await this.getUsersByTypeUseCase.execute(userType);
-      
-      return {
-        status: 'success',
-        message: 'Usuarios obtenidos exitosamente',
-        data: {
-          users,
-          count: users.length
-        }
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          status: 'error',
-          message: 'Error interno del servidor',
-          errorCode: 'INTERNAL_ERROR'
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
   }
 }

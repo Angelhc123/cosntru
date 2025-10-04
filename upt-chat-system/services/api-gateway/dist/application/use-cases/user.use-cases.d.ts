@@ -1,18 +1,18 @@
+import { JwtService } from '@nestjs/jwt';
 import { UserDomainService } from '../../domain/services/user-domain.service';
-import { CreateUserDto, UserResponseDto, LoginUserDto } from '../dtos/user.dto';
+import { UserResponseDto, LoginUserDto } from '../dtos/user.dto';
 import { UserType } from '../../domain/entities/user.entity';
-export declare class CreateUserUseCase {
-    private readonly userDomainService;
-    constructor(userDomainService: UserDomainService);
-    execute(createUserDto: CreateUserDto): Promise<UserResponseDto>;
-    private generateUserId;
-}
+import { AppLoggerService } from '../../infrastructure/logging/logger.service';
 export declare class AuthenticateUserUseCase {
     private readonly userDomainService;
-    constructor(userDomainService: UserDomainService);
+    private readonly jwtService;
+    private readonly logger;
+    constructor(userDomainService: UserDomainService, jwtService: JwtService, logger: AppLoggerService);
     execute(loginDto: LoginUserDto): Promise<{
         user: UserResponseDto;
-        token: string;
+        access_token: string;
+        token_type: string;
+        expires_in: string;
     } | null>;
     private generateJwtToken;
 }

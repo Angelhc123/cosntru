@@ -18,163 +18,80 @@ const swagger_1 = require("@nestjs/swagger");
 const user_use_cases_1 = require("../../application/use-cases/user.use-cases");
 const user_dto_1 = require("../../application/dtos/user.dto");
 const user_entity_1 = require("../../domain/entities/user.entity");
+const jwt_auth_guard_1 = require("../../infrastructure/auth/guards/jwt-auth.guard");
+const current_user_decorator_1 = require("../../infrastructure/auth/decorators/current-user.decorator");
+const logger_service_1 = require("../../infrastructure/logging/logger.service");
 let UsersController = class UsersController {
-    createUserUseCase;
     authenticateUserUseCase;
     getUserProfileUseCase;
     validateUserForChatUseCase;
     getUsersByTypeUseCase;
-    constructor(createUserUseCase, authenticateUserUseCase, getUserProfileUseCase, validateUserForChatUseCase, getUsersByTypeUseCase) {
-        this.createUserUseCase = createUserUseCase;
+    logger;
+    constructor(authenticateUserUseCase, getUserProfileUseCase, validateUserForChatUseCase, getUsersByTypeUseCase, logger) {
         this.authenticateUserUseCase = authenticateUserUseCase;
         this.getUserProfileUseCase = getUserProfileUseCase;
         this.validateUserForChatUseCase = validateUserForChatUseCase;
         this.getUsersByTypeUseCase = getUsersByTypeUseCase;
-    }
-    async register(createUserDto) {
-        try {
-            const user = await this.createUserUseCase.execute(createUserDto);
-            return {
-                status: 'success',
-                message: 'Usuario registrado exitosamente',
-                data: user
-            };
-        }
-        catch (error) {
-            if (error.message.includes('ya está registrado')) {
-                throw new common_1.HttpException({
-                    status: 'error',
-                    message: error.message,
-                    errorCode: 'EMAIL_ALREADY_EXISTS'
-                }, common_1.HttpStatus.CONFLICT);
-            }
-            throw new common_1.HttpException({
-                status: 'error',
-                message: error.message,
-                errorCode: 'VALIDATION_ERROR'
-            }, common_1.HttpStatus.BAD_REQUEST);
-        }
+        this.logger = logger;
+        this.logger.setContext('UsersController');
     }
     async login(loginDto) {
-        try {
-            const result = await this.authenticateUserUseCase.execute(loginDto);
-            if (!result) {
-                throw new common_1.HttpException({
-                    status: 'error',
-                    message: 'Credenciales inválidas',
-                    errorCode: 'INVALID_CREDENTIALS'
-                }, common_1.HttpStatus.UNAUTHORIZED);
-            }
-            return {
-                status: 'success',
-                message: 'Usuario autenticado exitosamente',
-                data: result
-            };
+        this.logger.debug(`Intento de login para: ${loginDto.email}`);
+        const result = await this.authenticateUserUseCase.execute(loginDto);
+        if (!result) {
+            this.logger.warn(`Login fallido para: ${loginDto.email}`);
+            throw new common_1.HttpException('Credenciales inválidas. Verifica tu email y contraseña.', common_1.HttpStatus.UNAUTHORIZED);
         }
-        catch (error) {
-            if (error instanceof common_1.HttpException) {
-                throw error;
-            }
-            throw new common_1.HttpException({
-                status: 'error',
-                message: 'Error interno del servidor',
-                errorCode: 'INTERNAL_ERROR'
-            }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        this.logger.log(`Login exitoso para: ${loginDto.email}`);
+        return result;
     }
-    async getProfile(userId) {
-        try {
-            const user = await this.getUserProfileUseCase.execute(userId);
-            if (!user) {
-                throw new common_1.HttpException({
-                    status: 'error',
-                    message: 'Usuario no encontrado',
-                    errorCode: 'USER_NOT_FOUND'
-                }, common_1.HttpStatus.NOT_FOUND);
-            }
-            return {
-                status: 'success',
-                message: 'Perfil obtenido exitosamente',
-                data: user
-            };
+    async getProfile(userId, currentUser) {
+        this.logger.debug(`Usuario ${currentUser.email} solicitando perfil de: ${userId}`);
+        const user = await this.getUserProfileUseCase.execute(userId);
+        if (!user) {
+            throw new common_1.HttpException('Usuario no encontrado', common_1.HttpStatus.NOT_FOUND);
         }
-        catch (error) {
-            if (error instanceof common_1.HttpException) {
-                throw error;
-            }
-            throw new common_1.HttpException({
-                status: 'error',
-                message: 'Error interno del servidor',
-                errorCode: 'INTERNAL_ERROR'
-            }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return user;
     }
-    async validateForChat(userId) {
-        try {
-            const canChat = await this.validateUserForChatUseCase.execute(userId);
-            return {
-                status: 'success',
-                message: 'Validación completada',
-                data: { canChat }
-            };
-        }
-        catch (error) {
-            throw new common_1.HttpException({
-                status: 'error',
-                message: 'Error interno del servidor',
-                errorCode: 'INTERNAL_ERROR'
-            }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    async validateForChat(userId, currentUser) {
+        this.logger.debug(`Validando permisos de chat para usuario: ${userId}`);
+        const canChat = await this.validateUserForChatUseCase.execute(userId);
+        return { canChat };
     }
-    async getUsersByType(userType) {
-        try {
-            const users = await this.getUsersByTypeUseCase.execute(userType);
-            return {
-                status: 'success',
-                message: 'Usuarios obtenidos exitosamente',
-                data: {
-                    users,
-                    count: users.length
-                }
-            };
-        }
-        catch (error) {
-            throw new common_1.HttpException({
-                status: 'error',
-                message: 'Error interno del servidor',
-                errorCode: 'INTERNAL_ERROR'
-            }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    async getUsersByType(userType, currentUser) {
+        this.logger.debug(`Usuario ${currentUser.email} solicitando usuarios tipo: ${userType}`);
+        const users = await this.getUsersByTypeUseCase.execute(userType);
+        return {
+            users,
+            count: users.length,
+        };
     }
 };
 exports.UsersController = UsersController;
 __decorate([
-    (0, common_1.Post)('register'),
-    (0, swagger_1.ApiOperation)({ summary: 'Registrar un nuevo usuario en el sistema UPT' }),
-    (0, swagger_1.ApiResponse)({
-        status: 201,
-        description: 'Usuario creado exitosamente',
-        type: user_dto_1.UserResponseDto
-    }),
-    (0, swagger_1.ApiResponse)({
-        status: 400,
-        description: 'Datos de entrada inválidos'
-    }),
-    (0, swagger_1.ApiResponse)({
-        status: 409,
-        description: 'El email ya está registrado'
-    }),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_dto_1.CreateUserDto]),
-    __metadata("design:returntype", Promise)
-], UsersController.prototype, "register", null);
-__decorate([
     (0, common_1.Post)('login'),
-    (0, swagger_1.ApiOperation)({ summary: 'Autenticar usuario en el sistema' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Autenticar usuario UPT',
+        description: 'Valida credenciales contra sistema UPT y genera JWT token válido por 7 días',
+    }),
     (0, swagger_1.ApiResponse)({
         status: 200,
-        description: 'Usuario autenticado exitosamente'
+        description: 'Usuario autenticado exitosamente',
+        schema: {
+            example: {
+                user: {
+                    id: '507f1f77bcf86cd799439011',
+                    email: 'estudiante@upt.edu.pe',
+                    firstName: 'Juan',
+                    lastName: 'Pérez',
+                    userType: 'student',
+                    isActive: true,
+                },
+                access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+                token_type: 'Bearer',
+                expires_in: '7d',
+            },
+        },
     }),
     (0, swagger_1.ApiResponse)({
         status: 401,
@@ -187,52 +104,102 @@ __decorate([
 ], UsersController.prototype, "login", null);
 __decorate([
     (0, common_1.Get)('profile/:id'),
-    (0, swagger_1.ApiOperation)({ summary: 'Obtener perfil de usuario' }),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Obtener perfil de usuario',
+        description: 'Obtiene información detallada del perfil de un usuario. Requiere autenticación.',
+    }),
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Perfil obtenido exitosamente',
         type: user_dto_1.UserResponseDto
     }),
     (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'No autorizado - Token inválido o expirado'
+    }),
+    (0, swagger_1.ApiResponse)({
         status: 404,
         description: 'Usuario no encontrado'
     }),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "getProfile", null);
 __decorate([
     (0, common_1.Get)('validate-for-chat/:id'),
-    (0, swagger_1.ApiOperation)({ summary: 'Validar si usuario puede usar el chat' }),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Validar permisos de chat',
+        description: 'Verifica si un usuario puede iniciar sesiones de chat',
+    }),
     (0, swagger_1.ApiResponse)({
         status: 200,
-        description: 'Validación completada'
+        description: 'Validación completada',
+        schema: {
+            example: {
+                canChat: true,
+            },
+        },
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'No autorizado'
     }),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "validateForChat", null);
 __decorate([
     (0, common_1.Get)('by-type/:type'),
-    (0, swagger_1.ApiOperation)({ summary: 'Obtener usuarios por tipo' }),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Obtener usuarios por tipo',
+        description: 'Lista usuarios filtrados por tipo: student, teacher, admin, staff',
+    }),
     (0, swagger_1.ApiResponse)({
         status: 200,
-        description: 'Usuarios obtenidos exitosamente'
+        description: 'Usuarios obtenidos exitosamente',
+        schema: {
+            example: {
+                users: [
+                    {
+                        id: '507f1f77bcf86cd799439011',
+                        email: 'estudiante@upt.edu.pe',
+                        firstName: 'Juan',
+                        lastName: 'Pérez',
+                        userType: 'student',
+                        isActive: true,
+                    },
+                ],
+                count: 1,
+            },
+        },
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'No autorizado'
     }),
     __param(0, (0, common_1.Param)('type')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "getUsersByType", null);
 exports.UsersController = UsersController = __decorate([
     (0, swagger_1.ApiTags)('Users'),
-    (0, common_1.Controller)('api/v1/users'),
-    __metadata("design:paramtypes", [user_use_cases_1.CreateUserUseCase,
-        user_use_cases_1.AuthenticateUserUseCase,
+    (0, common_1.Controller)('users'),
+    __metadata("design:paramtypes", [user_use_cases_1.AuthenticateUserUseCase,
         user_use_cases_1.GetUserProfileUseCase,
         user_use_cases_1.ValidateUserForChatUseCase,
-        user_use_cases_1.GetUsersByTypeUseCase])
+        user_use_cases_1.GetUsersByTypeUseCase,
+        logger_service_1.AppLoggerService])
 ], UsersController);
 //# sourceMappingURL=users.controller.js.map

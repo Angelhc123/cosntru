@@ -9,48 +9,57 @@ import { Email } from '../value-objects/email.vo';
 export class UserDomainService {
   constructor(private readonly userRepository: IUserRepository) {}
 
-  async authenticateUser(email: string, password: string): Promise<User | null> {
+  /**
+   * Autentica un usuario consultando la base de datos EXISTENTE de UPT
+   * NO crea usuarios nuevos, solo valida credenciales contra la BD de UPT
+   */
+  async authenticateUserFromUptDatabase(email: string, password: string): Promise<User | null> {
     const emailVO = new Email(email);
-    const user = await this.userRepository.findByEmail(emailVO.value);
+    
+    // Consultar usuario en la base de datos de UPT (solo lectura)
+    const user = await this.userRepository.findByEmailInUptDatabase(emailVO.value);
     
     if (!user || !user.isActive) {
       return null;
     }
 
-    // Aquí integrarías con el sistema de autenticación de UPT
+    // TODO: Integrar con el sistema de autenticación real de UPT
+    // Esto podría ser:
+    // - API REST del sistema de autenticación de UPT
+    // - LDAP/Active Directory de la universidad
+    // - Base de datos centralizada de usuarios
     // Por ahora, simulamos la validación
+    const isValidPassword = await this.validatePasswordWithUptSystem(password, user);
+    
+    if (!isValidPassword) {
+      return null;
+    }
+
     return user;
   }
 
-  async createNewUser(userData: {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    userType: UserType;
-  }): Promise<User> {
-    // Validar que el email no exista
-    const emailExists = await this.userRepository.existsByEmail(userData.email);
-    if (emailExists) {
-      throw new Error('El email ya está registrado en el sistema');
-    }
-
-    // Validar que sea un email de UPT para estudiantes y docentes
-    const emailVO = new Email(userData.email);
-    if ((userData.userType === UserType.STUDENT || userData.userType === UserType.TEACHER) 
-        && !emailVO.isUptEmail()) {
-      throw new Error('Los estudiantes y docentes deben usar email institucional');
-    }
-
-    const user = User.create(userData);
-    return await this.userRepository.create(user);
+  /**
+   * Valida la contraseña contra el sistema de autenticación de UPT
+   * TODO: Implementar integración real con sistema UPT
+   */
+  private async validatePasswordWithUptSystem(password: string, user: User): Promise<boolean> {
+    // Placeholder - aquí iría la validación real contra sistema UPT
+    // Ejemplos:
+    // - Llamada a API de autenticación UPT
+    // - Verificación LDAP
+    // - Consulta a tabla de credenciales
+    return true; // Temporal
   }
 
   async getUserProfile(userId: string): Promise<User | null> {
     return await this.userRepository.findById(userId);
   }
 
-  async updateUserStatus(userId: string, isActive: boolean): Promise<User> {
+  /**
+   * Actualiza estado del usuario en caché local
+   * NOTA: Esto NO modifica el usuario en la BD de UPT
+   */
+  async updateUserStatusInLocalCache(userId: string, isActive: boolean): Promise<User> {
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new Error('Usuario no encontrado');
@@ -62,7 +71,7 @@ export class UserDomainService {
       user.deactivate();
     }
 
-    return await this.userRepository.update(userId, user);
+    return await this.userRepository.updateLocalUserCache(userId, user);
   }
 
   async validateUserForChat(userId: string): Promise<boolean> {

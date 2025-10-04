@@ -9,59 +9,54 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetUsersByTypeUseCase = exports.ValidateUserForChatUseCase = exports.GetUserProfileUseCase = exports.AuthenticateUserUseCase = exports.CreateUserUseCase = void 0;
+exports.GetUsersByTypeUseCase = exports.ValidateUserForChatUseCase = exports.GetUserProfileUseCase = exports.AuthenticateUserUseCase = void 0;
 const common_1 = require("@nestjs/common");
+const jwt_1 = require("@nestjs/jwt");
 const user_domain_service_1 = require("../../domain/services/user-domain.service");
 const user_dto_1 = require("../dtos/user.dto");
-let CreateUserUseCase = class CreateUserUseCase {
-    userDomainService;
-    constructor(userDomainService) {
-        this.userDomainService = userDomainService;
-    }
-    async execute(createUserDto) {
-        const userId = this.generateUserId();
-        const user = await this.userDomainService.createNewUser({
-            id: userId,
-            email: createUserDto.email,
-            firstName: createUserDto.firstName,
-            lastName: createUserDto.lastName,
-            userType: createUserDto.userType
-        });
-        return user_dto_1.UserResponseDto.fromDomain(user);
-    }
-    generateUserId() {
-        return `user_${Date.now()}_${Math.random().toString(36).substring(2)}`;
-    }
-};
-exports.CreateUserUseCase = CreateUserUseCase;
-exports.CreateUserUseCase = CreateUserUseCase = __decorate([
-    (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [user_domain_service_1.UserDomainService])
-], CreateUserUseCase);
+const logger_service_1 = require("../../infrastructure/logging/logger.service");
 let AuthenticateUserUseCase = class AuthenticateUserUseCase {
     userDomainService;
-    constructor(userDomainService) {
+    jwtService;
+    logger;
+    constructor(userDomainService, jwtService, logger) {
         this.userDomainService = userDomainService;
+        this.jwtService = jwtService;
+        this.logger = logger;
+        this.logger.setContext('AuthenticateUserUseCase');
     }
     async execute(loginDto) {
-        const user = await this.userDomainService.authenticateUser(loginDto.email, loginDto.password);
+        this.logger.debug(`Intento de autenticación para: ${loginDto.email}`);
+        const user = await this.userDomainService.authenticateUserFromUptDatabase(loginDto.email, loginDto.password);
         if (!user) {
+            this.logger.warn(`Autenticación fallida para: ${loginDto.email}`);
             return null;
         }
         const token = this.generateJwtToken(user);
+        this.logger.logAuth('login', loginDto.email, true);
+        this.logger.log(`Usuario autenticado exitosamente: ${user.email} (${user.userType})`);
         return {
             user: user_dto_1.UserResponseDto.fromDomain(user),
-            token
+            access_token: token,
+            token_type: 'Bearer',
+            expires_in: process.env.JWT_EXPIRES_IN || '7d',
         };
     }
     generateJwtToken(user) {
-        return `jwt_${user.id}_${Date.now()}`;
+        const payload = {
+            userId: user.id,
+            email: user.email,
+            userType: user.userType,
+        };
+        return this.jwtService.sign(payload);
     }
 };
 exports.AuthenticateUserUseCase = AuthenticateUserUseCase;
 exports.AuthenticateUserUseCase = AuthenticateUserUseCase = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [user_domain_service_1.UserDomainService])
+    __metadata("design:paramtypes", [user_domain_service_1.UserDomainService,
+        jwt_1.JwtService,
+        logger_service_1.AppLoggerService])
 ], AuthenticateUserUseCase);
 let GetUserProfileUseCase = class GetUserProfileUseCase {
     userDomainService;
