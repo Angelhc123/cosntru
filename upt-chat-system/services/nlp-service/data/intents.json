@@ -1,0 +1,233 @@
+{
+  "intents": [
+    {
+      "id": "saludo",
+      "name": "Saludo inicial",
+      "keywords": ["hola", "buenos dias", "buenas tardes", "buenas noches", "saludos", "hey", "alo"],
+      "examples": [
+        "Hola",
+        "Buenos días",
+        "Buenas tardes",
+        "Hola, necesito ayuda"
+      ],
+      "category": "general",
+      "priority": 8
+    },
+    {
+      "id": "despedida",
+      "name": "Despedida",
+      "keywords": ["adios", "chau", "hasta luego", "gracias", "bye", "nos vemos"],
+      "examples": [
+        "Adiós",
+        "Gracias por la ayuda",
+        "Hasta luego"
+      ],
+      "category": "general",
+      "priority": 7
+    },
+    {
+      "id": "inscripciones.fechas",
+      "name": "Consultar fechas de inscripción",
+      "keywords": ["inscripcion", "inscripciones", "fecha", "fechas", "cuando", "matricula", "plazo"],
+      "examples": [
+        "¿Cuándo son las inscripciones?",
+        "Fechas de inscripción para el próximo semestre",
+        "¿Hasta cuándo puedo inscribirme?"
+      ],
+      "category": "inscripciones",
+      "priority": 10
+    },
+    {
+      "id": "inscripciones.requisitos",
+      "name": "Consultar requisitos de inscripción",
+      "keywords": ["requisitos", "necesito", "documentos", "que necesito", "inscripcion"],
+      "examples": [
+        "¿Qué necesito para inscribirme?",
+        "Requisitos para la inscripción",
+        "¿Qué documentos debo presentar?"
+      ],
+      "category": "inscripciones",
+      "priority": 9
+    },
+    {
+      "id": "inscripciones.proceso",
+      "name": "Proceso de inscripción",
+      "keywords": ["como", "inscribirse", "inscribirme", "proceso", "pasos", "procedimiento"],
+      "examples": [
+        "¿Cómo me inscribo?",
+        "¿Cuál es el proceso de inscripción?",
+        "Pasos para inscribirse"
+      ],
+      "category": "inscripciones",
+      "priority": 9
+    },
+    {
+      "id": "inscripciones.costo",
+      "name": "Costo de matrícula",
+      "keywords": ["costo", "precio", "cuanto cuesta", "pagar", "matricula", "inscripcion"],
+      "examples": [
+        "¿Cuánto cuesta la matrícula?",
+        "Precio de inscripción",
+        "¿Cuánto debo pagar por inscribirme?"
+      ],
+      "category": "inscripciones",
+      "priority": 9
+    },
+    {
+      "id": "horarios.clases",
+      "name": "Consultar horarios de clases",
+      "keywords": ["horario", "horarios", "clases", "cuando", "hora", "turno"],
+      "examples": [
+        "¿Cuál es el horario de clases?",
+        "¿Cuándo empiezan las clases?",
+        "Horarios disponibles"
+      ],
+      "category": "horarios",
+      "priority": 8
+    },
+    {
+      "id": "horarios.consulta",
+      "name": "Ver mi horario personal",
+      "keywords": ["ver", "mi horario", "donde", "consultar", "revisar"],
+      "examples": [
+        "¿Dónde veo mi horario?",
+        "¿Cómo consulto mi horario?",
+        "Quiero ver mi horario"
+      ],
+      "category": "horarios",
+      "priority": 7
+    },
+    {
+      "id": "horarios.cambio",
+      "name": "Cambiar horario",
+      "keywords": ["cambiar", "modificar", "cambio", "horario", "puedo"],
+      "examples": [
+        "¿Puedo cambiar mi horario?",
+        "Quiero modificar mi horario",
+        "¿Cómo cambio de turno?"
+      ],
+      "category": "horarios",
+      "priority": 6
+    },
+    {
+      "id": "pagos.pensiones",
+      "name": "Consultar pagos y pensiones",
+      "keywords": ["pagar", "pago", "pensiones", "pension", "mensualidad", "cuota"],
+      "examples": [
+        "¿Cómo pago la pensión?",
+        "Información sobre pagos",
+        "¿Cuánto es la pensión mensual?"
+      ],
+      "category": "pagos",
+      "priority": 9
+    },
+    {
+      "id": "pagos.metodos",
+      "name": "Métodos de pago",
+      "keywords": ["como", "pagar", "metodos", "forma", "banco", "efectivo", "transferencia"],
+      "examples": [
+        "¿Cómo puedo pagar?",
+        "Métodos de pago disponibles",
+        "¿Aceptan transferencias bancarias?"
+      ],
+      "category": "pagos",
+      "priority": 8
+    },
+    {
+      "id": "pagos.descuentos",
+      "name": "Descuentos y becas",
+      "keywords": ["descuento", "descuentos", "beca", "becas", "rebaja", "beneficio"],
+      "examples": [
+        "¿Hay descuentos?",
+        "Información sobre becas",
+        "¿Qué beneficios ofrecen?"
+      ],
+      "category": "pagos",
+      "priority": 7
+    },
+    {
+      "id": "biblioteca.horarios",
+      "name": "Horarios de biblioteca",
+      "keywords": ["biblioteca", "horario", "horarios", "abierto", "abre", "cierra"],
+      "examples": [
+        "¿Cuál es el horario de la biblioteca?",
+        "¿A qué hora abre la biblioteca?",
+        "Horarios de atención de biblioteca"
+      ],
+      "category": "biblioteca",
+      "priority": 7
+    },
+    {
+      "id": "biblioteca.servicios",
+      "name": "Servicios de biblioteca",
+      "keywords": ["biblioteca", "servicios", "libros", "prestamo", "recursos", "digital"],
+      "examples": [
+        "¿Qué servicios ofrece la biblioteca?",
+        "¿Puedo pedir libros prestados?",
+        "¿Tienen recursos digitales?"
+      ],
+      "category": "biblioteca",
+      "priority": 6
+    },
+    {
+      "id": "tramites.certificados",
+      "name": "Solicitar certificados",
+      "keywords": ["certificado", "certificados", "constancia", "solicitar", "tramite"],
+      "examples": [
+        "¿Cómo solicito un certificado?",
+        "Necesito una constancia de estudios",
+        "Trámite de certificados"
+      ],
+      "category": "tramites",
+      "priority": 8
+    },
+    {
+      "id": "tramites.documentos",
+      "name": "Trámite de documentos",
+      "keywords": ["documentos", "tramite", "tramites", "solicitud", "presentar"],
+      "examples": [
+        "¿Dónde hago mis trámites?",
+        "¿Cómo solicito documentos?",
+        "Proceso de trámites"
+      ],
+      "category": "tramites",
+      "priority": 7
+    },
+    {
+      "id": "contacto.telefono",
+      "name": "Números de contacto",
+      "keywords": ["telefono", "telefonos", "numero", "llamar", "contactar", "contacto"],
+      "examples": [
+        "¿Cuál es el teléfono?",
+        "Números de contacto",
+        "¿Cómo los contacto?"
+      ],
+      "category": "contacto",
+      "priority": 8
+    },
+    {
+      "id": "contacto.correo",
+      "name": "Correos electrónicos",
+      "keywords": ["correo", "email", "mail", "escribir", "contacto"],
+      "examples": [
+        "¿Cuál es el correo de la universidad?",
+        "Email de contacto",
+        "¿A qué correo escribo?"
+      ],
+      "category": "contacto",
+      "priority": 7
+    },
+    {
+      "id": "contacto.ubicacion",
+      "name": "Ubicación de la universidad",
+      "keywords": ["ubicacion", "donde", "direccion", "esta", "queda", "encuentra"],
+      "examples": [
+        "¿Dónde está la universidad?",
+        "Dirección de la UPT",
+        "¿Dónde queda?"
+      ],
+      "category": "contacto",
+      "priority": 7
+    }
+  ]
+}

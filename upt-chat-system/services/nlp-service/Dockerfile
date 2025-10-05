@@ -1,17 +1,35 @@
-# NLP Service Dockerfile  
-# Estado: PENDIENTE DE IMPLEMENTACIÓN
-
 FROM python:3.11-slim
 
-WORKDIR /usr/src/app
+# Set working directory
+WORKDIR /app
 
-# Placeholder - será implementado cuando se desarrolle el servicio
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt || echo "requirements.txt no existe aún"
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
+# Copy requirements
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Download spaCy model
+RUN python -m spacy download es_core_news_sm
+
+# Copy application code
 COPY . .
 
-EXPOSE 3002
+# Create logs directory
+RUN mkdir -p logs
 
-# Comando temporal hasta implementación real
-CMD ["echo", "NLP Service - Pendiente de implementación"]
+# Expose port
+EXPOSE 8001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD python -c "import requests; requests.get('http://localhost:8001/health')"
+
+# Run application
+CMD ["python", "main.py"]
