@@ -13,12 +13,10 @@ import { winstonConfig } from './infrastructure/logging/winston.config';
 import { UserDomainService } from './domain/services/user-domain.service';
 import { ChatSessionDomainService } from './domain/services/chat-session-domain.service';
 
-// Use Cases
+// Use Cases (Solo lectura de BD UPT)
 import { 
-  AuthenticateUserUseCase, 
   GetUserProfileUseCase,
   ValidateUserForChatUseCase,
-  GetUsersByTypeUseCase
 } from './application/use-cases/user.use-cases';
 
 import {
@@ -119,12 +117,10 @@ import { IChatSessionRepository } from './domain/repositories/chat-session.repos
       inject: ['IChatSessionRepository'],
     },
 
-    // User Use Cases
-    // Use Cases (Solo consultas, NO creación de usuarios)
-    AuthenticateUserUseCase,
+    // User Use Cases (Solo consultas READ-ONLY de BD UPT)
+    // NO hay autenticación aquí, eso lo hace el sistema UPT
     GetUserProfileUseCase,
     ValidateUserForChatUseCase,
-    GetUsersByTypeUseCase,
 
     // Chat Session Use Cases
     StartChatSessionUseCase,

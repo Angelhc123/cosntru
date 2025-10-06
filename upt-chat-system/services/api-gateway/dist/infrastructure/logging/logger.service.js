@@ -8,10 +8,14 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppLoggerService = void 0;
 const common_1 = require("@nestjs/common");
 const winston_1 = require("winston");
+const nest_winston_1 = require("nest-winston");
 let AppLoggerService = class AppLoggerService {
     logger;
     context;
@@ -74,6 +78,7 @@ let AppLoggerService = class AppLoggerService {
 exports.AppLoggerService = AppLoggerService;
 exports.AppLoggerService = AppLoggerService = __decorate([
     (0, common_1.Injectable)(),
+    __param(0, (0, common_1.Inject)(nest_winston_1.WINSTON_MODULE_PROVIDER)),
     __metadata("design:paramtypes", [winston_1.Logger])
 ], AppLoggerService);
 //# sourceMappingURL=logger.service.js.map

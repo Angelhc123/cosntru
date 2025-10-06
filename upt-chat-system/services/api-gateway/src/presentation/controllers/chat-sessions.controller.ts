@@ -34,7 +34,7 @@ import {
  * Maneja las operaciones HTTP relacionadas con sesiones de chat del sistema UPT
  */
 @ApiTags('Chat Sessions')
-@Controller('api/v1/chat-sessions')
+@Controller('chat-sessions')
 export class ChatSessionsController {
   constructor(
     private readonly startChatSessionUseCase: StartChatSessionUseCase,

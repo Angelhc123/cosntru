@@ -349,7 +349,7 @@ __decorate([
 ], ChatSessionsController.prototype, "cleanupSessions", null);
 exports.ChatSessionsController = ChatSessionsController = __decorate([
     (0, swagger_1.ApiTags)('Chat Sessions'),
-    (0, common_1.Controller)('api/v1/chat-sessions'),
+    (0, common_1.Controller)('chat-sessions'),
     __metadata("design:paramtypes", [chat_session_use_cases_1.StartChatSessionUseCase,
         chat_session_use_cases_1.GetActiveChatSessionUseCase,
         chat_session_use_cases_1.EndChatSessionUseCase,

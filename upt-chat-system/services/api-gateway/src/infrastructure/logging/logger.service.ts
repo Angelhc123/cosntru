@@ -1,5 +1,6 @@
-import { Injectable, LoggerService as NestLoggerService } from '@nestjs/common';
+import { Injectable, LoggerService as NestLoggerService, Inject } from '@nestjs/common';
 import { Logger } from 'winston';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
 /**
  * Servicio de Logger personalizado usando Winston
@@ -16,7 +17,7 @@ import { Logger } from 'winston';
 export class AppLoggerService implements NestLoggerService {
   private context?: string;
 
-  constructor(private readonly logger: Logger) {}
+  constructor(@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger) {}
 
   /**
    * Establece el contexto del logger (nombre del servicio/controlador)
