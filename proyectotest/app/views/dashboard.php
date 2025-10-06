@@ -277,5 +277,13 @@
     </div>
 
     <script src="js/script.js"></script>
+    
+    <!-- CHATBOX WIDGET - Se conecta a MongoDB Atlas vía API Gateway -->
+    <link rel="stylesheet" href="css/chatbox.css">
+    <script>
+        // Pasar el user_id del usuario logueado al chatbox
+        localStorage.setItem('user_id', '<?php echo $_SESSION['user_id']; ?>');
+    </script>
+    <script src="js/chatbox.js"></script>
 </body>
 </html>

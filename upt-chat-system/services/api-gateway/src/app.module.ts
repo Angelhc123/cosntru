@@ -46,6 +46,7 @@ import { MongoUserRepository } from './infrastructure/database/repositories/mong
 import { MongoChatSessionRepository } from './infrastructure/database/repositories/mongo-chat-session.repository';
 import { UserDocument, UserSchema } from './infrastructure/database/schemas/user.schema';
 import { ChatSessionDocument, ChatSessionSchema } from './infrastructure/database/schemas/chat-session.schema';
+import { MessageDocument, MessageSchema } from './infrastructure/database/schemas/message.schema';
 
 // Repository Interfaces
 import { IUserRepository } from './domain/repositories/user.repository.interface';
@@ -63,7 +64,8 @@ import { IChatSessionRepository } from './domain/repositories/chat-session.repos
     MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/upt_chat_system'),
     MongooseModule.forFeature([
       { name: 'User', schema: UserSchema },
-      { name: 'ChatSession', schema: ChatSessionSchema }
+      { name: 'ChatSession', schema: ChatSessionSchema },
+      { name: 'Message', schema: MessageSchema }
     ]),
 
     // Rate Limiting

@@ -14,6 +14,8 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatSessionsController = void 0;
 const common_1 = require("@nestjs/common");
+const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
 const swagger_1 = require("@nestjs/swagger");
 const chat_session_use_cases_1 = require("../../application/use-cases/chat-session.use-cases");
 const chat_session_dto_1 = require("../../application/dtos/chat-session.dto");
@@ -27,7 +29,8 @@ let ChatSessionsController = class ChatSessionsController {
     updateSessionMetadataUseCase;
     getSessionAnalyticsUseCase;
     cleanupExpiredSessionsUseCase;
-    constructor(startChatSessionUseCase, getActiveChatSessionUseCase, endChatSessionUseCase, validateSessionTokenUseCase, recordUserMessageUseCase, setSessionSatisfactionUseCase, updateSessionMetadataUseCase, getSessionAnalyticsUseCase, cleanupExpiredSessionsUseCase) {
+    messageModel;
+    constructor(startChatSessionUseCase, getActiveChatSessionUseCase, endChatSessionUseCase, validateSessionTokenUseCase, recordUserMessageUseCase, setSessionSatisfactionUseCase, updateSessionMetadataUseCase, getSessionAnalyticsUseCase, cleanupExpiredSessionsUseCase, messageModel) {
         this.startChatSessionUseCase = startChatSessionUseCase;
         this.getActiveChatSessionUseCase = getActiveChatSessionUseCase;
         this.endChatSessionUseCase = endChatSessionUseCase;
@@ -37,6 +40,7 @@ let ChatSessionsController = class ChatSessionsController {
         this.updateSessionMetadataUseCase = updateSessionMetadataUseCase;
         this.getSessionAnalyticsUseCase = getSessionAnalyticsUseCase;
         this.cleanupExpiredSessionsUseCase = cleanupExpiredSessionsUseCase;
+        this.messageModel = messageModel;
     }
     async startSession(userId, startSessionDto) {
         try {
@@ -135,10 +139,11 @@ let ChatSessionsController = class ChatSessionsController {
     }
     async recordMessage(sessionId, messageData) {
         try {
-            await this.recordUserMessageUseCase.execute(sessionId, messageData.responseTime);
+            const result = await this.recordUserMessageUseCase.execute(sessionId, messageData.text, messageData.sender, messageData.responseTime);
             return {
                 status: 'success',
-                message: 'Mensaje registrado exitosamente'
+                message: 'Mensaje registrado exitosamente',
+                data: result
             };
         }
         catch (error) {
@@ -147,6 +152,27 @@ let ChatSessionsController = class ChatSessionsController {
                 message: error.message,
                 errorCode: 'MESSAGE_RECORD_ERROR'
             }, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
+    async getSessionMessages(sessionId) {
+        try {
+            const messages = await this.messageModel
+                .find({ sessionId })
+                .sort({ timestamp: 1 })
+                .select('sender text timestamp metadata')
+                .lean();
+            return {
+                status: 'success',
+                message: 'Mensajes obtenidos exitosamente',
+                data: messages
+            };
+        }
+        catch (error) {
+            throw new common_1.HttpException({
+                status: 'error',
+                message: 'Error al obtener mensajes',
+                errorCode: 'GET_MESSAGES_ERROR'
+            }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async setSatisfaction(sessionId, satisfactionDto) {
@@ -299,6 +325,18 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ChatSessionsController.prototype, "recordMessage", null);
 __decorate([
+    (0, common_1.Get)(':sessionId/messages'),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtener mensajes de una sesión' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Mensajes obtenidos exitosamente'
+    }),
+    __param(0, (0, common_1.Param)('sessionId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ChatSessionsController.prototype, "getSessionMessages", null);
+__decorate([
     (0, common_1.Put)(':sessionId/satisfaction'),
     (0, swagger_1.ApiOperation)({ summary: 'Establecer puntuación de satisfacción' }),
     (0, swagger_1.ApiResponse)({
@@ -350,6 +388,7 @@ __decorate([
 exports.ChatSessionsController = ChatSessionsController = __decorate([
     (0, swagger_1.ApiTags)('Chat Sessions'),
     (0, common_1.Controller)('chat-sessions'),
+    __param(9, (0, mongoose_1.InjectModel)('Message')),
     __metadata("design:paramtypes", [chat_session_use_cases_1.StartChatSessionUseCase,
         chat_session_use_cases_1.GetActiveChatSessionUseCase,
         chat_session_use_cases_1.EndChatSessionUseCase,
@@ -358,6 +397,7 @@ exports.ChatSessionsController = ChatSessionsController = __decorate([
         chat_session_use_cases_1.SetSessionSatisfactionUseCase,
         chat_session_use_cases_1.UpdateSessionMetadataUseCase,
         chat_session_use_cases_1.GetSessionAnalyticsUseCase,
-        chat_session_use_cases_1.CleanupExpiredSessionsUseCase])
+        chat_session_use_cases_1.CleanupExpiredSessionsUseCase,
+        mongoose_2.Model])
 ], ChatSessionsController);
 //# sourceMappingURL=chat-sessions.controller.js.map

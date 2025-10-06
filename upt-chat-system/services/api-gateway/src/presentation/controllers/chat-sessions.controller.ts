@@ -10,7 +10,10 @@ import {
   HttpException,
   UseGuards
 } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { MessageDocument } from '../../infrastructure/database/schemas/message.schema';
 import { 
   StartChatSessionUseCase,
   GetActiveChatSessionUseCase,
@@ -45,7 +48,8 @@ export class ChatSessionsController {
     private readonly setSessionSatisfactionUseCase: SetSessionSatisfactionUseCase,
     private readonly updateSessionMetadataUseCase: UpdateSessionMetadataUseCase,
     private readonly getSessionAnalyticsUseCase: GetSessionAnalyticsUseCase,
-    private readonly cleanupExpiredSessionsUseCase: CleanupExpiredSessionsUseCase
+    private readonly cleanupExpiredSessionsUseCase: CleanupExpiredSessionsUseCase,
+    @InjectModel('Message') private readonly messageModel: Model<MessageDocument>
   ) {}
 
   @Post('start/:userId')
@@ -243,17 +247,24 @@ export class ChatSessionsController {
   })
   async recordMessage(
     @Param('sessionId') sessionId: string,
-    @Body() messageData: { responseTime: number }
+    @Body() messageData: { text: string; sender: string; responseTime?: number }
   ): Promise<{
     status: string;
     message: string;
+    data: any;
   }> {
     try {
-      await this.recordUserMessageUseCase.execute(sessionId, messageData.responseTime);
+      const result = await this.recordUserMessageUseCase.execute(
+        sessionId, 
+        messageData.text,
+        messageData.sender,
+        messageData.responseTime
+      );
       
       return {
         status: 'success',
-        message: 'Mensaje registrado exitosamente'
+        message: 'Mensaje registrado exitosamente',
+        data: result
       };
     } catch (error) {
       throw new HttpException(
@@ -263,6 +274,41 @@ export class ChatSessionsController {
           errorCode: 'MESSAGE_RECORD_ERROR'
         },
         HttpStatus.BAD_REQUEST
+      );
+    }
+  }
+
+  @Get(':sessionId/messages')
+  @ApiOperation({ summary: 'Obtener mensajes de una sesión' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Mensajes obtenidos exitosamente' 
+  })
+  async getSessionMessages(@Param('sessionId') sessionId: string): Promise<{
+    status: string;
+    message: string;
+    data: any[];
+  }> {
+    try {
+      const messages = await this.messageModel
+        .find({ sessionId })
+        .sort({ timestamp: 1 })
+        .select('sender text timestamp metadata')
+        .lean();
+      
+      return {
+        status: 'success',
+        message: 'Mensajes obtenidos exitosamente',
+        data: messages
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: 'error',
+          message: 'Error al obtener mensajes',
+          errorCode: 'GET_MESSAGES_ERROR'
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }

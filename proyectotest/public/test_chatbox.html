@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Chatbox Widget</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .success {
+            background: #e8f5e9;
+            border-left-color: #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test del Widget de Chatbox</h1>
+        
+        <div class="info-box">
+            <strong>📌 Instrucciones:</strong><br>
+            1. Deberías ver un botón flotante <strong>"💬 Chat"</strong> en la esquina inferior derecha<br>
+            2. Click en el botón para abrir el chatbox<br>
+            3. Escribe un mensaje y envíalo<br>
+            4. Los mensajes se guardan en MongoDB Atlas (no en la BD de la U)
+        </div>
+
+        <div class="info-box success">
+            <strong>✅ Estado del Sistema:</strong><br>
+            • API Gateway: <span id="api-status">Verificando...</span><br>
+            • MongoDB Atlas: <span id="db-status">Verificando...</span>
+        </div>
+
+        <h2>🎯 Información de Debug</h2>
+        <div id="debug-info" style="background: #f5f5f5; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px;">
+            Cargando...
+        </div>
+    </div>
+
+    <!-- CHATBOX WIDGET -->
+    <link rel="stylesheet" href="css/chatbox.css">
+    <script src="js/chatbox.js"></script>
+
+    <script>
+        // Verificar estado del API Gateway
+        async function checkAPIStatus() {
+            try {
+                const response = await fetch('http://localhost:3000/api/v1/health/ping');
+                const data = await response.json();
+                document.getElementById('api-status').innerHTML = '<strong style="color: green;">✅ Conectado</strong>';
+                
+                // Verificar MongoDB
+                const dbResponse = await fetch('http://localhost:3000/api/v1/health/database');
+                const dbData = await dbResponse.json();
+                document.getElementById('db-status').innerHTML = '<strong style="color: green;">✅ Conectado</strong>';
+            } catch (error) {
+                document.getElementById('api-status').innerHTML = '<strong style="color: red;">❌ Error: ' + error.message + '</strong>';
+                document.getElementById('db-status').innerHTML = '<strong style="color: red;">❌ No disponible</strong>';
+            }
+        }
+
+        // Mostrar info de debug
+        function showDebugInfo() {
+            const info = {
+                'URL Actual': window.location.href,
+                'User Agent': navigator.userAgent,
+                'Chatbox cargado': typeof ChatboxWidget !== 'undefined' ? '✅ Sí' : '❌ No',
+                'LocalStorage user_id': localStorage.getItem('user_id') || 'No definido (usuario invitado)',
+                'LocalStorage session_token': localStorage.getItem('chat_session_token') || 'Sin sesión activa',
+                'API Gateway URL': 'http://localhost:3000/api/v1'
+            };
+
+            let html = '';
+            for (const [key, value] of Object.entries(info)) {
+                html += `<strong>${key}:</strong> ${value}<br>`;
+            }
+            document.getElementById('debug-info').innerHTML = html;
+        }
+
+        // Ejecutar verificaciones
+        checkAPIStatus();
+        showDebugInfo();
+
+        // Actualizar cada 3 segundos
+        setInterval(() => {
+            showDebugInfo();
+        }, 3000);
+
+        console.log('🔍 Página de test cargada');
+        console.log('🔍 Esperando a que ChatboxWidget se inicialice...');
+        
+        setTimeout(() => {
+            if (window.chatbox) {
+                console.log('✅ ChatboxWidget inicializado correctamente:', window.chatbox);
+            } else {
+                console.error('❌ ChatboxWidget NO se ha inicializado');
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

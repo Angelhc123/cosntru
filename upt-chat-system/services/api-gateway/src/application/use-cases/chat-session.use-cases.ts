@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { ChatSessionDomainService, SessionAnalytics } from '../../domain/services/chat-session-domain.service';
 import { 
   StartChatSessionDto, 
@@ -6,6 +8,7 @@ import {
   UpdateSessionMetadataDto,
   SessionSatisfactionDto 
 } from '../dtos/chat-session.dto';
+import { MessageDocument } from '../../infrastructure/database/schemas/message.schema';
 
 /**
  * Use Cases: Gestión de Sesiones de Chat
@@ -73,10 +76,35 @@ export class ValidateSessionTokenUseCase {
 
 @Injectable()
 export class RecordUserMessageUseCase {
-  constructor(private readonly sessionDomainService: ChatSessionDomainService) {}
+  constructor(
+    private readonly sessionDomainService: ChatSessionDomainService,
+    @InjectModel('Message') private readonly messageModel: Model<MessageDocument>
+  ) {}
 
-  async execute(sessionId: string, responseTime: number): Promise<void> {
-    await this.sessionDomainService.recordUserMessage(sessionId, responseTime);
+  async execute(sessionId: string, text: string, sender: string = 'user', responseTime?: number): Promise<any> {
+    // Guardar el mensaje en la colección de mensajes
+    const message = new this.messageModel({
+      sessionId,
+      sender,
+      text,
+      timestamp: new Date(),
+      metadata: responseTime ? { responseTime } : {}
+    });
+    
+    const savedMessage = await message.save();
+    
+    // También actualizar la sesión si hay responseTime
+    if (responseTime) {
+      await this.sessionDomainService.recordUserMessage(sessionId, responseTime);
+    }
+    
+    return {
+      id: savedMessage._id,
+      sessionId: savedMessage.sessionId,
+      sender: savedMessage.sender,
+      text: savedMessage.text,
+      timestamp: savedMessage.timestamp
+    };
   }
 }
 

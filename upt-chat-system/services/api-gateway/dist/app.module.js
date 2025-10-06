@@ -31,6 +31,7 @@ const mongo_user_repository_1 = require("./infrastructure/database/repositories/
 const mongo_chat_session_repository_1 = require("./infrastructure/database/repositories/mongo-chat-session.repository");
 const user_schema_1 = require("./infrastructure/database/schemas/user.schema");
 const chat_session_schema_1 = require("./infrastructure/database/schemas/chat-session.schema");
+const message_schema_1 = require("./infrastructure/database/schemas/message.schema");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -44,7 +45,8 @@ exports.AppModule = AppModule = __decorate([
             mongoose_1.MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/upt_chat_system'),
             mongoose_1.MongooseModule.forFeature([
                 { name: 'User', schema: user_schema_1.UserSchema },
-                { name: 'ChatSession', schema: chat_session_schema_1.ChatSessionSchema }
+                { name: 'ChatSession', schema: chat_session_schema_1.ChatSessionSchema },
+                { name: 'Message', schema: message_schema_1.MessageSchema }
             ]),
             throttler_1.ThrottlerModule.forRoot([{
                     ttl: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000'),

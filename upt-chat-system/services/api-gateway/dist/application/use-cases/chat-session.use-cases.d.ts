@@ -1,5 +1,7 @@
+import { Model } from 'mongoose';
 import { ChatSessionDomainService, SessionAnalytics } from '../../domain/services/chat-session-domain.service';
 import { StartChatSessionDto, ChatSessionResponseDto, UpdateSessionMetadataDto, SessionSatisfactionDto } from '../dtos/chat-session.dto';
+import { MessageDocument } from '../../infrastructure/database/schemas/message.schema';
 export declare class StartChatSessionUseCase {
     private readonly sessionDomainService;
     constructor(sessionDomainService: ChatSessionDomainService);
@@ -22,8 +24,9 @@ export declare class ValidateSessionTokenUseCase {
 }
 export declare class RecordUserMessageUseCase {
     private readonly sessionDomainService;
-    constructor(sessionDomainService: ChatSessionDomainService);
-    execute(sessionId: string, responseTime: number): Promise<void>;
+    private readonly messageModel;
+    constructor(sessionDomainService: ChatSessionDomainService, messageModel: Model<MessageDocument>);
+    execute(sessionId: string, text: string, sender?: string, responseTime?: number): Promise<any>;
 }
 export declare class SetSessionSatisfactionUseCase {
     private readonly sessionDomainService;
