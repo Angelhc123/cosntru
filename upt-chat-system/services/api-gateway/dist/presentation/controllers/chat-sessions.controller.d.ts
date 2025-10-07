@@ -43,6 +43,7 @@ export declare class ChatSessionsController {
         text: string;
         sender: string;
         responseTime?: number;
+        metadata?: any;
     }): Promise<{
         status: string;
         message: string;

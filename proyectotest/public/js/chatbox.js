@@ -6,10 +6,22 @@
 class ChatboxWidget {
     constructor() {
         this.apiGatewayUrl = 'http://localhost:3000/api/v1';
-        this.sessionToken = localStorage.getItem('chat_session_token');
-        this.sessionId = localStorage.getItem('chat_session_id');
+        
+        // Obtener valores del localStorage y validar que no sean 'undefined' como string
+        const storedToken = localStorage.getItem('chat_session_token');
+        const storedId = localStorage.getItem('chat_session_id');
+        
+        this.sessionToken = (storedToken && storedToken !== 'undefined' && storedToken !== 'null') ? storedToken : null;
+        this.sessionId = (storedId && storedId !== 'undefined' && storedId !== 'null') ? storedId : null;
         this.userId = localStorage.getItem('user_id'); // Del login de PHP
         this.isOpen = false;
+        
+        console.log('🔧 Chatbox inicializado:', {
+            sessionToken: this.sessionToken,
+            sessionId: this.sessionId,
+            userId: this.userId
+        });
+        
         this.init();
     }
 
@@ -130,19 +142,32 @@ class ChatboxWidget {
             }
             
             const data = await response.json();
-            console.log('✅ Sesión iniciada:', data);
+            console.log('✅ Sesión iniciada - Respuesta completa:', data);
             
             // Guardar en localStorage - La API devuelve data.data
             this.sessionToken = data.data?.sessionToken || data.sessionToken;
             this.sessionId = data.data?.id || data.id;
             
-            console.log('📝 Session Token:', this.sessionToken);
-            console.log('📝 Session ID:', this.sessionId);
+            console.log('📝 Valores extraídos:', {
+                sessionToken: this.sessionToken,
+                sessionId: this.sessionId,
+                dataObject: data.data
+            });
+            
+            // Validar que los valores no sean undefined antes de guardar
+            if (!this.sessionToken || !this.sessionId) {
+                throw new Error('La respuesta del servidor no contiene sessionToken o sessionId válidos');
+            }
             
             localStorage.setItem('chat_session_token', this.sessionToken);
             localStorage.setItem('chat_session_id', this.sessionId);
             
             this.addSystemMessage('Conversación iniciada. ¿En qué puedo ayudarte?');
+            
+            // Registrar mensaje de inicio en la BD (después de verificar que sessionId existe)
+            if (this.sessionId && this.sessionToken) {
+                await this.registerSystemMessage('Conversación iniciada', 'inicio');
+            }
             
         } catch (error) {
             console.error('❌ Error al iniciar sesión:', error);
@@ -156,8 +181,16 @@ class ChatboxWidget {
         
         if (!message) return;
         
-        if (!this.sessionToken) {
+        if (!this.sessionToken || !this.sessionId) {
             await this.startNewSession();
+            // Esperar un poco para asegurar que la sesión se cree
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
+        // Validar que ahora sí tenemos sessionId
+        if (!this.sessionId || this.sessionId === 'undefined') {
+            this.addSystemMessage('Error: No se pudo iniciar la sesión. Recarga la página.');
+            return;
         }
         
         // Agregar mensaje del usuario a la interfaz
@@ -165,7 +198,7 @@ class ChatboxWidget {
         input.value = '';
         
         try {
-            console.log('📤 Enviando mensaje:', message);
+            console.log('📤 Enviando mensaje:', message, 'SessionID:', this.sessionId);
             
             const response = await fetch(`${this.apiGatewayUrl}/chat-sessions/${this.sessionId}/message`, {
                 method: 'POST',
@@ -196,11 +229,25 @@ class ChatboxWidget {
     }
 
     async endConversation() {
-        if (!this.sessionToken) return;
+        if (!this.sessionToken || !this.sessionId || this.sessionId === 'undefined') {
+            this.addSystemMessage('No hay conversación activa para finalizar.');
+            console.warn('⚠️ No se puede finalizar:', {
+                sessionToken: this.sessionToken,
+                sessionId: this.sessionId
+            });
+            return;
+        }
         
         try {
-            console.log('🛑 Finalizando conversación...');
+            console.log('🛑 Finalizando conversación...', {
+                sessionId: this.sessionId,
+                sessionToken: this.sessionToken
+            });
             
+            // Registrar mensaje de cierre en la BD
+            await this.registerSystemMessage('Conversación finalizada por el usuario', 'cierre');
+            
+            // Finalizar sesión en el backend
             const response = await fetch(`${this.apiGatewayUrl}/chat-sessions/end/${this.sessionId}`, {
                 method: 'PUT',
                 headers: {
@@ -215,25 +262,68 @@ class ChatboxWidget {
                 throw new Error('Error al finalizar conversación');
             }
             
-            console.log('✅ Conversación finalizada');
+            const data = await response.json();
+            console.log('✅ Conversación finalizada:', data);
             
-            // Limpiar localStorage
-            localStorage.removeItem('chat_session_token');
-            localStorage.removeItem('chat_session_id');
+            // Mostrar mensaje de despedida
+            this.addSystemMessage('✅ Conversación finalizada y guardada. ¡Hasta pronto! 👋');
             
-            this.sessionToken = null;
-            this.sessionId = null;
-            
-            // Limpiar mensajes
-            document.getElementById('chat-messages').innerHTML = `
-                <div class="welcome-message">
-                    Conversación finalizada. ¡Hasta pronto! 👋
-                </div>
-            `;
+            // Limpiar localStorage después de 2 segundos
+            setTimeout(() => {
+                localStorage.removeItem('chat_session_token');
+                localStorage.removeItem('chat_session_id');
+                
+                this.sessionToken = null;
+                this.sessionId = null;
+                
+                // Reiniciar interfaz
+                document.getElementById('chat-messages').innerHTML = `
+                    <div class="welcome-message">
+                        👋 Hola, soy tu asistente virtual. ¿En qué puedo ayudarte hoy?
+                    </div>
+                `;
+            }, 2000);
             
         } catch (error) {
             console.error('❌ Error al finalizar conversación:', error);
-            this.addSystemMessage('Error al finalizar conversación.');
+            this.addSystemMessage('Error al finalizar conversación. Por favor, intenta de nuevo.');
+        }
+    }
+
+    async registerSystemMessage(text, tipo = 'system') {
+        if (!this.sessionToken || !this.sessionId || this.sessionId === 'undefined') {
+            console.warn('⚠️ No hay sesión activa para registrar mensaje del sistema', {
+                sessionToken: this.sessionToken,
+                sessionId: this.sessionId
+            });
+            return;
+        }
+        
+        try {
+            console.log(`📝 Registrando mensaje del sistema (${tipo}):`, text);
+            
+            const response = await fetch(`${this.apiGatewayUrl}/chat-sessions/${this.sessionId}/message`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: text,
+                    sender: 'system',
+                    session_token: this.sessionToken,
+                    metadata: { tipo: tipo }
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Error al registrar mensaje del sistema');
+            }
+            
+            const data = await response.json();
+            console.log('✅ Mensaje del sistema registrado:', data);
+            
+        } catch (error) {
+            console.error('❌ Error al registrar mensaje del sistema:', error);
         }
     }
 

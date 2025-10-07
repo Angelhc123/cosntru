@@ -26,7 +26,7 @@ export declare class RecordUserMessageUseCase {
     private readonly sessionDomainService;
     private readonly messageModel;
     constructor(sessionDomainService: ChatSessionDomainService, messageModel: Model<MessageDocument>);
-    execute(sessionId: string, text: string, sender?: string, responseTime?: number): Promise<any>;
+    execute(sessionId: string, text: string, sender?: string, responseTime?: number, metadata?: any): Promise<any>;
 }
 export declare class SetSessionSatisfactionUseCase {
     private readonly sessionDomainService;

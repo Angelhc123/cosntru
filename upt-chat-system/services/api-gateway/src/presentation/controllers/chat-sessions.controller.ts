@@ -247,7 +247,7 @@ export class ChatSessionsController {
   })
   async recordMessage(
     @Param('sessionId') sessionId: string,
-    @Body() messageData: { text: string; sender: string; responseTime?: number }
+    @Body() messageData: { text: string; sender: string; responseTime?: number; metadata?: any }
   ): Promise<{
     status: string;
     message: string;
@@ -258,7 +258,8 @@ export class ChatSessionsController {
         sessionId, 
         messageData.text,
         messageData.sender,
-        messageData.responseTime
+        messageData.responseTime,
+        messageData.metadata
       );
       
       return {

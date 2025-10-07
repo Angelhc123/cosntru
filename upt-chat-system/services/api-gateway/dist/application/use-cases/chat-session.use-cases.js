@@ -98,13 +98,17 @@ let RecordUserMessageUseCase = class RecordUserMessageUseCase {
         this.sessionDomainService = sessionDomainService;
         this.messageModel = messageModel;
     }
-    async execute(sessionId, text, sender = 'user', responseTime) {
+    async execute(sessionId, text, sender = 'user', responseTime, metadata) {
+        const messageMetadata = {
+            ...(responseTime ? { responseTime } : {}),
+            ...(metadata || {})
+        };
         const message = new this.messageModel({
             sessionId,
             sender,
             text,
             timestamp: new Date(),
-            metadata: responseTime ? { responseTime } : {}
+            metadata: messageMetadata
         });
         const savedMessage = await message.save();
         if (responseTime) {
@@ -115,7 +119,8 @@ let RecordUserMessageUseCase = class RecordUserMessageUseCase {
             sessionId: savedMessage.sessionId,
             sender: savedMessage.sender,
             text: savedMessage.text,
-            timestamp: savedMessage.timestamp
+            timestamp: savedMessage.timestamp,
+            metadata: savedMessage.metadata
         };
     }
 };

@@ -31,7 +31,7 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)({
         required: true,
-        enum: ['user', 'bot'],
+        enum: ['user', 'bot', 'system'],
         type: String
     }),
     __metadata("design:type", String)

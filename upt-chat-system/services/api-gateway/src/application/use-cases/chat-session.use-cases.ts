@@ -81,14 +81,20 @@ export class RecordUserMessageUseCase {
     @InjectModel('Message') private readonly messageModel: Model<MessageDocument>
   ) {}
 
-  async execute(sessionId: string, text: string, sender: string = 'user', responseTime?: number): Promise<any> {
+  async execute(sessionId: string, text: string, sender: string = 'user', responseTime?: number, metadata?: any): Promise<any> {
+    // Preparar metadata combinando responseTime y metadata adicional
+    const messageMetadata = {
+      ...(responseTime ? { responseTime } : {}),
+      ...(metadata || {})
+    };
+    
     // Guardar el mensaje en la colección de mensajes
     const message = new this.messageModel({
       sessionId,
       sender,
       text,
       timestamp: new Date(),
-      metadata: responseTime ? { responseTime } : {}
+      metadata: messageMetadata
     });
     
     const savedMessage = await message.save();
@@ -103,7 +109,8 @@ export class RecordUserMessageUseCase {
       sessionId: savedMessage.sessionId,
       sender: savedMessage.sender,
       text: savedMessage.text,
-      timestamp: savedMessage.timestamp
+      timestamp: savedMessage.timestamp,
+      metadata: savedMessage.metadata
     };
   }
 }

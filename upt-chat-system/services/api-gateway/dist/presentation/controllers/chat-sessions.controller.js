@@ -139,7 +139,7 @@ let ChatSessionsController = class ChatSessionsController {
     }
     async recordMessage(sessionId, messageData) {
         try {
-            const result = await this.recordUserMessageUseCase.execute(sessionId, messageData.text, messageData.sender, messageData.responseTime);
+            const result = await this.recordUserMessageUseCase.execute(sessionId, messageData.text, messageData.sender, messageData.responseTime, messageData.metadata);
             return {
                 status: 'success',
                 message: 'Mensaje registrado exitosamente',

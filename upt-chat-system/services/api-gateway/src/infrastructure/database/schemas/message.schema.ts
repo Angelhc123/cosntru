@@ -20,7 +20,7 @@ export class MessageDocument extends Document {
 
   @Prop({ 
     required: true,
-    enum: ['user', 'bot'],
+    enum: ['user', 'bot', 'system'],
     type: String
   })
   sender: string;
