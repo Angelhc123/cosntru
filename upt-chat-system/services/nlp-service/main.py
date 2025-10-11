@@ -10,6 +10,7 @@ from contextlib import asynccontextmanager
 
 from presentation.controllers.nlp_controller import router as nlp_router, set_use_cases
 from presentation.controllers.admin_controller import router as admin_router
+from presentation.controllers.dialogflow_controller import router as dialogflow_router, set_dialogflow_service
 from presentation.middleware.error_handler import (
     validation_exception_handler,
     http_exception_handler,
@@ -19,6 +20,8 @@ from presentation.middleware.error_handler import (
 from infrastructure.repositories.json_intent_repository import JsonIntentRepository
 from infrastructure.repositories.json_knowledge_base_repository import JsonKnowledgeBaseRepository
 from infrastructure.nlp.nlp_engine_initializer import NLPEngineInitializer
+from infrastructure.nlp.dialogflow_service import DialogFlowService
+from infrastructure.nlp.hybrid_nlp_service import HybridNLPService
 from infrastructure.logging.logger_config import logger
 
 from domain.services.nlp_domain_service import NLPDomainService
@@ -41,6 +44,9 @@ class DependencyContainer:
     process_message_use_case: ProcessMessageUseCase = None
     detect_intent_use_case: DetectIntentUseCase = None
     search_kb_use_case: SearchKnowledgeBaseUseCase = None
+    # DialogFlow components
+    dialogflow_service: DialogFlowService = None
+    hybrid_nlp_service: HybridNLPService = None
 
 
 container = DependencyContainer()
@@ -73,16 +79,38 @@ async def lifespan(app: FastAPI):
         )
         logger.info("✅ NLP engine initialized")
         
-        # 3. Inicializar servicios de dominio
+        # 3. Inicializar DialogFlow (si está habilitado)
+        if settings.use_dialogflow:
+            try:
+                logger.info("Initializing DialogFlow service...")
+                container.dialogflow_service = DialogFlowService(
+                    project_id=settings.google_project_id,
+                    credentials_path=settings.google_credentials_path,
+                    language_code=settings.dialogflow_language_code
+                )
+                logger.info("✅ DialogFlow service ready")
+            except Exception as e:
+                logger.warning(f"⚠️ DialogFlow initialization failed: {str(e)}")
+                logger.info("📋 Continuing with local NLP only...")
+                container.dialogflow_service = None
+        
+        # 4. Inicializar servicios de dominio
         logger.info("Initializing domain services...")
         container.context_manager = ContextManagerService()
         container.nlp_service = NLPDomainService(
             container.intent_repository,
             container.kb_repository
         )
+        
+        # 5. Inicializar servicio híbrido NLP
+        container.hybrid_nlp_service = HybridNLPService(
+            dialogflow_service=container.dialogflow_service,
+            nlp_engine=nlp_engine,
+            use_dialogflow=settings.use_dialogflow
+        )
         logger.info("✅ Domain services ready")
         
-        # 4. Inicializar casos de uso
+        # 6. Inicializar casos de uso
         logger.info("Initializing use cases...")
         container.process_message_use_case = ProcessMessageUseCase(
             container.nlp_service,
@@ -96,12 +124,17 @@ async def lifespan(app: FastAPI):
         )
         logger.info("✅ Use cases ready")
         
-        # 5. Configurar controladores con use cases
+        # 7. Configurar controladores con use cases
         set_use_cases(
             container.process_message_use_case,
             container.detect_intent_use_case,
             container.search_kb_use_case
         )
+        
+        # 8. Configurar controlador DialogFlow
+        if container.dialogflow_service:
+            set_dialogflow_service(container.dialogflow_service)
+            logger.info("✅ DialogFlow controller configured")
         
         logger.info("✅ NLP Service started successfully!")
         logger.info(f"📍 Environment: {settings.environment}")
@@ -143,6 +176,7 @@ app.add_exception_handler(Exception, general_exception_handler)
 # Registrar routers
 app.include_router(nlp_router)
 app.include_router(admin_router)
+app.include_router(dialogflow_router)
 
 
 @app.get("/", tags=["Root"])
