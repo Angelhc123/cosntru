@@ -34,6 +34,9 @@ class ProcessMessageResponseDTO(BaseModel):
     confidence: float = Field(..., ge=0.0, le=1.0, description="Confianza de la respuesta")
     suggestions: Optional[List[str]] = Field(None, description="Sugerencias de seguimiento")
     timestamp: datetime = Field(default_factory=datetime.now)
+    requires_validation: bool = Field(default=False, description="Indica si requiere validación por email")
+    validation_state: Optional[str] = Field(default=None, description="Estado actual de validación")
+    validation_message: Optional[str] = Field(default=None, description="Mensaje específico de validación")
     
     class Config:
         schema_extra = {

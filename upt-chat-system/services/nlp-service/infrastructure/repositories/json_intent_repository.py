@@ -37,10 +37,12 @@ class JsonIntentRepository(IIntentRepository):
             intent = Intent(
                 id=item['id'],
                 name=item['name'],
+                display_name=item.get('display_name', item['name']),
                 keywords=item['keywords'],
                 examples=item.get('examples', []),
                 category=item['category'],
-                priority=item.get('priority', 5)
+                priority=item.get('priority', 5),
+                requires_context=item.get('requires_context', False)
             )
             self._intents.append(intent)
     

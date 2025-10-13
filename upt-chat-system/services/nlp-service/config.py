@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     environment: str = "development"
     debug: bool = True
     
+    # Account
+    admin_email: str = "angelxhernandezxcruz@gmail.com"
+    
     # Server
     host: str = "0.0.0.0"
     port: int = 8001
@@ -24,12 +27,12 @@ class Settings(BaseSettings):
     log_file: str = "logs/nlp-service.log"
     
     # CORS
-    cors_origins: List[str] = [
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://localhost:4000",
-        "http://localhost:5173"
-    ]
+    cors_origins: str = "http://localhost:3000,http://localhost:3001,http://localhost:4000,http://localhost:5173"
+    
+    @property
+    def get_cors_origins(self) -> List[str]:
+        """Convierte el string de CORS a lista"""
+        return [origin.strip() for origin in self.cors_origins.split(",")]
     
     # Data paths
     intents_data_path: str = "data/intents.json"

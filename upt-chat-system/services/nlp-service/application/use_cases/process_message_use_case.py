@@ -1,8 +1,10 @@
 """
 Process Message Use Case - Application Layer
 Caso de uso principal para procesar mensajes del usuario.
+Implementa RF004 - Validación por Correo Personal
 """
 from typing import Optional
+import re
 from domain.services.nlp_domain_service import NLPDomainService, IntentDetectionResult
 from domain.services.context_manager_service import ContextManagerService
 from domain.value_objects.message import Message
@@ -13,6 +15,11 @@ from application.dtos.nlp_response_dto import (
     IntentDTO,
     FAQDTO
 )
+from application.detectors.sensitive_query_detector import SensitiveQueryDetector
+from infrastructure.clients.api_gateway_client import ApiGatewayClient
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class ProcessMessageUseCase:
@@ -33,10 +40,13 @@ class ProcessMessageUseCase:
                  context_manager: ContextManagerService):
         self.nlp_service = nlp_service
         self.context_manager = context_manager
+        self.sensitive_detector = SensitiveQueryDetector()
+        self.api_client = ApiGatewayClient()
     
     async def execute(self, request: ProcessMessageRequestDTO) -> ProcessMessageResponseDTO:
         """
         Procesa un mensaje y retorna una respuesta
+        Implementa RF004: Validación por correo para consultas sensibles
         """
         # 1. Obtener/crear conversación
         conversation = self.context_manager.get_or_create_conversation(
@@ -50,7 +60,37 @@ class ProcessMessageUseCase:
         # Agregar mensaje del usuario a la conversación
         conversation.add_user_message(request.message)
         
-        # 3. Detectar intent
+        # 2.1 NUEVO: Verificar si estamos en un flujo de validación
+        if request.validation_state == "awaiting_email":
+            # Usuario debe proporcionar su email
+            return await self._handle_email_input(request, conversation)
+        
+        elif request.validation_state == "awaiting_confirmation":
+            # Usuario confirmó su email, esperando validación
+            return await self._handle_awaiting_confirmation(request, conversation)
+        
+        # 2.2 NUEVO: Detectar si es consulta sensible (RF004)
+        if self.sensitive_detector.is_sensitive_query(request.message):
+            category = self.sensitive_detector.get_sensitive_category(request.message)
+            validation_prompt = self.sensitive_detector.get_validation_prompt(category)
+            
+            logger.info(f"Consulta sensible detectada: {category} en sesión {request.session_id}")
+            
+            # Guardar categoría en el contexto
+            conversation.set_context_value("pending_category", category)
+            conversation.set_context_value("original_query", request.message)
+            
+            return ProcessMessageResponseDTO(
+                session_id=request.session_id,
+                response=validation_prompt,
+                intent=None,
+                confidence=1.0,
+                requires_validation=True,
+                validation_state="awaiting_email",
+                validation_message=validation_prompt
+            )
+        
+        # 3. Flujo normal: Detectar intent
         intent_result: IntentDetectionResult = await self.nlp_service.detect_intent(message)
         
         # 4. Generar respuesta basada en el intent
@@ -156,3 +196,119 @@ class ProcessMessageUseCase:
             "¿Qué más puedes hacer?",
             "Necesito ayuda con otro tema"
         ])
+    
+    async def _handle_email_input(self, request: ProcessMessageRequestDTO, conversation) -> ProcessMessageResponseDTO:
+        """
+        Maneja la entrada de email del usuario para validación (RF004)
+        """
+        email = request.message.strip()
+        
+        # Validar formato de email
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_pattern, email):
+            return ProcessMessageResponseDTO(
+                session_id=request.session_id,
+                response="Por favor, ingresa un correo electrónico válido. Por ejemplo: tunombre@upt.edu.pe o tunombre@gmail.com",
+                intent=None,
+                confidence=1.0,
+                requires_validation=True,
+                validation_state="awaiting_email",
+                validation_message="Email inválido, intenta nuevamente"
+            )
+        
+        # Verificar email con API Gateway
+        logger.info(f"Verificando email {email} en sesión {request.session_id}")
+        verification_result = await self.api_client.verify_email(email)
+        
+        if not verification_result.get("exists", False):
+            return ProcessMessageResponseDTO(
+                session_id=request.session_id,
+                response="El correo electrónico no está registrado en el sistema UPT. Por favor verifica que sea correcto o contacta con soporte en soporte@upt.edu.pe",
+                intent=None,
+                confidence=1.0,
+                requires_validation=True,
+                validation_state="awaiting_email",
+                validation_message="Email no encontrado"
+            )
+        
+        # Email válido y existe - Iniciar proceso de reset
+        pending_category = conversation.get_context_value("pending_category", "password")
+        
+        if pending_category == "password":
+            # Iniciar recuperación de contraseña
+            reset_result = await self.api_client.initiate_password_reset(email, request.session_id)
+            
+            if reset_result.get("success", False):
+                user_name = verification_result.get("name", "")
+                conversation.set_context_value("validated_email", email)
+                conversation.set_context_value("user_name", user_name)
+                
+                return ProcessMessageResponseDTO(
+                    session_id=request.session_id,
+                    response=f"Perfecto, {user_name}. He enviado un correo de confirmación a {email}. Por favor, revisa tu bandeja de entrada y haz clic en el enlace de confirmación. Te notificaré aquí cuando completes el proceso.",
+                    intent=None,
+                    confidence=1.0,
+                    requires_validation=True,
+                    validation_state="awaiting_confirmation",
+                    validation_message="Esperando confirmación por email"
+                )
+            else:
+                return ProcessMessageResponseDTO(
+                    session_id=request.session_id,
+                    response="Hubo un error al procesar tu solicitud. Por favor intenta nuevamente o contacta con soporte.",
+                    intent=None,
+                    confidence=1.0,
+                    requires_validation=False,
+                    validation_state=None
+                )
+        else:
+            # Otras categorías sensibles (notas, pagos, etc.)
+            # Por ahora retornar mensaje genérico
+            return ProcessMessageResponseDTO(
+                session_id=request.session_id,
+                response=f"Para acceder a tu información de {pending_category}, necesitarás ingresar al sistema UPT. Visita https://intranet.upt.edu.pe con tu usuario y contraseña.",
+                intent=None,
+                confidence=1.0,
+                requires_validation=False,
+                validation_state=None
+            )
+    
+    async def _handle_awaiting_confirmation(self, request: ProcessMessageRequestDTO, conversation) -> ProcessMessageResponseDTO:
+        """
+        Maneja el estado de espera de confirmación por email (RF004)
+        """
+        # Verificar estado de la validación
+        status_result = await self.api_client.check_validation_status(request.session_id)
+        
+        status = status_result.get("status", "pending")
+        
+        if status == "confirmed":
+            # Usuario ya confirmó por email
+            return ProcessMessageResponseDTO(
+                session_id=request.session_id,
+                response="¡Excelente! Tu identidad ha sido confirmada. Tu nueva contraseña ha sido enviada a tu correo electrónico. Por favor revisa tu bandeja de entrada.",
+                intent=None,
+                confidence=1.0,
+                requires_validation=False,
+                validation_state="validated"
+            )
+        elif status == "expired":
+            return ProcessMessageResponseDTO(
+                session_id=request.session_id,
+                response="El enlace de confirmación ha expirado. Por favor inicia el proceso nuevamente escribiendo 'olvidé mi contraseña'.",
+                intent=None,
+                confidence=1.0,
+                requires_validation=False,
+                validation_state=None
+            )
+        else:
+            # Aún pendiente
+            return ProcessMessageResponseDTO(
+                session_id=request.session_id,
+                response="Aún estoy esperando que confirmes tu correo electrónico. Por favor revisa tu bandeja de entrada y haz clic en el enlace de confirmación. Si no lo encuentras, revisa tu carpeta de spam.",
+                intent=None,
+                confidence=1.0,
+                requires_validation=True,
+                validation_state="awaiting_confirmation",
+                validation_message="Aún esperando confirmación"
+            )

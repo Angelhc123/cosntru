@@ -35,6 +35,7 @@ import {
 import { UsersController } from './presentation/controllers/users.controller';
 import { ChatSessionsController } from './presentation/controllers/chat-sessions.controller';
 import { HealthController } from './presentation/controllers/health.controller';
+import { PasswordResetController } from './infrastructure/controllers/password-reset.controller';
 
 // Auth
 import { JwtStrategy } from './infrastructure/auth/strategies/jwt.strategy';
@@ -47,6 +48,10 @@ import { MongoChatSessionRepository } from './infrastructure/database/repositori
 import { UserDocument, UserSchema } from './infrastructure/database/schemas/user.schema';
 import { ChatSessionDocument, ChatSessionSchema } from './infrastructure/database/schemas/chat-session.schema';
 import { MessageDocument, MessageSchema } from './infrastructure/database/schemas/message.schema';
+
+// RF004 Services
+import { MySQLConnectionService } from './infrastructure/services/mysql-connection.service';
+import { PasswordResetService } from './application/services/password-reset.service';
 
 // Repository Interfaces
 import { IUserRepository } from './domain/repositories/user.repository.interface';
@@ -65,7 +70,29 @@ import { IChatSessionRepository } from './domain/repositories/chat-session.repos
     MongooseModule.forFeature([
       { name: 'User', schema: UserSchema },
       { name: 'ChatSession', schema: ChatSessionSchema },
-      { name: 'Message', schema: MessageSchema }
+      { name: 'Message', schema: MessageSchema },
+      // RF004: Schemas para password reset
+      { 
+        name: 'PasswordResetToken', 
+        schema: new (require('mongoose').Schema)({
+          token: { type: String, required: true, unique: true, index: true },
+          email: { type: String, required: true, index: true },
+          session_id: { type: String, required: true, index: true },
+          created_at: { type: Date, default: Date.now },
+          expires_at: { type: Date, required: true, index: true },
+          used: { type: Boolean, default: false }
+        })
+      },
+      { 
+        name: 'ValidationNotification', 
+        schema: new (require('mongoose').Schema)({
+          session_id: { type: String, required: true, unique: true, index: true },
+          status: { type: String, enum: ['pending', 'confirmed', 'expired', 'error'], default: 'pending' },
+          message: { type: String, required: true },
+          created_at: { type: Date, default: Date.now },
+          updated_at: { type: Date, default: Date.now }
+        })
+      }
     ]),
 
     // Rate Limiting
@@ -92,6 +119,7 @@ import { IChatSessionRepository } from './domain/repositories/chat-session.repos
     UsersController,
     ChatSessionsController,
     HealthController,
+    PasswordResetController, // RF004
   ],
   
   providers: [
@@ -143,6 +171,13 @@ import { IChatSessionRepository } from './domain/repositories/chat-session.repos
 
     // Logger Service
     AppLoggerService,
+
+    // RF004: Password Reset Services
+    MySQLConnectionService,
+    PasswordResetService,
+  ],
+  exports: [
+    MySQLConnectionService, // Para usar en UsersController
   ],
 })
 export class AppModule {}

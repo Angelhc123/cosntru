@@ -14,6 +14,8 @@ class ProcessMessageRequestDTO(BaseModel):
     user_id: str = Field(..., description="ID del usuario")
     message: str = Field(..., min_length=1, max_length=1000, description="Mensaje del usuario")
     context: Optional[dict] = Field(default=None, description="Contexto adicional opcional")
+    validation_state: Optional[str] = Field(default=None, description="Estado de validación: 'awaiting_email', 'awaiting_confirmation', 'validated'")
+    pending_category: Optional[str] = Field(default=None, description="Categoría de consulta sensible pendiente")
     
     class Config:
         schema_extra = {

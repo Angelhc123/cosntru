@@ -3,6 +3,7 @@
     {
       "id": "saludo",
       "name": "Saludo inicial",
+      "display_name": "Saludo",
       "keywords": ["hola", "buenos dias", "buenas tardes", "buenas noches", "saludos", "hey", "alo"],
       "examples": [
         "Hola",
@@ -11,11 +12,13 @@
         "Hola, necesito ayuda"
       ],
       "category": "general",
-      "priority": 8
+      "priority": 8,
+      "requires_context": false
     },
     {
       "id": "despedida",
       "name": "Despedida",
+      "display_name": "Despedida",
       "keywords": ["adios", "chau", "hasta luego", "gracias", "bye", "nos vemos"],
       "examples": [
         "Adiós",
@@ -23,11 +26,13 @@
         "Hasta luego"
       ],
       "category": "general",
-      "priority": 7
+      "priority": 7,
+      "requires_context": false
     },
     {
       "id": "inscripciones.fechas",
       "name": "Consultar fechas de inscripción",
+      "display_name": "Consultar Fechas de Inscripción",
       "keywords": ["inscripcion", "inscripciones", "fecha", "fechas", "cuando", "matricula", "plazo"],
       "examples": [
         "¿Cuándo son las inscripciones?",
@@ -35,11 +40,13 @@
         "¿Hasta cuándo puedo inscribirme?"
       ],
       "category": "inscripciones",
-      "priority": 10
+      "priority": 10,
+      "requires_context": false
     },
     {
       "id": "inscripciones.requisitos",
       "name": "Consultar requisitos de inscripción",
+      "display_name": "Consultar Requisitos de Inscripción",
       "keywords": ["requisitos", "necesito", "documentos", "que necesito", "inscripcion"],
       "examples": [
         "¿Qué necesito para inscribirme?",
@@ -47,11 +54,13 @@
         "¿Qué documentos debo presentar?"
       ],
       "category": "inscripciones",
-      "priority": 9
+      "priority": 9,
+      "requires_context": false
     },
     {
       "id": "inscripciones.proceso",
       "name": "Proceso de inscripción",
+      "display_name": "Proceso de Inscripción",
       "keywords": ["como", "inscribirse", "inscribirme", "proceso", "pasos", "procedimiento"],
       "examples": [
         "¿Cómo me inscribo?",
@@ -59,11 +68,13 @@
         "Pasos para inscribirse"
       ],
       "category": "inscripciones",
-      "priority": 9
+      "priority": 9,
+      "requires_context": false
     },
     {
       "id": "inscripciones.costo",
       "name": "Costo de matrícula",
+      "display_name": "Costo de Matrícula",
       "keywords": ["costo", "precio", "cuanto cuesta", "pagar", "matricula", "inscripcion"],
       "examples": [
         "¿Cuánto cuesta la matrícula?",
@@ -71,11 +82,13 @@
         "¿Cuánto debo pagar por inscribirme?"
       ],
       "category": "inscripciones",
-      "priority": 9
+      "priority": 9,
+      "requires_context": false
     },
     {
       "id": "horarios.clases",
       "name": "Consultar horarios de clases",
+      "display_name": "Consultar Horarios de Clases",
       "keywords": ["horario", "horarios", "clases", "cuando", "hora", "turno"],
       "examples": [
         "¿Cuál es el horario de clases?",
@@ -83,11 +96,13 @@
         "Horarios disponibles"
       ],
       "category": "horarios",
-      "priority": 8
+      "priority": 8,
+      "requires_context": false
     },
     {
       "id": "horarios.consulta",
       "name": "Ver mi horario personal",
+      "display_name": "Ver Horario Personal",
       "keywords": ["ver", "mi horario", "donde", "consultar", "revisar"],
       "examples": [
         "¿Dónde veo mi horario?",
@@ -95,11 +110,13 @@
         "Quiero ver mi horario"
       ],
       "category": "horarios",
-      "priority": 7
+      "priority": 7,
+      "requires_context": false
     },
     {
       "id": "horarios.cambio",
       "name": "Cambiar horario",
+      "display_name": "Cambiar Horario",
       "keywords": ["cambiar", "modificar", "cambio", "horario", "puedo"],
       "examples": [
         "¿Puedo cambiar mi horario?",
@@ -107,11 +124,13 @@
         "¿Cómo cambio de turno?"
       ],
       "category": "horarios",
-      "priority": 6
+      "priority": 6,
+      "requires_context": false
     },
     {
       "id": "pagos.pensiones",
       "name": "Consultar pagos y pensiones",
+      "display_name": "Consultar Pagos y Pensiones",
       "keywords": ["pagar", "pago", "pensiones", "pension", "mensualidad", "cuota"],
       "examples": [
         "¿Cómo pago la pensión?",
@@ -119,11 +138,13 @@
         "¿Cuánto es la pensión mensual?"
       ],
       "category": "pagos",
-      "priority": 9
+      "priority": 9,
+      "requires_context": false
     },
     {
       "id": "pagos.metodos",
       "name": "Métodos de pago",
+      "display_name": "Métodos de Pago",
       "keywords": ["como", "pagar", "metodos", "forma", "banco", "efectivo", "transferencia"],
       "examples": [
         "¿Cómo puedo pagar?",
@@ -131,11 +152,13 @@
         "¿Aceptan transferencias bancarias?"
       ],
       "category": "pagos",
-      "priority": 8
+      "priority": 8,
+      "requires_context": false
     },
     {
       "id": "pagos.descuentos",
       "name": "Descuentos y becas",
+      "display_name": "Descuentos y Becas",
       "keywords": ["descuento", "descuentos", "beca", "becas", "rebaja", "beneficio"],
       "examples": [
         "¿Hay descuentos?",
@@ -143,11 +166,13 @@
         "¿Qué beneficios ofrecen?"
       ],
       "category": "pagos",
-      "priority": 7
+      "priority": 7,
+      "requires_context": false
     },
     {
       "id": "biblioteca.horarios",
       "name": "Horarios de biblioteca",
+      "display_name": "Horarios de Biblioteca",
       "keywords": ["biblioteca", "horario", "horarios", "abierto", "abre", "cierra"],
       "examples": [
         "¿Cuál es el horario de la biblioteca?",
@@ -155,11 +180,13 @@
         "Horarios de atención de biblioteca"
       ],
       "category": "biblioteca",
-      "priority": 7
+      "priority": 7,
+      "requires_context": false
     },
     {
       "id": "biblioteca.servicios",
       "name": "Servicios de biblioteca",
+      "display_name": "Servicios de Biblioteca",
       "keywords": ["biblioteca", "servicios", "libros", "prestamo", "recursos", "digital"],
       "examples": [
         "¿Qué servicios ofrece la biblioteca?",
@@ -167,11 +194,13 @@
         "¿Tienen recursos digitales?"
       ],
       "category": "biblioteca",
-      "priority": 6
+      "priority": 6,
+      "requires_context": false
     },
     {
       "id": "tramites.certificados",
       "name": "Solicitar certificados",
+      "display_name": "Solicitar Certificados",
       "keywords": ["certificado", "certificados", "constancia", "solicitar", "tramite"],
       "examples": [
         "¿Cómo solicito un certificado?",
@@ -179,11 +208,13 @@
         "Trámite de certificados"
       ],
       "category": "tramites",
-      "priority": 8
+      "priority": 8,
+      "requires_context": false
     },
     {
       "id": "tramites.documentos",
       "name": "Trámite de documentos",
+      "display_name": "Trámite de Documentos",
       "keywords": ["documentos", "tramite", "tramites", "solicitud", "presentar"],
       "examples": [
         "¿Dónde hago mis trámites?",
@@ -191,11 +222,13 @@
         "Proceso de trámites"
       ],
       "category": "tramites",
-      "priority": 7
+      "priority": 7,
+      "requires_context": false
     },
     {
       "id": "contacto.telefono",
       "name": "Números de contacto",
+      "display_name": "Números de Contacto",
       "keywords": ["telefono", "telefonos", "numero", "llamar", "contactar", "contacto"],
       "examples": [
         "¿Cuál es el teléfono?",
@@ -203,11 +236,13 @@
         "¿Cómo los contacto?"
       ],
       "category": "contacto",
-      "priority": 8
+      "priority": 8,
+      "requires_context": false
     },
     {
       "id": "contacto.correo",
       "name": "Correos electrónicos",
+      "display_name": "Correos Electrónicos",
       "keywords": ["correo", "email", "mail", "escribir", "contacto"],
       "examples": [
         "¿Cuál es el correo de la universidad?",
@@ -215,11 +250,13 @@
         "¿A qué correo escribo?"
       ],
       "category": "contacto",
-      "priority": 7
+      "priority": 7,
+      "requires_context": false
     },
     {
       "id": "contacto.ubicacion",
       "name": "Ubicación de la universidad",
+      "display_name": "Ubicación de la Universidad",
       "keywords": ["ubicacion", "donde", "direccion", "esta", "queda", "encuentra"],
       "examples": [
         "¿Dónde está la universidad?",
@@ -227,7 +264,8 @@
         "¿Dónde queda?"
       ],
       "category": "contacto",
-      "priority": 7
+      "priority": 7,
+      "requires_context": false
     }
   ]
 }

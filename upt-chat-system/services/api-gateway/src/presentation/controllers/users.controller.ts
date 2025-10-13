@@ -1,6 +1,8 @@
 import { 
   Controller, 
   Get, 
+  Post,
+  Body,
   Param, 
   HttpStatus, 
   HttpException,
@@ -16,6 +18,7 @@ import { JwtAuthGuard } from '../../infrastructure/auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../../infrastructure/auth/decorators/current-user.decorator';
 import type { CurrentUserDto } from '../../infrastructure/auth/decorators/current-user.decorator';
 import { AppLoggerService } from '../../infrastructure/logging/logger.service';
+import { MySQLConnectionService } from '../../infrastructure/services/mysql-connection.service';
 
 /**
  * Controller: Users
@@ -40,6 +43,7 @@ export class UsersController {
     private readonly getUserProfileUseCase: GetUserProfileUseCase,
     private readonly validateUserForChatUseCase: ValidateUserForChatUseCase,
     private readonly logger: AppLoggerService,
+    private readonly mysqlService: MySQLConnectionService, // RF004
   ) {
     this.logger.setContext('UsersController');
   }
@@ -130,5 +134,52 @@ export class UsersController {
       canChat,
       reason: canChat ? 'Usuario activo en sistema UPT' : 'Usuario inactivo o sin permisos'
     };
+  }
+
+  /**
+   * POST /api/users/verify-email
+   * 
+   * Verifica si un correo electrónico existe en el sistema UPT.
+   * Usado para RF004 - Validación por Correo Personal
+   * No requiere autenticación (el usuario no está logueado)
+   */
+  @Post('verify-email')
+  @ApiOperation({ 
+    summary: 'Verificar correo electrónico',
+    description: 'Verifica si un email existe en la BD UPT (para recuperación de contraseña)',
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Verificación completada',
+    schema: {
+      example: {
+        exists: true,
+        user_id: '2018001234',
+        name: 'Juan Pérez García',
+      },
+    },
+  })
+  async verifyEmail(@Body() body: { email: string }): Promise<any> {
+    this.logger.debug(`Verificando email: ${body.email}`);
+    
+    try {
+      const verification = await this.mysqlService.verifyEmail(body.email);
+      
+      if (verification.exists) {
+        return {
+          exists: true,
+          user_id: verification.user.username,
+          name: verification.user.name,
+        };
+      }
+      
+      return { exists: false };
+    } catch (error) {
+      this.logger.error(`Error verificando email: ${error.message}`);
+      throw new HttpException(
+        'Error al verificar email',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 }

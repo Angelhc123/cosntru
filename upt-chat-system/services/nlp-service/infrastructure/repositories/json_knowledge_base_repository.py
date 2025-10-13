@@ -39,6 +39,7 @@ class JsonKnowledgeBaseRepository(IKnowledgeBaseRepository):
                 question=item['question'],
                 answer=item['answer'],
                 keywords=item.get('keywords', []),
+                category=item.get('category', 'general'),
                 priority=item.get('priority', 5),
                 metadata=item.get('metadata', {})
             )
@@ -123,6 +124,12 @@ class JsonKnowledgeBaseRepository(IKnowledgeBaseRepository):
             faq for faq in self._faqs
             if faq.metadata.get('category', '').lower() == category.lower()
         ]
+    
+    async def find_by_category(self, category: str) -> List[FAQ]:
+        """
+        Busca FAQs por categoría
+        """
+        return await self.get_by_category(category)
     
     def reload(self) -> None:
         """
