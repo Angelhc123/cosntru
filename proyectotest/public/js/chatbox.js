@@ -431,17 +431,17 @@ class ChatboxWidget {
             if (nlpData.success && nlpData.data) {
                 confidence = nlpData.data.confidence || 0;
                 
-                // Prioridad 1: Respuesta del FAQ
-                if (nlpData.data.faq_answer) {
+                // Prioridad 1: Respuesta directa del NLP Service (incluye Dialogflow)
+                if (nlpData.data.response) {
+                    botResponse = nlpData.data.response;
+                }
+                // Prioridad 2: Respuesta del FAQ (fallback)
+                else if (nlpData.data.faq_answer) {
                     botResponse = nlpData.data.faq_answer;
                 }
-                // Prioridad 2: Respuesta de DialogFlow
+                // Prioridad 3: Respuesta de DialogFlow específica
                 else if (nlpData.data.dialogflow_response) {
                     botResponse = nlpData.data.dialogflow_response;
-                }
-                // Prioridad 3: Respuesta genérica basada en intent
-                else if (nlpData.data.intent && nlpData.data.intent !== 'unknown') {
-                    botResponse = `Entiendo que preguntas sobre: ${nlpData.data.intent}. ¿Puedes ser más específico?`;
                 }
                 // Sin respuesta clara
                 else {

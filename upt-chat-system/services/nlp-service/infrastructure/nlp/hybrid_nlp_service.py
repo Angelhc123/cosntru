@@ -207,18 +207,18 @@ class HybridNLPService:
         Obtiene texto de respuesta por defecto
         """
         responses = {
-            "matricula": "Te puedo ayudar con información sobre matrícula. ¿Qué específicamente necesitas saber?",
-            "notas": "Para consultar tus notas, puedes acceder al campus virtual o solicitar información específica.",
-            "horarios": "Los horarios están disponibles en el campus virtual. ¿Buscas algo específico?",
-            "pagos": "Información sobre pagos y pensiones está disponible en tesorería.",
-            "biblioteca": "La biblioteca ofrece varios servicios. ¿Qué necesitas?",
-            "tramites": "Hay varios trámites disponibles. ¿Cuál necesitas realizar?",
-            "contacto": "Puedo proporcionarte información de contacto de diferentes áreas.",
-            "campus_virtual": "Para acceder al campus virtual necesitas tus credenciales UPT.",
-            "consulta_general": "Entiendo que necesitas ayuda. ¿Podrías ser más específico sobre lo que buscas?"
+            "matricula": "Te puedo ayudar con información sobre matrícula. ¿Qué específicamente necesitas saber? [RESPUESTA DADA POR PYTHON]",
+            "notas": "Para consultar tus notas, puedes acceder al campus virtual o solicitar información específica. [RESPUESTA DADA POR PYTHON]",
+            "horarios": "Los horarios están disponibles en el campus virtual. ¿Buscas algo específico? [RESPUESTA DADA POR PYTHON]",
+            "pagos": "Información sobre pagos y pensiones está disponible en tesorería. [RESPUESTA DADA POR PYTHON]",
+            "biblioteca": "La biblioteca ofrece varios servicios. ¿Qué necesitas? [RESPUESTA DADA POR PYTHON]",
+            "tramites": "Hay varios trámites disponibles. ¿Cuál necesitas realizar? [RESPUESTA DADA POR PYTHON]",
+            "contacto": "Puedo proporcionarte información de contacto de diferentes áreas. [RESPUESTA DADA POR PYTHON]",
+            "campus_virtual": "Para acceder al campus virtual necesitas tus credenciales UPT. [RESPUESTA DADA POR PYTHON]",
+            "consulta_general": "Entiendo que necesitas ayuda. ¿Podrías ser más específico sobre lo que buscas? [RESPUESTA DADA POR PYTHON]"
         }
         
-        return responses.get(intent_name, "Te puedo ayudar. ¿Podrías darme más detalles?")
+        return responses.get(intent_name, "Te puedo ayudar. ¿Podrías darme más detalles? [RESPUESTA DADA POR PYTHON]")
     
     def _get_fallback_response(
         self,
@@ -237,7 +237,7 @@ class HybridNLPService:
             "confidence": 0.1,
             "fulfillment_text": (
                 "Lo siento, en este momento tengo dificultades para procesar tu consulta. "
-                "¿Podrías reformular tu pregunta o contactar directamente con soporte técnico?"
+                "¿Podrías reformular tu pregunta o contactar directamente con soporte técnico? [RESPUESTA DADA POR PYTHON]"
             ),
             "parameters": {},
             "action": "input.unknown",

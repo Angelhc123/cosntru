@@ -174,7 +174,7 @@ class NLPDomainService:
         return (
             "Disculpa, no estoy seguro de entender tu pregunta. "
             "¿Podrías reformularla? Puedo ayudarte con información sobre "
-            "inscripciones, horarios, pagos, biblioteca y trámites académicos."
+            "inscripciones, horarios, pagos, biblioteca y trámites académicos. [RESPUESTA DADA POR PYTHON]"
         )
     
     async def get_greeting_response(self, user_name: Optional[str] = None) -> str:
