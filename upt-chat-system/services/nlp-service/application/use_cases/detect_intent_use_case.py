@@ -27,7 +27,7 @@ class DetectIntentUseCase:
         Detecta el intent de un mensaje
         """
         # Crear Message VO
-        message = Message(request.message)
+        message = Message.create(request.message)
         
         # Detectar intent
         intent_result = await self.nlp_service.detect_intent(message)

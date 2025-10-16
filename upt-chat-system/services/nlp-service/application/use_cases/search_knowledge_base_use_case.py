@@ -31,7 +31,7 @@ class SearchKnowledgeBaseUseCase:
         Busca en la knowledge base
         """
         # Crear Message VO para la query
-        message = Message(request.query)
+        message = Message.create(request.query)
         
         # Buscar en KB
         results = await self.nlp_service.search_knowledge_base(

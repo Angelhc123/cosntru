@@ -219,8 +219,8 @@ class ChatboxWidget {
             const data = await response.json();
             console.log('✅ Mensaje enviado y guardado:', data);
             
-            // Por ahora solo confirmar que se guardó (sin respuesta del bot)
-            this.addSystemMessage('Mensaje recibido y guardado ✓');
+            // Procesar mensaje con NLP y obtener respuesta del bot
+            await this.processMessageWithNLP(message);
             
         } catch (error) {
             console.error('❌ Error al enviar mensaje:', error);
@@ -392,6 +392,131 @@ class ChatboxWidget {
         `;
         messagesContainer.appendChild(messageDiv);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    async processMessageWithNLP(userMessage) {
+        try {
+            console.log('🤖 Procesando mensaje con NLP Service...');
+            
+            // Mostrar indicador de "escribiendo..."
+            this.showTypingIndicator();
+            
+            // Llamar al NLP Service a través del API Gateway
+            const response = await fetch(`${this.apiGatewayUrl}/nlp/process`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: userMessage,
+                    session_id: this.sessionId,
+                    language: 'es'
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Error al procesar con NLP');
+            }
+            
+            const nlpData = await response.json();
+            console.log('✅ Respuesta NLP:', nlpData);
+            
+            // Remover indicador de escritura
+            this.removeTypingIndicator();
+            
+            // Extraer la respuesta del bot
+            let botResponse = '';
+            let confidence = 0;
+            
+            if (nlpData.success && nlpData.data) {
+                confidence = nlpData.data.confidence || 0;
+                
+                // Prioridad 1: Respuesta del FAQ
+                if (nlpData.data.faq_answer) {
+                    botResponse = nlpData.data.faq_answer;
+                }
+                // Prioridad 2: Respuesta de DialogFlow
+                else if (nlpData.data.dialogflow_response) {
+                    botResponse = nlpData.data.dialogflow_response;
+                }
+                // Prioridad 3: Respuesta genérica basada en intent
+                else if (nlpData.data.intent && nlpData.data.intent !== 'unknown') {
+                    botResponse = `Entiendo que preguntas sobre: ${nlpData.data.intent}. ¿Puedes ser más específico?`;
+                }
+                // Sin respuesta clara
+                else {
+                    botResponse = 'Lo siento, no entendí tu pregunta. ¿Podrías reformularla? 🤔';
+                }
+                
+                // Agregar información de confianza si es baja
+                if (confidence < 0.7 && confidence > 0) {
+                    botResponse += `\n\n💡 Tip: Si necesitas ayuda específica, intenta preguntar de otra manera.`;
+                }
+            } else {
+                botResponse = 'Disculpa, estoy teniendo problemas para procesar tu mensaje. Por favor, intenta de nuevo.';
+            }
+            
+            // Mostrar respuesta del bot
+            this.addBotMessage(botResponse);
+            
+            // Guardar respuesta del bot en la BD
+            await this.saveResponseToDatabase(botResponse, nlpData.data);
+            
+        } catch (error) {
+            console.error('❌ Error al procesar con NLP:', error);
+            this.removeTypingIndicator();
+            this.addBotMessage('Lo siento, estoy teniendo problemas técnicos. Por favor, intenta de nuevo en un momento. 🔧');
+        }
+    }
+
+    showTypingIndicator() {
+        const messagesContainer = document.getElementById('chat-messages');
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message bot-message typing-indicator';
+        typingDiv.id = 'typing-indicator';
+        typingDiv.innerHTML = `
+            <div class="message-content">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        `;
+        messagesContainer.appendChild(typingDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    removeTypingIndicator() {
+        const typingIndicator = document.getElementById('typing-indicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+    }
+
+    async saveResponseToDatabase(botMessage, nlpData) {
+        try {
+            const response = await fetch(`${this.apiGatewayUrl}/chat-sessions/${this.sessionId}/message`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: botMessage,
+                    sender: 'bot',
+                    session_token: this.sessionToken,
+                    metadata: {
+                        intent: nlpData?.intent || 'unknown',
+                        confidence: nlpData?.confidence || 0,
+                        source: nlpData?.source || 'nlp-service'
+                    }
+                })
+            });
+            
+            if (response.ok) {
+                console.log('✅ Respuesta del bot guardada en BD');
+            }
+        } catch (error) {
+            console.error('⚠️ Error al guardar respuesta del bot:', error);
+        }
     }
 
     escapeHtml(text) {

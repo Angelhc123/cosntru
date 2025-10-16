@@ -20,14 +20,17 @@ const user_dto_1 = require("../../application/dtos/user.dto");
 const jwt_auth_guard_1 = require("../../infrastructure/auth/guards/jwt-auth.guard");
 const current_user_decorator_1 = require("../../infrastructure/auth/decorators/current-user.decorator");
 const logger_service_1 = require("../../infrastructure/logging/logger.service");
+const mysql_connection_service_1 = require("../../infrastructure/services/mysql-connection.service");
 let UsersController = class UsersController {
     getUserProfileUseCase;
     validateUserForChatUseCase;
     logger;
-    constructor(getUserProfileUseCase, validateUserForChatUseCase, logger) {
+    mysqlService;
+    constructor(getUserProfileUseCase, validateUserForChatUseCase, logger, mysqlService) {
         this.getUserProfileUseCase = getUserProfileUseCase;
         this.validateUserForChatUseCase = validateUserForChatUseCase;
         this.logger = logger;
+        this.mysqlService = mysqlService;
         this.logger.setContext('UsersController');
     }
     async getProfile(userId, currentUser) {
@@ -45,6 +48,24 @@ let UsersController = class UsersController {
             canChat,
             reason: canChat ? 'Usuario activo en sistema UPT' : 'Usuario inactivo o sin permisos'
         };
+    }
+    async verifyEmail(body) {
+        this.logger.debug(`Verificando email: ${body.email}`);
+        try {
+            const verification = await this.mysqlService.verifyEmail(body.email);
+            if (verification.exists) {
+                return {
+                    exists: true,
+                    user_id: verification.user.username,
+                    name: verification.user.name,
+                };
+            }
+            return { exists: false };
+        }
+        catch (error) {
+            this.logger.error(`Error verificando email: ${error.message}`);
+            throw new common_1.HttpException('Error al verificar email', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 };
 exports.UsersController = UsersController;
@@ -103,11 +124,34 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "validateForChat", null);
+__decorate([
+    (0, common_1.Post)('verify-email'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Verificar correo electrónico',
+        description: 'Verifica si un email existe en la BD UPT (para recuperación de contraseña)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Verificación completada',
+        schema: {
+            example: {
+                exists: true,
+                user_id: '2018001234',
+                name: 'Juan Pérez García',
+            },
+        },
+    }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "verifyEmail", null);
 exports.UsersController = UsersController = __decorate([
     (0, swagger_1.ApiTags)('Users'),
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_use_cases_1.GetUserProfileUseCase,
         user_use_cases_1.ValidateUserForChatUseCase,
-        logger_service_1.AppLoggerService])
+        logger_service_1.AppLoggerService,
+        mysql_connection_service_1.MySQLConnectionService])
 ], UsersController);
 //# sourceMappingURL=users.controller.js.map

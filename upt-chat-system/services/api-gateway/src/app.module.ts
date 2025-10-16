@@ -36,6 +36,8 @@ import { UsersController } from './presentation/controllers/users.controller';
 import { ChatSessionsController } from './presentation/controllers/chat-sessions.controller';
 import { HealthController } from './presentation/controllers/health.controller';
 import { PasswordResetController } from './infrastructure/controllers/password-reset.controller';
+import { NlpController } from './presentation/controllers/nlp.controller';
+import { ConfigController } from './presentation/controllers/config.controller';
 
 // Auth
 import { JwtStrategy } from './infrastructure/auth/strategies/jwt.strategy';
@@ -52,6 +54,9 @@ import { MessageDocument, MessageSchema } from './infrastructure/database/schema
 // RF004 Services
 import { MySQLConnectionService } from './infrastructure/services/mysql-connection.service';
 import { PasswordResetService } from './application/services/password-reset.service';
+
+// NLP Service
+import { NlpService } from './application/services/nlp.service';
 
 // Repository Interfaces
 import { IUserRepository } from './domain/repositories/user.repository.interface';
@@ -120,6 +125,8 @@ import { IChatSessionRepository } from './domain/repositories/chat-session.repos
     ChatSessionsController,
     HealthController,
     PasswordResetController, // RF004
+    NlpController, // NLP Integration
+    ConfigController, // Widget Configuration
   ],
   
   providers: [
@@ -175,6 +182,9 @@ import { IChatSessionRepository } from './domain/repositories/chat-session.repos
     // RF004: Password Reset Services
     MySQLConnectionService,
     PasswordResetService,
+
+    // NLP Service
+    NlpService,
   ],
   exports: [
     MySQLConnectionService, // Para usar en UsersController

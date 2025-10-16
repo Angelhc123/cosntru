@@ -89,7 +89,7 @@ async def detect_intent(
     try:
         from domain.value_objects.message import Message
         
-        message = Message(content=request.message)
+        message = Message.create(request.message)
         result = await service.detect_intent(request.session_id, message)
         
         return {

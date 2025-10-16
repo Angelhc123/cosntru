@@ -42,24 +42,70 @@ proyectotest/
 
 ## Configuración de Base de Datos
 
-La configuración de la base de datos está en `config/database.php`:
+### 🔧 Base de Datos en Clever Cloud (MySQL)
 
-```php
-Host: sql10.freesqldatabase.com
-Database: sql10801643
-User: sql10801643
-Password: E78UeVmJ2g
-Port: 3306
-```
+El proyecto ahora usa **Clever Cloud** para el hosting de la base de datos MySQL.
+
+#### Configuración Inicial
+
+1. **Copiar el archivo de ejemplo de variables de entorno:**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Editar el archivo `.env` con tus credenciales de Clever Cloud:**
+   ```env
+   MYSQL_ADDON_HOST=tu-host.clever-cloud.com
+   MYSQL_ADDON_DB=tu_database
+   MYSQL_ADDON_USER=tu_usuario
+   MYSQL_ADDON_PORT=3306
+   MYSQL_ADDON_PASSWORD=tu_password
+   ```
+
+3. **Probar la conexión:**
+   ```bash
+   php test_connection.php
+   ```
+
+4. **Configurar las tablas (opcional - ejecutar script SQL):**
+   ```bash
+   ./setup_database.sh
+   ```
+   O manualmente:
+   ```bash
+   mysql -h TU_HOST -P 3306 -u TU_USER -p TU_DATABASE < database_setup.sql
+   ```
+
+#### 🔒 Seguridad
+
+⚠️ **IMPORTANTE:** El archivo `.env` contiene credenciales sensibles y **NO debe subirse a Git**.
+
+- ✅ Ya está incluido en `.gitignore`
+- ✅ Usa `.env.example` como plantilla
+- ✅ Las credenciales se cargan automáticamente desde `config/database.php`
+
+---
 
 ## Instalación
 
-1. **Descargar el proyecto**
+1. **Clonar el proyecto**
    ```bash
-   cd /home/desci/Documentos/constru/proyectotest
+   git clone <tu-repo>
+   cd proyectotest
    ```
 
-2. **Configurar servidor web**
+2. **Configurar variables de entorno**
+   ```bash
+   cp .env.example .env
+   # Edita .env con tus credenciales reales
+   ```
+
+3. **Probar conexión a la base de datos**
+   ```bash
+   php test_connection.php
+   ```
+
+4. **Configurar servidor web**
    - Configurar Apache/Nginx para que apunte a la carpeta `public/`
    - O usar el servidor de desarrollo de PHP:
    ```bash
@@ -67,8 +113,10 @@ Port: 3306
    php -S localhost:8000
    ```
 
-3. **Crear tabla de usuarios**
-   La tabla se crea automáticamente al acceder por primera vez al sistema.
+5. **Configurar las tablas de la base de datos**
+   ```bash
+   ./setup_database.sh
+   ```
 
 ## Usuario Demo
 

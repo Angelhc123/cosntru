@@ -113,14 +113,14 @@ async def lifespan(app: FastAPI):
         # 6. Inicializar casos de uso
         logger.info("Initializing use cases...")
         container.process_message_use_case = ProcessMessageUseCase(
-            container.nlp_service,
+            container.hybrid_nlp_service,
             container.context_manager
         )
         container.detect_intent_use_case = DetectIntentUseCase(
-            container.nlp_service
+            container.hybrid_nlp_service
         )
         container.search_kb_use_case = SearchKnowledgeBaseUseCase(
-            container.nlp_service
+            container.hybrid_nlp_service
         )
         logger.info("✅ Use cases ready")
         

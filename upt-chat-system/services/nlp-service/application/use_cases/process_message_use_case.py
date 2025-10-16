@@ -55,7 +55,7 @@ class ProcessMessageUseCase:
         )
         
         # 2. Crear Message VO
-        message = Message(request.message)
+        message = Message.create(request.message)
         
         # Agregar mensaje del usuario a la conversación
         conversation.add_user_message(request.message)
@@ -91,7 +91,42 @@ class ProcessMessageUseCase:
             )
         
         # 3. Flujo normal: Detectar intent
-        intent_result: IntentDetectionResult = await self.nlp_service.detect_intent(message)
+        hybrid_result = None  # Para almacenar resultado de Dialogflow
+        
+        # Para híbrido service, usamos método específico
+        if hasattr(self.nlp_service, 'detect_intent') and len(self.nlp_service.detect_intent.__code__.co_varnames) > 2:
+            # Híbrido service: devuelve dict, necesitamos convertir
+            hybrid_result = await self.nlp_service.detect_intent(request.session_id, message)
+            
+            # Convertir respuesta de híbrido a IntentDetectionResult
+            from domain.entities.intent import Intent
+            from domain.value_objects.confidence import Confidence
+            
+            if hybrid_result.get('intent_name') and hybrid_result.get('confidence', 0) > 0.5:
+                # Intent detectado por DialogFlow
+                intent = Intent(
+                    id=hybrid_result.get('intent_name', 'unknown'),
+                    name=hybrid_result.get('intent_name', 'Unknown'),
+                    display_name=hybrid_result.get('intent_name', 'Unknown'),
+                    keywords=['dialogflow_intent'],  # Al menos una keyword requerida
+                    examples=[hybrid_result.get('query_text', '')],
+                    category='dialogflow',
+                    priority=10,
+                    requires_context=False
+                )
+                confidence = Confidence(hybrid_result.get('confidence', 0.0))
+                
+                intent_result = IntentDetectionResult(
+                    intent=intent,
+                    confidence=confidence,
+                    matched_keywords=[]
+                )
+            else:
+                # No detectado o confianza baja
+                intent_result = IntentDetectionResult(None, Confidence(0.0), [])
+        else:
+            # NLP Service normal
+            intent_result: IntentDetectionResult = await self.nlp_service.detect_intent(message)
         
         # 4. Generar respuesta basada en el intent
         response_text: str
@@ -110,24 +145,29 @@ class ProcessMessageUseCase:
                 matched_keywords=intent_result.matched_keywords
             )
             
-            # Buscar FAQ más relevante
-            faq_result = await self.nlp_service.find_best_faq(intent, message)
-            
-            if faq_result:
-                faq, faq_confidence = faq_result
-                response_text = faq.get_formatted_answer()
-                confidence = min(intent_result.confidence.value, faq_confidence.value)
-                
-                # Actualizar contexto
-                conversation.set_context_value("last_faq_id", faq.id)
-                conversation.last_intent = intent.id
-                
-                # Generar sugerencias basadas en el intent
-                suggestions = self._generate_suggestions(intent.category)
+            # Si es de Dialogflow, usar su respuesta directamente
+            if intent.category == 'dialogflow' and hybrid_result:
+                response_text = hybrid_result.get('fulfillment_text', 'Respuesta de Dialogflow no disponible')
+                confidence = intent_result.confidence.value
             else:
-                # No se encontró FAQ para el intent
-                response_text = await self.nlp_service.get_fallback_response()
-                confidence = 0.5
+                # Buscar FAQ más relevante (solo para NLP local)
+                faq_result = await self.nlp_service.find_best_faq(intent, message)
+                
+                if faq_result:
+                    faq, faq_confidence = faq_result
+                    response_text = faq.get_formatted_answer()
+                    confidence = min(intent_result.confidence.value, faq_confidence.value)
+                    
+                    # Actualizar contexto
+                    conversation.set_context_value("last_faq_id", faq.id)
+                    conversation.last_intent = intent.id
+                    
+                    # Generar sugerencias basadas en el intent
+                    suggestions = self._generate_suggestions(intent.category)
+                else:
+                    # No se encontró FAQ para el intent
+                    response_text = await self.nlp_service.get_fallback_response()
+                    confidence = 0.5
         else:
             # Intent no detectado o baja confianza - buscar en toda la KB
             kb_results = await self.nlp_service.search_knowledge_base(message, top_n=1)

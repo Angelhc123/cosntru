@@ -85,7 +85,7 @@ class DialogFlowService:
             
             # Crear text input
             text_input = dialogflow.TextInput(
-                text=message.content,
+                text=message.normalized_text,
                 language_code=self.language_code
             )
             
@@ -139,7 +139,6 @@ class DialogFlowService:
                 }
                 for context in query_result.output_contexts
             ],
-            "session_id": response.session,
             "response_id": response.response_id
         }
     

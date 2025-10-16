@@ -42,8 +42,8 @@ class Settings(BaseSettings):
     spacy_model: str = "es_core_news_sm"
     
     # DialogFlow Configuration
-    use_dialogflow: bool = True
-    google_project_id: str = "upt-chat-system-nlp"
+    use_dialogflow: bool = False  # Temporalmente desactivado por permisos
+    google_project_id: str = "upt-chat-fhps"
     google_credentials_path: str = "credentials/dialogflow-credentials.json"
     dialogflow_session_path: str = ""
     dialogflow_language_code: str = "es"
@@ -56,6 +56,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+        extra = "ignore"  # Permitir campos extra sin error
 
 
 # Instancia global de settings

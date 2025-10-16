@@ -24,6 +24,9 @@ const chat_session_use_cases_1 = require("./application/use-cases/chat-session.u
 const users_controller_1 = require("./presentation/controllers/users.controller");
 const chat_sessions_controller_1 = require("./presentation/controllers/chat-sessions.controller");
 const health_controller_1 = require("./presentation/controllers/health.controller");
+const password_reset_controller_1 = require("./infrastructure/controllers/password-reset.controller");
+const nlp_controller_1 = require("./presentation/controllers/nlp.controller");
+const config_controller_1 = require("./presentation/controllers/config.controller");
 const jwt_strategy_1 = require("./infrastructure/auth/strategies/jwt.strategy");
 const logger_service_1 = require("./infrastructure/logging/logger.service");
 const health_use_cases_1 = require("./application/use-cases/health.use-cases");
@@ -32,6 +35,9 @@ const mongo_chat_session_repository_1 = require("./infrastructure/database/repos
 const user_schema_1 = require("./infrastructure/database/schemas/user.schema");
 const chat_session_schema_1 = require("./infrastructure/database/schemas/chat-session.schema");
 const message_schema_1 = require("./infrastructure/database/schemas/message.schema");
+const mysql_connection_service_1 = require("./infrastructure/services/mysql-connection.service");
+const password_reset_service_1 = require("./application/services/password-reset.service");
+const nlp_service_1 = require("./application/services/nlp.service");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -46,7 +52,28 @@ exports.AppModule = AppModule = __decorate([
             mongoose_1.MongooseModule.forFeature([
                 { name: 'User', schema: user_schema_1.UserSchema },
                 { name: 'ChatSession', schema: chat_session_schema_1.ChatSessionSchema },
-                { name: 'Message', schema: message_schema_1.MessageSchema }
+                { name: 'Message', schema: message_schema_1.MessageSchema },
+                {
+                    name: 'PasswordResetToken',
+                    schema: new (require('mongoose').Schema)({
+                        token: { type: String, required: true, unique: true, index: true },
+                        email: { type: String, required: true, index: true },
+                        session_id: { type: String, required: true, index: true },
+                        created_at: { type: Date, default: Date.now },
+                        expires_at: { type: Date, required: true, index: true },
+                        used: { type: Boolean, default: false }
+                    })
+                },
+                {
+                    name: 'ValidationNotification',
+                    schema: new (require('mongoose').Schema)({
+                        session_id: { type: String, required: true, unique: true, index: true },
+                        status: { type: String, enum: ['pending', 'confirmed', 'expired', 'error'], default: 'pending' },
+                        message: { type: String, required: true },
+                        created_at: { type: Date, default: Date.now },
+                        updated_at: { type: Date, default: Date.now }
+                    })
+                }
             ]),
             throttler_1.ThrottlerModule.forRoot([{
                     ttl: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000'),
@@ -66,6 +93,9 @@ exports.AppModule = AppModule = __decorate([
             users_controller_1.UsersController,
             chat_sessions_controller_1.ChatSessionsController,
             health_controller_1.HealthController,
+            password_reset_controller_1.PasswordResetController,
+            nlp_controller_1.NlpController,
+            config_controller_1.ConfigController,
         ],
         providers: [
             app_service_1.AppService,
@@ -101,6 +131,12 @@ exports.AppModule = AppModule = __decorate([
             health_use_cases_1.HealthCheckUseCase,
             jwt_strategy_1.JwtStrategy,
             logger_service_1.AppLoggerService,
+            mysql_connection_service_1.MySQLConnectionService,
+            password_reset_service_1.PasswordResetService,
+            nlp_service_1.NlpService,
+        ],
+        exports: [
+            mysql_connection_service_1.MySQLConnectionService,
         ],
     })
 ], AppModule);

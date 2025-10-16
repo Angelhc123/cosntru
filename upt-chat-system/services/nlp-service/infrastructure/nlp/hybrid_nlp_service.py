@@ -71,7 +71,7 @@ class HybridNLPService:
         # Estrategia 1: Intentar DialogFlow primero (si está habilitado y disponible)
         if self.use_dialogflow and self.dialogflow_available:
             try:
-                logger.debug(f"🤖 Trying DialogFlow for: {message.content[:50]}...")
+                logger.debug(f"🤖 Trying DialogFlow for: {message.normalized_text[:50]}...")
                 result = await self.dialogflow_service.detect_intent(session_id, message)
                 method_used = "dialogflow"
                 
@@ -93,7 +93,7 @@ class HybridNLPService:
         # Estrategia 2: Usar NLP local (como fallback o primario)
         if result is None and self.local_nlp_available:
             try:
-                logger.debug(f"🧠 Trying Local NLP for: {message.content[:50]}...")
+                logger.debug(f"🧠 Trying Local NLP for: {message.normalized_text[:50]}...")
                 result = await self._detect_intent_local(session_id, message)
                 method_used = "local_nlp"
                 
