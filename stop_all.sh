@@ -34,6 +34,14 @@ kill_port 8000 "Frontend PHP"
 kill_port 3000 "API Gateway"
 kill_port 8001 "NLP Service"
 kill_port 3005 "Notification Service"
+kill_port 4040 "ngrok"
+
+# Detener ngrok específicamente
+if pkill -x ngrok 2>/dev/null; then
+    echo -e "${GREEN}✅ ngrok detenido${NC}"
+else
+    echo -e "${YELLOW}⚠️  ngrok no estaba corriendo${NC}"
+fi
 
 # Detener por proceso
 echo ""

@@ -48,6 +48,9 @@ class Settings(BaseSettings):
     dialogflow_session_path: str = ""
     dialogflow_language_code: str = "es"
     
+    # API Gateway Configuration (for RF004 webhook)
+    api_gateway_url: str = "http://localhost:3000"
+    
     # Confidence thresholds
     min_confidence: float = 0.6
     high_confidence: float = 0.8

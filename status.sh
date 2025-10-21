@@ -38,6 +38,34 @@ check_service 3000 "API Gateway (NestJS)" "http://localhost:3000"
 check_service 8001 "NLP Service (Python)" "http://localhost:8001"
 check_service 3005 "Notification Service" "http://localhost:3005"
 
+# Verificar ngrok
+echo -e "${YELLOW}🌐 Túnel HTTPS (ngrok):${NC}"
+if pgrep -x "ngrok" > /dev/null; then
+    PID=$(pgrep -x ngrok)
+    echo -e "${GREEN}✅ ngrok corriendo (PID: $PID)${NC}"
+    
+    # Intentar obtener URL
+    NGROK_URL=$(curl -s http://localhost:4040/api/tunnels 2>/dev/null | grep -o '"public_url":"https://[^"]*' | head -1 | cut -d'"' -f4)
+    
+    if [ ! -z "$NGROK_URL" ]; then
+        echo "   Dashboard: http://localhost:4040"
+        echo ""
+        echo "   ╔════════════════════════════════════════════════════════╗"
+        echo "   ║  🔐 URL WEBHOOK PARA DIALOGFLOW:                      ║"
+        echo "   ╠════════════════════════════════════════════════════════╣"
+        echo "      $NGROK_URL/webhook"
+        echo "   ╚════════════════════════════════════════════════════════╝"
+    else
+        echo "   Dashboard: http://localhost:4040"
+        echo -e "   ${YELLOW}⚠️  No se pudo obtener URL automáticamente${NC}"
+        echo "   Verifica en: http://localhost:4040"
+    fi
+else
+    echo -e "${RED}❌ ngrok - NO CORRIENDO${NC}"
+    echo "   Para iniciar con ngrok: ./start_all.sh → Opción 1"
+fi
+echo ""
+
 # Verificar base de datos
 echo -e "${YELLOW}🗄️  Base de Datos:${NC}"
 if [ -f "/home/desci/Documentos/constru/proyectotest/.env" ]; then

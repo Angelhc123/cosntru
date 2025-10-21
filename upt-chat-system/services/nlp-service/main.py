@@ -11,6 +11,7 @@ from contextlib import asynccontextmanager
 from presentation.controllers.nlp_controller import router as nlp_router, set_use_cases
 from presentation.controllers.admin_controller import router as admin_router
 from presentation.controllers.dialogflow_controller import router as dialogflow_router, set_dialogflow_service
+from presentation.controllers.webhook_controller import router as webhook_router
 from presentation.middleware.error_handler import (
     validation_exception_handler,
     http_exception_handler,
@@ -177,6 +178,7 @@ app.add_exception_handler(Exception, general_exception_handler)
 app.include_router(nlp_router)
 app.include_router(admin_router)
 app.include_router(dialogflow_router)
+app.include_router(webhook_router)  # Webhook para DialogFlow RF004
 
 
 @app.get("/", tags=["Root"])

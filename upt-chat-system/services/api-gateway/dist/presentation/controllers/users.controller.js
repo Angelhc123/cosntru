@@ -52,12 +52,12 @@ let UsersController = class UsersController {
     async verifyEmail(body) {
         this.logger.debug(`Verificando email: ${body.email}`);
         try {
-            const verification = await this.mysqlService.verifyEmail(body.email);
+            const verification = await this.mysqlService.verifyEmailPersonal(body.email);
             if (verification.exists) {
                 return {
                     exists: true,
-                    user_id: verification.user.username,
-                    name: verification.user.name,
+                    user_id: verification.usuario,
+                    name: verification.nombreCompleto,
                 };
             }
             return { exists: false };

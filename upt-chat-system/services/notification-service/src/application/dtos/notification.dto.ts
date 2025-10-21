@@ -12,7 +12,7 @@ export class SendPasswordResetConfirmationDto {
   @IsNotEmpty()
   userName: string;
 
-  @IsUrl()
+  @IsUrl({ require_tld: false }) // Permitir localhost y URLs sin TLD para desarrollo
   @IsNotEmpty()
   confirmationUrl: string;
 }

@@ -124,21 +124,26 @@ class DialogFlowService:
         """
         query_result = response.query_result
         
+        # Procesar output contexts (incluye los del webhook)
+        output_contexts = []
+        for context in query_result.output_contexts:
+            output_contexts.append({
+                "name": context.name,
+                "lifespanCount": context.lifespan_count,
+                "parameters": dict(context.parameters)
+            })
+        
         return {
             "query_text": query_result.query_text,
             "intent_name": query_result.intent.display_name if query_result.intent.display_name else "Default Fallback Intent",
             "intent_id": query_result.intent.name,
             "confidence": query_result.intent_detection_confidence,
-            "fulfillment_text": query_result.fulfillment_text,
+            "fulfillment_text": query_result.fulfillment_text,  # DialogFlow convierte camelCase a snake_case
+            "fulfillmentText": query_result.fulfillment_text,    # También en formato original
             "parameters": dict(query_result.parameters),
             "action": query_result.action,
-            "contexts": [
-                {
-                    "name": context.name,
-                    "parameters": dict(context.parameters)
-                }
-                for context in query_result.output_contexts
-            ],
+            "contexts": output_contexts,  # Formato antiguo (mantener compatibilidad)
+            "outputContexts": output_contexts,  # Formato nuevo (webhook)
             "response_id": response.response_id
         }
     

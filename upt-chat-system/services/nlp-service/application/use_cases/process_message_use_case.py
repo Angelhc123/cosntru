@@ -98,6 +98,78 @@ class ProcessMessageUseCase:
             # Híbrido service: devuelve dict, necesitamos convertir
             hybrid_result = await self.nlp_service.detect_intent(request.session_id, message)
             
+            # ===================================================================
+            # NUEVO: Detectar si el mensaje contiene un email válido
+            # Si el usuario envió solo un email, procesarlo como recuperación de contraseña
+            # ===================================================================
+            email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+            email_matches = re.findall(email_pattern, request.message)
+            
+            if email_matches:
+                email = email_matches[0]
+                logger.info(f"📧 Email detectado en mensaje: {email}")
+                
+                # Verificar si viene de un contexto de recuperación de contraseña
+                # O si el mensaje solo contiene el email
+                message_words = request.message.strip().split()
+                if len(message_words) <= 3 or conversation.get_context_value('dialogflow_awaiting_email'):
+                    logger.info(f"🔄 Procesando email como parte de flujo de recuperación: {email}")
+                    
+                    # Llamar directamente al handler del webhook
+                    from presentation.controllers.webhook_controller import handle_password_recovery_with_email
+                    
+                    webhook_response = await handle_password_recovery_with_email(
+                        email_personal=email,
+                        session=f"projects/upt-chatbox/agent/sessions/{request.session_id}"
+                    )
+                    
+                    response_text = webhook_response.get('fulfillmentText', 'Procesando...')
+                    
+                    # Limpiar contexto si es necesario
+                    if not webhook_response.get('outputContexts'):
+                        conversation.set_context_value('dialogflow_awaiting_email', False)
+                    
+                    conversation.add_bot_message(response_text)
+                    self.context_manager.save_conversation(conversation)
+                    
+                    return ProcessMessageResponseDTO(
+                        session_id=request.session_id,
+                        response=response_text,
+                        intent=None,
+                        confidence=1.0
+                    )
+            
+            # ===================================================================
+            # NUEVO: Verificar si hay contexto de recuperación de contraseña
+            # ===================================================================
+            output_contexts = hybrid_result.get('outputContexts', [])
+            for context in output_contexts:
+                context_name = context.get('name', '').split('/')[-1]
+                if context_name == 'awaiting-email':
+                    # Hay un contexto activo de recuperación de contraseña
+                    # Esto significa que DialogFlow está esperando el email del usuario
+                    logger.info(f"🔄 Contexto 'awaiting-email' detectado en DialogFlow")
+                    
+                    # Usar la respuesta del webhook de DialogFlow directamente
+                    response_text = (
+                        hybrid_result.get('fulfillmentText') or 
+                        hybrid_result.get('fulfillment_text') or 
+                        'Procesando tu solicitud...'
+                    )
+                    
+                    # Guardar contexto en la conversación
+                    conversation.set_context_value('dialogflow_awaiting_email', True)
+                    conversation.add_bot_message(response_text)
+                    self.context_manager.save_conversation(conversation)
+                    
+                    return ProcessMessageResponseDTO(
+                        session_id=request.session_id,
+                        response=response_text,
+                        intent=None,
+                        confidence=hybrid_result.get('confidence', 0.5)
+                    )
+            # ===================================================================
+            
             # Convertir respuesta de híbrido a IntentDetectionResult
             from domain.entities.intent import Intent
             from domain.value_objects.confidence import Confidence
@@ -147,8 +219,22 @@ class ProcessMessageUseCase:
             
             # Si es de Dialogflow, usar su respuesta directamente
             if intent.category == 'dialogflow' and hybrid_result:
-                response_text = hybrid_result.get('fulfillment_text', 'Respuesta de Dialogflow no disponible')
+                # DialogFlow webhook devuelve "fulfillmentText" (con T mayúscula)
+                response_text = (
+                    hybrid_result.get('fulfillmentText') or 
+                    hybrid_result.get('fulfillment_text') or 
+                    'Respuesta de Dialogflow no disponible'
+                )
                 confidence = intent_result.confidence.value
+                
+                # IMPORTANTE: Guardar contextos de DialogFlow en la conversación
+                output_contexts = hybrid_result.get('outputContexts', [])
+                if output_contexts:
+                    for context in output_contexts:
+                        context_name = context.get('name', '').split('/')[-1]
+                        if context_name == 'awaiting-email':
+                            conversation.set_context_value('dialogflow_awaiting_email', True)
+                            logger.info(f"💾 Contexto 'awaiting-email' guardado para sesión {request.session_id}")
             else:
                 # Buscar FAQ más relevante (solo para NLP local)
                 faq_result = await self.nlp_service.find_best_faq(intent, message)
@@ -169,15 +255,23 @@ class ProcessMessageUseCase:
                     response_text = await self.nlp_service.get_fallback_response()
                     confidence = 0.5
         else:
-            # Intent no detectado o baja confianza - buscar en toda la KB
-            kb_results = await self.nlp_service.search_knowledge_base(message, top_n=1)
-            
-            if kb_results and kb_results[0][1].value >= 0.6:
-                faq, faq_confidence = kb_results[0]
-                response_text = faq.get_formatted_answer()
-                confidence = faq_confidence.value
+            # Intent no detectado o baja confianza
+            # Verificar si el servicio tiene knowledge base search
+            if hasattr(self.nlp_service, 'search_knowledge_base'):
+                # Buscar en toda la KB
+                kb_results = await self.nlp_service.search_knowledge_base(message, top_n=1)
+                
+                if kb_results and kb_results[0][1].value >= 0.6:
+                    faq, faq_confidence = kb_results[0]
+                    response_text = faq.get_formatted_answer()
+                    confidence = faq_confidence.value
+                else:
+                    # Fallback response
+                    response_text = await self.nlp_service.get_fallback_response()
+                    confidence = 0.3
             else:
-                # Fallback response
+                # No hay knowledge base disponible, usar fallback directamente
+                logger.warning("⚠️ Knowledge base search no disponible en este servicio")
                 response_text = await self.nlp_service.get_fallback_response()
                 confidence = 0.3
         

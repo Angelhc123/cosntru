@@ -125,15 +125,18 @@ class HybridNLPService:
         # Aquí integrarías con tu motor NLP local existente
         # Por ahora, simulamos el procesamiento
         
-        normalized_text = self.nlp_engine.normalize_text(message.content)
-        keywords = self.nlp_engine.extract_keywords(message.content)
+        # Extraer texto del mensaje (puede ser Message object o string)
+        message_text = message.content if hasattr(message, 'content') else str(message)
+        
+        normalized_text = self.nlp_engine.normalize_text(message_text)
+        keywords = self.nlp_engine.extract_keywords(message_text)
         
         # Lógica simplificada de detección de intención
         intent_name = self._classify_intent(normalized_text, keywords)
         confidence = self._calculate_confidence(normalized_text, intent_name)
         
         return {
-            "query_text": message.content,
+            "query_text": message_text,
             "intent_name": intent_name,
             "intent_id": f"local_{intent_name.lower().replace(' ', '_')}",
             "confidence": confidence,
@@ -142,7 +145,7 @@ class HybridNLPService:
             "action": f"input.{intent_name.lower().replace(' ', '_')}",
             "contexts": [],
             "session_id": session_id,
-            "response_id": f"local_{session_id}_{hash(message.content)}",
+            "response_id": f"local_{session_id}_{hash(message_text)}",
             "keywords": keywords,
             "normalized_text": normalized_text
         }
@@ -228,10 +231,12 @@ class HybridNLPService:
         """
         Respuesta por defecto cuando todos los métodos fallan
         """
-        logger.error(f"❌ All NLP methods failed for message: {message.content}")
+        # Extraer texto del mensaje (puede ser Message object o string)
+        message_text = message.content if hasattr(message, 'content') else str(message)
+        logger.error(f"❌ All NLP methods failed for message: {message_text}")
         
         return {
-            "query_text": message.content,
+            "query_text": message_text,
             "intent_name": "system_fallback",
             "intent_id": "system_fallback",
             "confidence": 0.1,
@@ -248,6 +253,16 @@ class HybridNLPService:
             "hybrid_confidence": 0.1,
             "error": "All NLP methods failed"
         }
+    
+    async def get_fallback_response(self) -> str:
+        """
+        Devuelve una respuesta de fallback cuando no se puede procesar el mensaje
+        """
+        return (
+            "Lo siento, no pude entender tu pregunta. "
+            "¿Podrías reformularla de otra manera? "
+            "También puedes contactar directamente con soporte técnico."
+        )
     
     def get_status(self) -> Dict[str, Any]:
         """

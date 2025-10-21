@@ -3,12 +3,20 @@
  * Conexión a la base de datos proyectotest (simulación UPT)
  * Implementa RF004 y RF007
  */
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
 import * as mysql from 'mysql2/promise';
+import axios from 'axios';
 
 @Injectable()
 export class MySQLConnectionService implements OnModuleInit, OnModuleDestroy {
   private connection: mysql.Connection;
+  private readonly logger = new Logger(MySQLConnectionService.name);
+  private readonly phpApiBaseUrl: string;
+
+  constructor() {
+    this.phpApiBaseUrl = process.env.PHP_API_BASE_URL || 'http://localhost:8000';
+    this.logger.log(`✅ PHP API Base URL configured: ${this.phpApiBaseUrl}`);
+  }
 
   async onModuleInit() {
     try {
@@ -19,67 +27,98 @@ export class MySQLConnectionService implements OnModuleInit, OnModuleDestroy {
         password: process.env.MYSQL_PASSWORD || '',
         database: process.env.MYSQL_DATABASE || 'upt_intranet',
       });
-      console.log('✅ Conectado a MySQL (proyectotest)');
+      this.logger.log('✅ Conectado a MySQL (proyectotest)');
     } catch (error) {
-      console.error('❌ Error conectando a MySQL:', error.message);
+      this.logger.error('❌ Error conectando a MySQL:', error.message);
     }
   }
 
   async onModuleDestroy() {
     if (this.connection) {
       await this.connection.end();
-      console.log('🔌 Desconectado de MySQL');
+      this.logger.log('🔌 Desconectado de MySQL');
     }
   }
 
   /**
-   * Verifica si un email existe en la base de datos
+   * Verifica si un email PERSONAL existe en la base de datos UPT
+   * Llama al endpoint PHP del proyecto test
    */
-  async verifyEmail(email: string): Promise<{ exists: boolean; user?: any }> {
+  async verifyEmailPersonal(emailPersonal: string): Promise<{
+    exists: boolean;
+    usuario?: string;
+    nombreCompleto?: string;
+    email?: string;
+    codigoUniversitario?: string;
+  }> {
     try {
-      const [rows] = await this.connection.execute(
-        'SELECT id, usuario, nombre_completo, email FROM usuarios WHERE email = ?',
-        [email]
+      this.logger.log(`🔍 Verificando email personal: ${emailPersonal}`);
+      
+      const response = await axios.post(
+        `${this.phpApiBaseUrl}/api_verify_email.php`,
+        { email_personal: emailPersonal },
+        {
+          headers: { 'Content-Type': 'application/json' },
+          timeout: 10000,
+        }
       );
 
-      const users = rows as any[];
-      
-      if (users.length > 0) {
+      if (response.data.success) {
+        this.logger.log(`✅ Email personal encontrado: ${response.data.data.usuario}`);
         return {
           exists: true,
-          user: {
-            id: users[0].id,
-            username: users[0].usuario,
-            name: users[0].nombre_completo,
-            email: users[0].email,
-          },
+          usuario: response.data.data.usuario,
+          nombreCompleto: response.data.data.nombre_completo,
+          email: response.data.data.email,
+          codigoUniversitario: response.data.data.codigo_universitario || response.data.data.usuario,
         };
       }
 
+      this.logger.log(`❌ Email personal no encontrado: ${emailPersonal}`);
       return { exists: false };
+      
     } catch (error) {
-      console.error('Error verificando email:', error);
-      throw error;
+      this.logger.error(`❌ Error verificando email personal: ${error.message}`);
+      
+      if (error.response) {
+        this.logger.error(`Response status: ${error.response.status}`);
+        this.logger.error(`Response data: ${JSON.stringify(error.response.data)}`);
+      }
+      
+      return { exists: false };
     }
   }
 
   /**
-   * Actualiza la contraseña de un usuario
+   * Actualiza la contraseña de un usuario usando el endpoint PHP
    */
-  async updatePassword(email: string, newPassword: string): Promise<boolean> {
+  async updateUserPassword(usuario: string, newPassword: string): Promise<boolean> {
     try {
-      // En producción, deberías hashear la contraseña
-      // Para pruebas, guardamos en texto plano
-      const [result] = await this.connection.execute(
-        'UPDATE usuarios SET password = ?, updated_at = NOW() WHERE email = ?',
-        [newPassword, email]
+      this.logger.log(`🔄 Actualizando contraseña para usuario: ${usuario}`);
+      
+      const response = await axios.post(
+        `${this.phpApiBaseUrl}/api_update_password.php`,
+        {
+          usuario: usuario,
+          new_password: newPassword,
+        },
+        {
+          headers: { 'Content-Type': 'application/json' },
+          timeout: 10000,
+        }
       );
 
-      const updateResult = result as mysql.ResultSetHeader;
-      return updateResult.affectedRows > 0;
+      if (response.data.success) {
+        this.logger.log(`✅ Contraseña actualizada para: ${usuario}`);
+        return true;
+      }
+
+      this.logger.error(`❌ Error actualizando contraseña: ${response.data.message}`);
+      return false;
+      
     } catch (error) {
-      console.error('Error actualizando contraseña:', error);
-      throw error;
+      this.logger.error(`❌ Error actualizando contraseña: ${error.message}`);
+      return false;
     }
   }
 

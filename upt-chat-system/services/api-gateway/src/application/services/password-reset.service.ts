@@ -41,6 +41,20 @@ export class PasswordResetService {
   }
 
   /**
+   * Verifica si un email personal existe en la base de datos UPT
+   * RF004 - Validación por Correo Personal
+   */
+  async verifyEmailPersonal(emailPersonal: string): Promise<{
+    exists: boolean;
+    usuario?: string;
+    nombreCompleto?: string;
+    email?: string;
+    codigoUniversitario?: string;
+  }> {
+    return await this.mysqlService.verifyEmailPersonal(emailPersonal);
+  }
+
+  /**
    * Genera un token seguro aleatorio
    */
   private generateToken(): string {
@@ -75,13 +89,13 @@ export class PasswordResetService {
    */
   async initiatePasswordReset(email: string, sessionId: string): Promise<any> {
     try {
-      // 1. Verificar que el email existe
-      const verification = await this.mysqlService.verifyEmail(email);
+      // 1. Verificar que el email personal existe
+      const verification = await this.mysqlService.verifyEmailPersonal(email);
       
       if (!verification.exists) {
         return {
           success: false,
-          message: 'Email no encontrado en el sistema',
+          message: 'Email personal no encontrado en el sistema',
         };
       }
 
@@ -110,12 +124,12 @@ export class PasswordResetService {
       });
 
       // 5. Enviar email de confirmación via Notification Service
-      const confirmationUrl = `${process.env.API_GATEWAY_URL || 'http://localhost:3000'}/api/password-reset/confirm/${token}`;
+      const confirmationUrl = `${process.env.API_GATEWAY_URL || 'http://localhost:3000'}/api/v1/password-reset/confirm/${token}`;
       
       try {
         await axios.post(`${this.notificationServiceUrl}/api/notifications/email/password-reset-confirmation`, {
           to: email,
-          userName: verification.user.name,
+          userName: verification.nombreCompleto,
           confirmationUrl,
         });
         this.logger.log(`✅ Email de confirmación enviado a ${email}`);
@@ -169,9 +183,19 @@ export class PasswordResetService {
       // 3. Generar nueva contraseña
       const newPassword = this.generateSecurePassword();
 
-      // 4. Actualizar contraseña en MySQL
-      const updated = await this.mysqlService.updatePassword(
-        tokenDoc.email,
+      // 4. Obtener información del usuario por email personal
+      const userInfo = await this.mysqlService.verifyEmailPersonal(tokenDoc.email);
+      
+      if (!userInfo.exists || !userInfo.usuario) {
+        return {
+          success: false,
+          message: 'Usuario no encontrado',
+        };
+      }
+
+      // 5. Actualizar contraseña en MySQL usando el nombre de usuario
+      const updated = await this.mysqlService.updateUserPassword(
+        userInfo.usuario,
         newPassword
       );
 
@@ -182,13 +206,13 @@ export class PasswordResetService {
         };
       }
 
-      // 5. Marcar token como usado
+      // 6. Marcar token como usado
       await this.tokenModel.updateOne(
         { token },
         { used: true }
       );
 
-      // 6. Actualizar notificación
+      // 7. Actualizar notificación
       await this.notificationModel.updateOne(
         { session_id: tokenDoc.session_id },
         { 
@@ -198,14 +222,11 @@ export class PasswordResetService {
         }
       );
 
-      // 7. Obtener información del usuario
-      const user = await this.mysqlService.getUserByEmail(tokenDoc.email);
-
       // 8. Enviar email con nueva contraseña via Notification Service
       try {
         await axios.post(`${this.notificationServiceUrl}/api/notifications/email/new-password`, {
           to: tokenDoc.email,
-          userName: user.nombre_completo,
+          userName: userInfo.nombreCompleto,
           newPassword,
         });
         this.logger.log(`✅ Email con nueva contraseña enviado a ${tokenDoc.email}`);
@@ -213,8 +234,15 @@ export class PasswordResetService {
         this.logger.error(`❌ Error enviando email: ${error.message}`);
       }
 
-      // 9. Registrar log de acceso
-      await this.mysqlService.logAccess(user.id, 'password_reset');
+      // 9. Registrar log de acceso (opcional)
+      try {
+        const user = await this.mysqlService.getUserByEmail(tokenDoc.email);
+        if (user && user.id) {
+          await this.mysqlService.logAccess(user.id, 'password_reset');
+        }
+      } catch (error) {
+        this.logger.warn(`⚠️ No se pudo registrar log de acceso: ${error.message}`);
+      }
 
       return {
         success: true,

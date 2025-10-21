@@ -7,7 +7,7 @@ import { Controller, Post, Body, Get, Param, HttpStatus, HttpException } from '@
 import { PasswordResetService } from '../../application/services/password-reset.service';
 import { InitiateResetDto, ConfirmResetDto } from '../../application/dtos/password-reset.dto';
 
-@Controller('api/password-reset')
+@Controller('password-reset')
 export class PasswordResetController {
   constructor(private readonly passwordResetService: PasswordResetService) {}
 
