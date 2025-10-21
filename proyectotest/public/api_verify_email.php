@@ -58,42 +58,7 @@ try {
         exit();
     }
     
-    // ===================================================================
-    // USUARIOS DE PRUEBA (RF004 Testing)
-    // ===================================================================
-    $test_users = [
-        'xxdescixx@gmail.com' => [
-            'id' => 9999,
-            'usuario' => 'xxdescixx',
-            'nombre_completo' => 'Desci Test Usuario',
-            'email' => 'xxdescixx@gmail.com',
-            'email_institucional' => 'xxdescixx@upt.pe',
-            'codigo_universitario' => '2024999999'
-        ],
-        'angelxhernandezxcruz@gmail.com' => [
-            'id' => 9998,
-            'usuario' => 'angelxhcruz',
-            'nombre_completo' => 'Angel Hernandez Cruz',
-            'email' => 'angelxhernandezxcruz@gmail.com',
-            'email_institucional' => 'angel.hernandez@upt.pe',
-            'codigo_universitario' => '2024999998'
-        ]
-    ];
-    
-    // Si es un usuario de prueba, devolver directamente
-    if (isset($test_users[$email_personal])) {
-        $test_user = $test_users[$email_personal];
-        http_response_code(200);
-        echo json_encode([
-            'success' => true,
-            'message' => 'Email personal encontrado (TEST USER)',
-            'data' => $test_user
-        ]);
-        exit();
-    }
-    // ===================================================================
-    
-    // Conectar a base de datos (solo si no es usuario de prueba)
+    // Conectar a base de datos
     $database = new Database();
     $db = $database->getConnection();
     

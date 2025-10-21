@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Insertar usuarios de prueba (contraseña por defecto: "password123" para todos)
--- Hash generado con: password_hash('password123', PASSWORD_DEFAULT)
+-- Insertar usuarios de prueba (contraseña por defecto: "password" para todos)
+-- Hash generado con: password_hash('password', PASSWORD_DEFAULT)
 
 -- Usuario demo original
 INSERT INTO usuarios (usuario, password, nombre_completo, email, email_personal, tipo_usuario, codigo_universitario, carrera, estado) 
