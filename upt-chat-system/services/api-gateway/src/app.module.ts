@@ -38,6 +38,7 @@ import { HealthController } from './presentation/controllers/health.controller';
 import { PasswordResetController } from './infrastructure/controllers/password-reset.controller';
 import { NlpController } from './presentation/controllers/nlp.controller';
 import { ConfigController } from './presentation/controllers/config.controller';
+import { FaqsController } from './presentation/controllers/faqs.controller';
 
 // Auth
 import { JwtStrategy } from './infrastructure/auth/strategies/jwt.strategy';
@@ -50,6 +51,7 @@ import { MongoChatSessionRepository } from './infrastructure/database/repositori
 import { UserDocument, UserSchema } from './infrastructure/database/schemas/user.schema';
 import { ChatSessionDocument, ChatSessionSchema } from './infrastructure/database/schemas/chat-session.schema';
 import { MessageDocument, MessageSchema } from './infrastructure/database/schemas/message.schema';
+import { FaqDocument, FaqSchema } from './infrastructure/database/schemas/faq.schema';
 
 // RF004 Services
 import { MySQLConnectionService } from './infrastructure/services/mysql-connection.service';
@@ -76,6 +78,7 @@ import { IChatSessionRepository } from './domain/repositories/chat-session.repos
       { name: 'User', schema: UserSchema },
       { name: 'ChatSession', schema: ChatSessionSchema },
       { name: 'Message', schema: MessageSchema },
+      { name: 'Faq', schema: FaqSchema },
       // RF004: Schemas para password reset
       { 
         name: 'PasswordResetToken', 
@@ -127,6 +130,7 @@ import { IChatSessionRepository } from './domain/repositories/chat-session.repos
     PasswordResetController, // RF004
     NlpController, // NLP Integration
     ConfigController, // Widget Configuration
+    FaqsController, // FAQs Management
   ],
   
   providers: [

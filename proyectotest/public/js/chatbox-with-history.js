@@ -44,6 +44,7 @@ class ChatboxWidgetWithHistory {
     init() {
         this.createChatboxHTML();
         this.attachEventListeners();
+        this.loadFaqs(); // Cargar FAQs al inicializar
         
         // Si hay sesión activa, cargar mensajes
         if (this.sessionToken) {
@@ -97,6 +98,10 @@ class ChatboxWidgetWithHistory {
                                 ➕ Iniciar Nueva Conversación
                             </button>
                         </div>
+                    </div>
+                    
+                    <div id="quick-faqs" class="quick-faqs-container" style="display: none;">
+                        <!-- FAQs se cargarán aquí -->
                     </div>
                     
                     <div class="chat-input-container" id="chat-input-area" style="display: none;">
@@ -198,6 +203,7 @@ class ChatboxWidgetWithHistory {
         document.getElementById('start-conversation-prompt').style.display = 'flex';
         document.getElementById('chat-input-area').style.display = 'none';
         document.getElementById('chat-footer').style.display = 'none';
+        document.getElementById('quick-faqs').style.display = 'none';
     }
     
     showChatInterface() {
@@ -208,6 +214,7 @@ class ChatboxWidgetWithHistory {
         }
         document.getElementById('chat-input-area').style.display = 'flex';
         document.getElementById('chat-footer').style.display = 'block';
+        document.getElementById('quick-faqs').style.display = 'flex';
     }
 
     toggleHistory() {
@@ -606,6 +613,58 @@ class ChatboxWidgetWithHistory {
         
         messagesContainer.appendChild(errorDiv);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    async loadFaqs() {
+        try {
+            const response = await fetch(`${this.apiGatewayUrl}/faqs/active`);
+            const data = await response.json();
+            
+            if (data.status === 'success' && data.data && data.data.length > 0) {
+                this.renderFaqs(data.data);
+            }
+        } catch (error) {
+            console.error('⚠️ Error al cargar FAQs:', error);
+        }
+    }
+
+    renderFaqs(faqs) {
+        const container = document.getElementById('quick-faqs');
+        if (!container) return;
+
+        container.innerHTML = faqs.map(faq => 
+            `<button class="faq-button" data-text="${this.escapeHtml(faq.texto_chat)}">
+                ${this.escapeHtml(faq.nombre)}
+            </button>`
+        ).join('');
+
+        // Agregar event listeners a los botones de FAQ
+        container.querySelectorAll('.faq-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                this.handleFaqClick(e.target.dataset.text);
+            });
+        });
+    }
+
+    handleFaqClick(text) {
+        // Llenar el input con el texto de la FAQ
+        const input = document.getElementById('chat-input');
+        input.value = text;
+        
+        // Enviar automáticamente el mensaje
+        this.sendMessage();
+        
+        // Agregar animación al botón
+        event.target.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            event.target.style.transform = 'scale(1)';
+        }, 150);
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 }
 

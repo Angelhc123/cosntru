@@ -27,6 +27,7 @@ const health_controller_1 = require("./presentation/controllers/health.controlle
 const password_reset_controller_1 = require("./infrastructure/controllers/password-reset.controller");
 const nlp_controller_1 = require("./presentation/controllers/nlp.controller");
 const config_controller_1 = require("./presentation/controllers/config.controller");
+const faqs_controller_1 = require("./presentation/controllers/faqs.controller");
 const jwt_strategy_1 = require("./infrastructure/auth/strategies/jwt.strategy");
 const logger_service_1 = require("./infrastructure/logging/logger.service");
 const health_use_cases_1 = require("./application/use-cases/health.use-cases");
@@ -35,6 +36,7 @@ const mongo_chat_session_repository_1 = require("./infrastructure/database/repos
 const user_schema_1 = require("./infrastructure/database/schemas/user.schema");
 const chat_session_schema_1 = require("./infrastructure/database/schemas/chat-session.schema");
 const message_schema_1 = require("./infrastructure/database/schemas/message.schema");
+const faq_schema_1 = require("./infrastructure/database/schemas/faq.schema");
 const mysql_connection_service_1 = require("./infrastructure/services/mysql-connection.service");
 const password_reset_service_1 = require("./application/services/password-reset.service");
 const nlp_service_1 = require("./application/services/nlp.service");
@@ -53,6 +55,7 @@ exports.AppModule = AppModule = __decorate([
                 { name: 'User', schema: user_schema_1.UserSchema },
                 { name: 'ChatSession', schema: chat_session_schema_1.ChatSessionSchema },
                 { name: 'Message', schema: message_schema_1.MessageSchema },
+                { name: 'Faq', schema: faq_schema_1.FaqSchema },
                 {
                     name: 'PasswordResetToken',
                     schema: new (require('mongoose').Schema)({
@@ -96,6 +99,7 @@ exports.AppModule = AppModule = __decorate([
             password_reset_controller_1.PasswordResetController,
             nlp_controller_1.NlpController,
             config_controller_1.ConfigController,
+            faqs_controller_1.FaqsController,
         ],
         providers: [
             app_service_1.AppService,

@@ -43,7 +43,14 @@ class AuthController {
                 $_SESSION['user_id'] = $this->user->id;
                 $_SESSION['usuario'] = $this->user->usuario;
                 $_SESSION['nombre_completo'] = $this->user->nombre_completo;
-                header("Location: dashboard.php");
+                $_SESSION['tipo_usuario'] = $this->user->tipo_usuario;  // ✅ Guardar tipo de usuario
+                
+                // ✅ Redirigir según tipo de usuario
+                if ($this->user->tipo_usuario === 'administrativo') {
+                    header("Location: admin_dashboard.php");
+                } else {
+                    header("Location: dashboard.php");
+                }
                 exit();
             } else {
                 $_SESSION['error'] = "Usuario o contraseña incorrectos";
