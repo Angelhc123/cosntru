@@ -27,52 +27,42 @@ kill_port() {
     fi
 }
 
-# Detener por puerto
-echo -e "${YELLOW}🔍 Buscando y deteniendo servicios...${NC}\n"
+# Detener por puerto PRIMERO (más confiable)
+echo -e "${YELLOW}🔍 Buscando y deteniendo servicios por puerto...${NC}\n"
 
 kill_port 8000 "Frontend PHP"
-kill_port 3000 "API Gateway"
+kill_port 3000 "API Gateway" 
 kill_port 8001 "NLP Service"
 kill_port 3005 "Notification Service"
-kill_port 4040 "ngrok"
 
-# Detener ngrok específicamente
-if pkill -x ngrok 2>/dev/null; then
-    echo -e "${GREEN}✅ ngrok detenido${NC}"
-else
-    echo -e "${YELLOW}⚠️  ngrok no estaba corriendo${NC}"
-fi
-
-# Detener por proceso
+# Detener por proceso (por si quedaron zombies)
 echo ""
-echo -e "${YELLOW}🔍 Buscando procesos por nombre...${NC}\n"
+echo -e "${YELLOW}🔍 Limpiando procesos residuales...${NC}\n"
 
-# NLP Service
-if pkill -f "python3 main.py" 2>/dev/null; then
-    echo -e "${GREEN}✅ NLP Service detenido${NC}"
-else
-    echo -e "${YELLOW}⚠️  NLP Service no encontrado${NC}"
+# Frontend PHP
+if pkill -9 -f "php -S localhost:8000" 2>/dev/null; then
+    echo -e "${GREEN}✅ Proceso PHP limpiado${NC}"
 fi
 
-# API Gateway
-if pkill -f "nest start" 2>/dev/null; then
-    echo -e "${GREEN}✅ API Gateway detenido${NC}"
-else
-    echo -e "${YELLOW}⚠️  API Gateway no encontrado${NC}"
+# NLP Service (FastAPI/Uvicorn)
+if pkill -9 -f "main.py" 2>/dev/null; then
+    echo -e "${GREEN}✅ Proceso NLP Service limpiado${NC}"
+fi
+
+# API Gateway (NestJS)
+if pkill -9 -f "nest start" 2>/dev/null || pkill -9 -f "api-gateway" 2>/dev/null; then
+    echo -e "${GREEN}✅ Proceso API Gateway limpiado${NC}"
 fi
 
 # Notification Service
-if pkill -f "notification-service" 2>/dev/null; then
-    echo -e "${GREEN}✅ Notification Service detenido${NC}"
-else
-    echo -e "${YELLOW}⚠️  Notification Service no encontrado${NC}"
+if pkill -9 -f "notification-service" 2>/dev/null; then
+    echo -e "${GREEN}✅ Proceso Notification Service limpiado${NC}"
 fi
 
-# Frontend PHP
-if pkill -f "php -S localhost:8000" 2>/dev/null; then
-    echo -e "${GREEN}✅ Frontend PHP detenido${NC}"
-else
-    echo -e "${YELLOW}⚠️  Frontend PHP no encontrado${NC}"
+# ngrok
+if pkill -9 ngrok 2>/dev/null; then
+    echo -e "${GREEN}✅ ngrok detenido${NC}"
+    kill_port 4040 "ngrok web interface"
 fi
 
 # Limpiar archivos de log (opcional)

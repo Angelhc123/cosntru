@@ -173,7 +173,7 @@ export class ChatSessionsController {
         });
         
         return {
-          sessionId: session.sessionId,
+          sessionId: session._id.toString(),  // ✅ CORRECCIÓN: Usar _id no sessionId
           title: `Conversación ${sessionNumber}`,
           date: dateStr,
           isActive: session.isActive,
@@ -358,10 +358,28 @@ export class ChatSessionsController {
     try {
       console.log('🔍 Buscando mensajes para sessionId:', sessionId);
       
+      // ✅ VALIDACIÓN CRÍTICA: Verificar que la sesión existe y obtener su userId
+      const session = await this.chatSessionModel
+        .findById(sessionId)
+        .select('userId')
+        .lean();
+      
+      if (!session) {
+        console.warn('⚠️  Sesión no encontrada:', sessionId);
+        return {
+          status: 'success',
+          message: 'Sesión no encontrada',
+          data: []
+        };
+      }
+      
+      console.log('✅ Sesión encontrada con userId:', session.userId);
+      
+      // ✅ Filtrar SOLO por sessionId (es suficiente para seguridad)
       const messages = await this.messageModel
         .find({ sessionId })
         .sort({ timestamp: 1 })
-        .select('sender text timestamp metadata')
+        .select('sender text timestamp metadata userId')
         .lean();
       
       console.log(`📨 Encontrados ${messages.length} mensajes para session ${sessionId}`);
@@ -508,6 +526,56 @@ export class ChatSessionsController {
           status: 'error',
           message: 'Error interno del servidor',
           errorCode: 'INTERNAL_ERROR'
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Post('cleanup-undefined')
+  @ApiOperation({ summary: '🧹 Limpiar datos basura con sessionId "undefined"' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Datos basura eliminados exitosamente' 
+  })
+  async cleanupUndefinedData(): Promise<{
+    status: string;
+    message: string;
+    data: {
+      messagesDeleted: number;
+      sessionsDeleted: number;
+    };
+  }> {
+    try {
+      console.log('🧹 Iniciando limpieza de datos basura con sessionId "undefined"...');
+      
+      // Eliminar mensajes con sessionId "undefined"
+      const messagesResult = await this.messageModel.deleteMany({ 
+        sessionId: 'undefined' 
+      });
+      console.log(`✅ Mensajes eliminados: ${messagesResult.deletedCount}`);
+      
+      // Eliminar sesiones con _id "undefined"
+      const sessionsResult = await this.chatSessionModel.deleteMany({ 
+        _id: 'undefined' 
+      });
+      console.log(`✅ Sesiones eliminadas: ${sessionsResult.deletedCount}`);
+      
+      return {
+        status: 'success',
+        message: 'Datos basura eliminados exitosamente',
+        data: {
+          messagesDeleted: messagesResult.deletedCount,
+          sessionsDeleted: sessionsResult.deletedCount
+        }
+      };
+    } catch (error) {
+      console.error('❌ Error limpiando datos basura:', error);
+      throw new HttpException(
+        {
+          status: 'error',
+          message: 'Error al limpiar datos basura',
+          errorCode: 'CLEANUP_ERROR'
         },
         HttpStatus.INTERNAL_SERVER_ERROR
       );

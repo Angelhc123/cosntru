@@ -24,15 +24,15 @@ export class NlpService {
                 try {
                     await this.messageModel.create({
                         sessionId: sessionId,
+                        userId: userId || 'anonymous',  // ✅ Campo principal, no metadata
                         sender: 'user',
                         text: text,
                         timestamp: new Date(),
                         metadata: {
-                            userId: userId || 'anonymous',
                             language: language
                         }
                     });
-                    console.log('✅ Mensaje de usuario guardado en MongoDB');
+                    console.log('✅ Mensaje de usuario guardado en MongoDB con userId:', userId);
                 } catch (dbError) {
                     console.error('⚠️  Error guardando mensaje de usuario:', dbError.message);
                 }
@@ -57,23 +57,29 @@ export class NlpService {
             console.log('✅ Respuesta de NLP Service:', response.data);
 
             // 3. Guardar respuesta del BOT en MongoDB
-            if (sessionId && response.data && response.data.data && response.data.data.response) {
+            // ✅ CORRECCIÓN: El NLP Service retorna directamente response, no data.data.response
+            const botResponse = response.data?.response || response.data?.data?.response;
+            
+            if (sessionId && botResponse) {
                 try {
                     await this.messageModel.create({
                         sessionId: sessionId,
+                        userId: userId || 'anonymous',
                         sender: 'bot',
-                        text: response.data.data.response,
+                        text: botResponse,
                         timestamp: new Date(),
                         metadata: {
-                            intent: response.data.data.intent,
-                            confidence: response.data.data.confidence,
-                            source: response.data.data.source
+                            intent: response.data?.intent || response.data?.data?.intent,
+                            confidence: response.data?.confidence || response.data?.data?.confidence,
+                            source: response.data?.source || response.data?.data?.source
                         }
                     });
-                    console.log('✅ Respuesta del bot guardada en MongoDB');
+                    console.log('✅ Respuesta del bot guardada en MongoDB:', botResponse.substring(0, 50) + '...');
                 } catch (dbError) {
                     console.error('⚠️  Error guardando respuesta del bot:', dbError.message);
                 }
+            } else {
+                console.warn('⚠️  No se pudo guardar respuesta del bot. sessionId:', sessionId, 'botResponse:', botResponse);
             }
 
             return response.data;

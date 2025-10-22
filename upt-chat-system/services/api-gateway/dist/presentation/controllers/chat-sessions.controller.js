@@ -106,7 +106,7 @@ let ChatSessionsController = class ChatSessionsController {
                     minute: '2-digit'
                 });
                 return {
-                    sessionId: session.sessionId,
+                    sessionId: session._id.toString(),
                     title: `Conversación ${sessionNumber}`,
                     date: dateStr,
                     isActive: session.isActive,
@@ -203,10 +203,23 @@ let ChatSessionsController = class ChatSessionsController {
     async getSessionMessages(sessionId) {
         try {
             console.log('🔍 Buscando mensajes para sessionId:', sessionId);
+            const session = await this.chatSessionModel
+                .findById(sessionId)
+                .select('userId')
+                .lean();
+            if (!session) {
+                console.warn('⚠️  Sesión no encontrada:', sessionId);
+                return {
+                    status: 'success',
+                    message: 'Sesión no encontrada',
+                    data: []
+                };
+            }
+            console.log('✅ Sesión encontrada con userId:', session.userId);
             const messages = await this.messageModel
                 .find({ sessionId })
                 .sort({ timestamp: 1 })
-                .select('sender text timestamp metadata')
+                .select('sender text timestamp metadata userId')
                 .lean();
             console.log(`📨 Encontrados ${messages.length} mensajes para session ${sessionId}`);
             return {
@@ -288,6 +301,35 @@ let ChatSessionsController = class ChatSessionsController {
                 status: 'error',
                 message: 'Error interno del servidor',
                 errorCode: 'INTERNAL_ERROR'
+            }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async cleanupUndefinedData() {
+        try {
+            console.log('🧹 Iniciando limpieza de datos basura con sessionId "undefined"...');
+            const messagesResult = await this.messageModel.deleteMany({
+                sessionId: 'undefined'
+            });
+            console.log(`✅ Mensajes eliminados: ${messagesResult.deletedCount}`);
+            const sessionsResult = await this.chatSessionModel.deleteMany({
+                _id: 'undefined'
+            });
+            console.log(`✅ Sesiones eliminadas: ${sessionsResult.deletedCount}`);
+            return {
+                status: 'success',
+                message: 'Datos basura eliminados exitosamente',
+                data: {
+                    messagesDeleted: messagesResult.deletedCount,
+                    sessionsDeleted: sessionsResult.deletedCount
+                }
+            };
+        }
+        catch (error) {
+            console.error('❌ Error limpiando datos basura:', error);
+            throw new common_1.HttpException({
+                status: 'error',
+                message: 'Error al limpiar datos basura',
+                errorCode: 'CLEANUP_ERROR'
             }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -446,6 +488,17 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], ChatSessionsController.prototype, "cleanupSessions", null);
+__decorate([
+    (0, common_1.Post)('cleanup-undefined'),
+    (0, swagger_1.ApiOperation)({ summary: '🧹 Limpiar datos basura con sessionId "undefined"' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Datos basura eliminados exitosamente'
+    }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ChatSessionsController.prototype, "cleanupUndefinedData", null);
 exports.ChatSessionsController = ChatSessionsController = __decorate([
     (0, swagger_1.ApiTags)('Chat Sessions'),
     (0, common_1.Controller)('chat-sessions'),

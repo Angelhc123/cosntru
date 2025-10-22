@@ -11,9 +11,24 @@ class ChatboxWidgetWithHistory {
         // Obtener valores del localStorage
         const storedToken = localStorage.getItem('chat_session_token');
         const storedId = localStorage.getItem('chat_session_id');
+        const storedUserId = localStorage.getItem('chat_user_id');
         
-        this.sessionToken = (storedToken && storedToken !== 'undefined' && storedToken !== 'null') ? storedToken : null;
-        this.sessionId = (storedId && storedId !== 'undefined' && storedId !== 'null') ? storedId : null;
+        // ✅ VALIDACIÓN: Si el userId cambió, limpiar sesión anterior
+        if (storedUserId && storedUserId !== String(userId)) {
+            console.warn('⚠️  Usuario cambió. Limpiando sesión anterior.');
+            localStorage.removeItem('chat_session_id');
+            localStorage.removeItem('chat_session_token');
+            localStorage.removeItem('chat_user_id');
+            this.sessionToken = null;
+            this.sessionId = null;
+        } else {
+            this.sessionToken = (storedToken && storedToken !== 'undefined' && storedToken !== 'null') ? storedToken : null;
+            this.sessionId = (storedId && storedId !== 'undefined' && storedId !== 'null') ? storedId : null;
+        }
+        
+        // Guardar userId actual
+        localStorage.setItem('chat_user_id', String(userId));
+        
         this.isOpen = false;
         this.historyOpen = false;
         
@@ -291,6 +306,7 @@ class ChatboxWidgetWithHistory {
             // Limpiar localStorage
             localStorage.removeItem('chat_session_id');
             localStorage.removeItem('chat_session_token');
+            localStorage.removeItem('chat_user_id');  // ✅ Limpiar userId también
             
             this.sessionId = null;
             this.sessionToken = null;
@@ -333,26 +349,69 @@ class ChatboxWidgetWithHistory {
 
     async startNewSession() {
         try {
+            console.log('🔄 Creando nueva sesión para userId:', this.userId);
+            
+            // ✅ PASO 1: Cerrar sesión anterior si existe
+            if (this.sessionId && this.sessionId !== 'undefined' && this.sessionId !== 'null') {
+                console.log('🔒 Cerrando sesión anterior:', this.sessionId);
+                await this.endConversation(false); // false = no mostrar mensaje
+            }
+            
+            // ✅ PASO 2: Crear nueva sesión
             const response = await fetch(`${this.apiGatewayUrl}/chat-sessions/start/${this.userId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                }
+                },
+                body: JSON.stringify({})  // Body vacío pero válido
             });
 
             const data = await response.json();
+            console.log('📦 Respuesta de creación de sesión:', data);
             
-            if (data.status === 'success') {
-                this.sessionId = data.data.sessionId;
+            if (data.status === 'success' && data.data) {
+                // ✅ CORRECCIÓN: El backend retorna "id" no "sessionId"
+                this.sessionId = data.data.id;  // ← ERA data.data.sessionId
                 this.sessionToken = data.data.sessionToken;
+                
+                // Validar que los valores no sean undefined
+                if (!this.sessionId || this.sessionId === 'undefined') {
+                    console.error('❌ sessionId inválido recibido:', this.sessionId);
+                    throw new Error('SessionId inválido');
+                }
+                
+                if (!this.sessionToken || this.sessionToken === 'undefined') {
+                    console.error('❌ sessionToken inválido recibido:', this.sessionToken);
+                    throw new Error('SessionToken inválido');
+                }
                 
                 localStorage.setItem('chat_session_id', this.sessionId);
                 localStorage.setItem('chat_session_token', this.sessionToken);
+                localStorage.setItem('chat_user_id', String(this.userId));  // ✅ Guardar userId también
                 
-                console.log('✅ Nueva sesión iniciada:', this.sessionId);
+                console.log('✅ Nueva sesión iniciada correctamente:', {
+                    sessionId: this.sessionId,
+                    sessionToken: this.sessionToken,
+                    userId: this.userId
+                });
+                
+                // ✅ PASO 3: Limpiar mensajes anteriores
+                const messagesContainer = document.getElementById('chat-messages');
+                messagesContainer.innerHTML = `
+                    <div class="welcome-message">
+                        🎉 Nueva conversación iniciada
+                    </div>
+                `;
+                
+                return true;
+            } else {
+                console.error('❌ Error en respuesta de sesión:', data);
+                throw new Error('No se pudo crear la sesión');
             }
         } catch (error) {
-            console.error('Error al iniciar sesión:', error);
+            console.error('❌ Error al iniciar sesión:', error);
+            this.showError('Error al crear sesión de chat');
+            return false;
         }
     }
 
@@ -361,6 +420,19 @@ class ChatboxWidgetWithHistory {
         const message = input.value.trim();
         
         if (!message) return;
+        
+        // VALIDAR que tengamos sessionId válido
+        if (!this.sessionId || this.sessionId === 'undefined' || this.sessionId === 'null') {
+            console.error('❌ No hay sessionId válido. Iniciando nueva sesión...');
+            await this.startNewSession();
+            
+            if (!this.sessionId) {
+                this.addMessage('Error: No se pudo crear sesión. Intenta de nuevo.', 'bot');
+                return;
+            }
+        }
+        
+        console.log('📤 Enviando mensaje con sessionId:', this.sessionId);
         
         // Mostrar mensaje del usuario
         this.addMessage(message, 'user');
@@ -377,24 +449,41 @@ class ChatboxWidgetWithHistory {
                 },
                 body: JSON.stringify({
                     text: message,
-                    session_id: this.sessionId,
+                    session_id: this.sessionId,  // ✅ Ahora garantizado que es válido
                     user_id: this.userId
                 })
             });
 
             const data = await response.json();
+            console.log('📥 Respuesta completa del bot:', JSON.stringify(data, null, 2));
             
             // Remover indicador de "escribiendo..."
             this.removeTypingIndicator();
             
-            if (data.success && data.data) {
-                this.addMessage(data.data.response, 'bot');
+            // ✅ ARREGLO: Probar diferentes estructuras de respuesta
+            let botResponse = null;
+            
+            if (data.data?.data?.response) {
+                botResponse = data.data.data.response;
+                console.log('✅ Respuesta encontrada en data.data.data.response');
+            } else if (data.data?.response) {
+                botResponse = data.data.response;
+                console.log('✅ Respuesta encontrada en data.data.response');
+            } else if (data.response) {
+                botResponse = data.response;
+                console.log('✅ Respuesta encontrada en data.response');
+            }
+            
+            if (botResponse) {
+                this.addMessage(botResponse, 'bot');
             } else {
+                console.error('❌ No se encontró respuesta del bot en la estructura de datos');
                 this.addMessage('Lo siento, hubo un error al procesar tu mensaje.', 'bot');
             }
         } catch (error) {
             this.removeTypingIndicator();
-            console.error('Error al enviar mensaje:', error);
+            console.error('❌ Error completo al enviar mensaje:', error);
+            console.error('❌ Error al enviar mensaje:', error);
             this.addMessage('Error de conexión. Por favor, intenta nuevamente.', 'bot');
         }
     }
@@ -429,7 +518,19 @@ class ChatboxWidgetWithHistory {
 
     async loadMessages() {
         try {
-            console.log('📥 Cargando mensajes para sessionId:', this.sessionId);
+            // ✅ VALIDACIÓN CRÍTICA: Verificar que el sessionId sea válido y no "undefined"
+            if (!this.sessionId || this.sessionId === 'undefined' || this.sessionId === 'null') {
+                console.warn('⚠️  No hay sessionId válido. No se pueden cargar mensajes.');
+                const messagesContainer = document.getElementById('chat-messages');
+                messagesContainer.innerHTML = `
+                    <div class="welcome-message">
+                        ⚠️ Crea una nueva conversación para comenzar
+                    </div>
+                `;
+                return;
+            }
+            
+            console.log('📥 Cargando mensajes para sessionId:', this.sessionId, 'userId:', this.userId);
             
             const response = await fetch(
                 `${this.apiGatewayUrl}/chat-sessions/${this.sessionId}/messages`
@@ -442,13 +543,13 @@ class ChatboxWidgetWithHistory {
                 const messagesContainer = document.getElementById('chat-messages');
                 messagesContainer.innerHTML = '';
                 
-                // Los mensajes vienen en data.data (array directo)
+                // ✅ El backend YA filtra por sessionId y userId, solo renderizamos
                 data.data.forEach(msg => {
                     // Los mensajes tienen 'text' no 'content'
                     this.addMessage(msg.text, msg.sender);
                 });
                 
-                console.log(`✅ ${data.data.length} mensajes cargados`);
+                console.log(`✅ ${data.data.length} mensajes cargados correctamente`);
             } else {
                 console.log('ℹ️  No hay mensajes en esta conversación');
                 const messagesContainer = document.getElementById('chat-messages');
@@ -477,6 +578,7 @@ class ChatboxWidgetWithHistory {
 
             localStorage.removeItem('chat_session_id');
             localStorage.removeItem('chat_session_token');
+            localStorage.removeItem('chat_user_id');  // ✅ Limpiar userId también
             
             this.sessionId = null;
             this.sessionToken = null;

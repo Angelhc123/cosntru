@@ -82,4 +82,12 @@ export declare class ChatSessionsController {
             cleanedSessions: number;
         };
     }>;
+    cleanupUndefinedData(): Promise<{
+        status: string;
+        message: string;
+        data: {
+            messagesDeleted: number;
+            sessionsDeleted: number;
+        };
+    }>;
 }
