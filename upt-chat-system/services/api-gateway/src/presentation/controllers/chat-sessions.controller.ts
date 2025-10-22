@@ -14,6 +14,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { MessageDocument } from '../../infrastructure/database/schemas/message.schema';
+import { ChatSessionDocument } from '../../infrastructure/database/schemas/chat-session.schema';
 import { 
   StartChatSessionUseCase,
   GetActiveChatSessionUseCase,
@@ -49,7 +50,8 @@ export class ChatSessionsController {
     private readonly updateSessionMetadataUseCase: UpdateSessionMetadataUseCase,
     private readonly getSessionAnalyticsUseCase: GetSessionAnalyticsUseCase,
     private readonly cleanupExpiredSessionsUseCase: CleanupExpiredSessionsUseCase,
-    @InjectModel('Message') private readonly messageModel: Model<MessageDocument>
+    @InjectModel('Message') private readonly messageModel: Model<MessageDocument>,
+    @InjectModel('ChatSession') private readonly chatSessionModel: Model<ChatSessionDocument>
   ) {}
 
   @Post('start/:userId')
@@ -128,6 +130,69 @@ export class ChatSessionsController {
         {
           status: 'error',
           message: 'Error interno del servidor',
+          errorCode: 'INTERNAL_ERROR'
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Get('history/:userId')
+  @ApiOperation({ summary: 'Obtener historial de conversaciones del usuario' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Historial de conversaciones obtenido exitosamente' 
+  })
+  async getUserHistory(@Param('userId') userId: string): Promise<{
+    status: string;
+    message: string;
+    data: any[];
+  }> {
+    try {
+      // Obtener solo las sesiones ACTIVAS del usuario (isActive: true)
+      const sessions = await this.chatSessionModel.find({ 
+        userId,
+        isActive: true  // ✅ SOLO conversaciones activas (no finalizadas)
+      })
+        .sort({ startedAt: -1 }) // Más recientes primero
+        .limit(20) // Últimas 20 conversaciones
+        .select('sessionId startedAt endedAt isActive metadata')
+        .lean();
+
+      console.log(`📊 Historial de usuario ${userId}: ${sessions.length} conversaciones activas`);
+
+      // Formatear las conversaciones
+      const formattedSessions = sessions.map((session: any, index: number) => {
+        const sessionNumber = sessions.length - index;
+        const date = new Date(session.startedAt);
+        const dateStr = date.toLocaleDateString('es-PE', { 
+          day: '2-digit', 
+          month: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        
+        return {
+          sessionId: session.sessionId,
+          title: `Conversación ${sessionNumber}`,
+          date: dateStr,
+          isActive: session.isActive,
+          startedAt: session.startedAt,
+          endedAt: session.endedAt
+        };
+      });
+
+      return {
+        status: 'success',
+        message: 'Historial obtenido exitosamente',
+        data: formattedSessions
+      };
+    } catch (error) {
+      console.error('❌ Error obteniendo historial:', error);
+      throw new HttpException(
+        {
+          status: 'error',
+          message: 'Error al obtener historial de conversaciones',
           errorCode: 'INTERNAL_ERROR'
         },
         HttpStatus.INTERNAL_SERVER_ERROR
@@ -291,11 +356,15 @@ export class ChatSessionsController {
     data: any[];
   }> {
     try {
+      console.log('🔍 Buscando mensajes para sessionId:', sessionId);
+      
       const messages = await this.messageModel
         .find({ sessionId })
         .sort({ timestamp: 1 })
         .select('sender text timestamp metadata')
         .lean();
+      
+      console.log(`📨 Encontrados ${messages.length} mensajes para session ${sessionId}`);
       
       return {
         status: 'success',
@@ -303,6 +372,7 @@ export class ChatSessionsController {
         data: messages
       };
     } catch (error) {
+      console.error('❌ Error obteniendo mensajes:', error);
       throw new HttpException(
         {
           status: 'error',

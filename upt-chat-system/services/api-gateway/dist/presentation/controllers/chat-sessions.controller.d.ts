@@ -1,5 +1,6 @@
 import { Model } from 'mongoose';
 import { MessageDocument } from '../../infrastructure/database/schemas/message.schema';
+import { ChatSessionDocument } from '../../infrastructure/database/schemas/chat-session.schema';
 import { StartChatSessionUseCase, GetActiveChatSessionUseCase, EndChatSessionUseCase, ValidateSessionTokenUseCase, RecordUserMessageUseCase, SetSessionSatisfactionUseCase, UpdateSessionMetadataUseCase, GetSessionAnalyticsUseCase, CleanupExpiredSessionsUseCase } from '../../application/use-cases/chat-session.use-cases';
 import { StartChatSessionDto, ChatSessionResponseDto, UpdateSessionMetadataDto, SessionSatisfactionDto } from '../../application/dtos/chat-session.dto';
 export declare class ChatSessionsController {
@@ -13,7 +14,8 @@ export declare class ChatSessionsController {
     private readonly getSessionAnalyticsUseCase;
     private readonly cleanupExpiredSessionsUseCase;
     private readonly messageModel;
-    constructor(startChatSessionUseCase: StartChatSessionUseCase, getActiveChatSessionUseCase: GetActiveChatSessionUseCase, endChatSessionUseCase: EndChatSessionUseCase, validateSessionTokenUseCase: ValidateSessionTokenUseCase, recordUserMessageUseCase: RecordUserMessageUseCase, setSessionSatisfactionUseCase: SetSessionSatisfactionUseCase, updateSessionMetadataUseCase: UpdateSessionMetadataUseCase, getSessionAnalyticsUseCase: GetSessionAnalyticsUseCase, cleanupExpiredSessionsUseCase: CleanupExpiredSessionsUseCase, messageModel: Model<MessageDocument>);
+    private readonly chatSessionModel;
+    constructor(startChatSessionUseCase: StartChatSessionUseCase, getActiveChatSessionUseCase: GetActiveChatSessionUseCase, endChatSessionUseCase: EndChatSessionUseCase, validateSessionTokenUseCase: ValidateSessionTokenUseCase, recordUserMessageUseCase: RecordUserMessageUseCase, setSessionSatisfactionUseCase: SetSessionSatisfactionUseCase, updateSessionMetadataUseCase: UpdateSessionMetadataUseCase, getSessionAnalyticsUseCase: GetSessionAnalyticsUseCase, cleanupExpiredSessionsUseCase: CleanupExpiredSessionsUseCase, messageModel: Model<MessageDocument>, chatSessionModel: Model<ChatSessionDocument>);
     startSession(userId: string, startSessionDto: StartChatSessionDto): Promise<{
         status: string;
         message: string;
@@ -23,6 +25,11 @@ export declare class ChatSessionsController {
         status: string;
         message: string;
         data?: ChatSessionResponseDto;
+    }>;
+    getUserHistory(userId: string): Promise<{
+        status: string;
+        message: string;
+        data: any[];
     }>;
     endSession(sessionId: string): Promise<{
         status: string;

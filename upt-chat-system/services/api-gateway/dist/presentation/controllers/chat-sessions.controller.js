@@ -30,7 +30,8 @@ let ChatSessionsController = class ChatSessionsController {
     getSessionAnalyticsUseCase;
     cleanupExpiredSessionsUseCase;
     messageModel;
-    constructor(startChatSessionUseCase, getActiveChatSessionUseCase, endChatSessionUseCase, validateSessionTokenUseCase, recordUserMessageUseCase, setSessionSatisfactionUseCase, updateSessionMetadataUseCase, getSessionAnalyticsUseCase, cleanupExpiredSessionsUseCase, messageModel) {
+    chatSessionModel;
+    constructor(startChatSessionUseCase, getActiveChatSessionUseCase, endChatSessionUseCase, validateSessionTokenUseCase, recordUserMessageUseCase, setSessionSatisfactionUseCase, updateSessionMetadataUseCase, getSessionAnalyticsUseCase, cleanupExpiredSessionsUseCase, messageModel, chatSessionModel) {
         this.startChatSessionUseCase = startChatSessionUseCase;
         this.getActiveChatSessionUseCase = getActiveChatSessionUseCase;
         this.endChatSessionUseCase = endChatSessionUseCase;
@@ -41,6 +42,7 @@ let ChatSessionsController = class ChatSessionsController {
         this.getSessionAnalyticsUseCase = getSessionAnalyticsUseCase;
         this.cleanupExpiredSessionsUseCase = cleanupExpiredSessionsUseCase;
         this.messageModel = messageModel;
+        this.chatSessionModel = chatSessionModel;
     }
     async startSession(userId, startSessionDto) {
         try {
@@ -79,6 +81,50 @@ let ChatSessionsController = class ChatSessionsController {
             throw new common_1.HttpException({
                 status: 'error',
                 message: 'Error interno del servidor',
+                errorCode: 'INTERNAL_ERROR'
+            }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async getUserHistory(userId) {
+        try {
+            const sessions = await this.chatSessionModel.find({
+                userId,
+                isActive: true
+            })
+                .sort({ startedAt: -1 })
+                .limit(20)
+                .select('sessionId startedAt endedAt isActive metadata')
+                .lean();
+            console.log(`📊 Historial de usuario ${userId}: ${sessions.length} conversaciones activas`);
+            const formattedSessions = sessions.map((session, index) => {
+                const sessionNumber = sessions.length - index;
+                const date = new Date(session.startedAt);
+                const dateStr = date.toLocaleDateString('es-PE', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                return {
+                    sessionId: session.sessionId,
+                    title: `Conversación ${sessionNumber}`,
+                    date: dateStr,
+                    isActive: session.isActive,
+                    startedAt: session.startedAt,
+                    endedAt: session.endedAt
+                };
+            });
+            return {
+                status: 'success',
+                message: 'Historial obtenido exitosamente',
+                data: formattedSessions
+            };
+        }
+        catch (error) {
+            console.error('❌ Error obteniendo historial:', error);
+            throw new common_1.HttpException({
+                status: 'error',
+                message: 'Error al obtener historial de conversaciones',
                 errorCode: 'INTERNAL_ERROR'
             }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -156,11 +202,13 @@ let ChatSessionsController = class ChatSessionsController {
     }
     async getSessionMessages(sessionId) {
         try {
+            console.log('🔍 Buscando mensajes para sessionId:', sessionId);
             const messages = await this.messageModel
                 .find({ sessionId })
                 .sort({ timestamp: 1 })
                 .select('sender text timestamp metadata')
                 .lean();
+            console.log(`📨 Encontrados ${messages.length} mensajes para session ${sessionId}`);
             return {
                 status: 'success',
                 message: 'Mensajes obtenidos exitosamente',
@@ -168,6 +216,7 @@ let ChatSessionsController = class ChatSessionsController {
             };
         }
         catch (error) {
+            console.error('❌ Error obteniendo mensajes:', error);
             throw new common_1.HttpException({
                 status: 'error',
                 message: 'Error al obtener mensajes',
@@ -280,6 +329,18 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ChatSessionsController.prototype, "getActiveSession", null);
 __decorate([
+    (0, common_1.Get)('history/:userId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtener historial de conversaciones del usuario' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Historial de conversaciones obtenido exitosamente'
+    }),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ChatSessionsController.prototype, "getUserHistory", null);
+__decorate([
     (0, common_1.Put)('end/:sessionId'),
     (0, swagger_1.ApiOperation)({ summary: 'Finalizar sesión de chat' }),
     (0, swagger_1.ApiResponse)({
@@ -389,6 +450,7 @@ exports.ChatSessionsController = ChatSessionsController = __decorate([
     (0, swagger_1.ApiTags)('Chat Sessions'),
     (0, common_1.Controller)('chat-sessions'),
     __param(9, (0, mongoose_1.InjectModel)('Message')),
+    __param(10, (0, mongoose_1.InjectModel)('ChatSession')),
     __metadata("design:paramtypes", [chat_session_use_cases_1.StartChatSessionUseCase,
         chat_session_use_cases_1.GetActiveChatSessionUseCase,
         chat_session_use_cases_1.EndChatSessionUseCase,
@@ -398,6 +460,7 @@ exports.ChatSessionsController = ChatSessionsController = __decorate([
         chat_session_use_cases_1.UpdateSessionMetadataUseCase,
         chat_session_use_cases_1.GetSessionAnalyticsUseCase,
         chat_session_use_cases_1.CleanupExpiredSessionsUseCase,
+        mongoose_2.Model,
         mongoose_2.Model])
 ], ChatSessionsController);
 //# sourceMappingURL=chat-sessions.controller.js.map

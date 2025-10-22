@@ -6,17 +6,17 @@ export class NlpController {
     constructor(private readonly nlpService: NlpService) {}
 
     @Post('process')
-    async processMessage(@Body() body: { text: string; session_id?: string; language?: string }) {
+    async processMessage(@Body() body: { text: string; session_id?: string; user_id?: string; language?: string }) {
         try {
-            const { text, session_id, language = 'es' } = body;
+            const { text, session_id, user_id, language = 'es' } = body;
 
             if (!text || text.trim().length === 0) {
                 throw new HttpException('Text is required', HttpStatus.BAD_REQUEST);
             }
 
-            console.log('🤖 Procesando mensaje con NLP:', { text, session_id });
+            console.log('🤖 Procesando mensaje con NLP:', { text, session_id, user_id });
 
-            const result = await this.nlpService.processMessage(text, language, session_id);
+            const result = await this.nlpService.processMessage(text, language, session_id, user_id);
 
             return {
                 success: true,
