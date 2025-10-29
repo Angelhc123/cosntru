@@ -44,6 +44,21 @@ export class MessageDocument extends Document {
     default: {}
   })
   metadata: Record<string, any>;
+
+  @Prop({
+    type: String,
+    enum: ['positive', 'negative'],
+    required: false,
+    default: null
+  })
+  feedback: string | null;
+
+  @Prop({
+    type: Date,
+    required: false,
+    default: null
+  })
+  feedbackTimestamp: Date | null;
 }
 
 export const MessageSchema = SchemaFactory.createForClass(MessageDocument);

@@ -333,6 +333,45 @@ let ChatSessionsController = class ChatSessionsController {
             }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    async sendMessageFeedback(sessionId, messageId, body) {
+        try {
+            const { feedback } = body;
+            if (!['positive', 'negative'].includes(feedback)) {
+                throw new common_1.HttpException('Feedback debe ser "positive" o "negative"', common_1.HttpStatus.BAD_REQUEST);
+            }
+            const updatedMessage = await this.messageModel.findOneAndUpdate({
+                _id: messageId,
+                sessionId: sessionId,
+                sender: 'bot'
+            }, {
+                feedback: feedback,
+                feedbackTimestamp: new Date()
+            }, { new: true });
+            if (!updatedMessage) {
+                throw new common_1.HttpException('Mensaje no encontrado o no es un mensaje del bot', common_1.HttpStatus.NOT_FOUND);
+            }
+            console.log(`📝 Feedback "${feedback}" registrado para mensaje ${messageId}`);
+            return {
+                status: 'success',
+                message: 'Feedback registrado exitosamente',
+                data: {
+                    messageId: messageId,
+                    feedback: feedback,
+                    timestamp: updatedMessage.feedbackTimestamp
+                }
+            };
+        }
+        catch (error) {
+            if (error instanceof common_1.HttpException)
+                throw error;
+            console.error('❌ Error registrando feedback:', error);
+            throw new common_1.HttpException({
+                status: 'error',
+                message: 'Error al registrar feedback',
+                errorCode: 'FEEDBACK_ERROR'
+            }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 };
 exports.ChatSessionsController = ChatSessionsController;
 __decorate([
@@ -499,6 +538,18 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], ChatSessionsController.prototype, "cleanupUndefinedData", null);
+__decorate([
+    (0, common_1.Put)(':sessionId/message/:messageId/feedback'),
+    (0, swagger_1.ApiOperation)({ summary: 'Enviar feedback para un mensaje' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Feedback registrado exitosamente' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Mensaje no encontrado' }),
+    __param(0, (0, common_1.Param)('sessionId')),
+    __param(1, (0, common_1.Param)('messageId')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Object]),
+    __metadata("design:returntype", Promise)
+], ChatSessionsController.prototype, "sendMessageFeedback", null);
 exports.ChatSessionsController = ChatSessionsController = __decorate([
     (0, swagger_1.ApiTags)('Chat Sessions'),
     (0, common_1.Controller)('chat-sessions'),

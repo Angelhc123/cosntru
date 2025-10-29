@@ -90,4 +90,11 @@ export declare class ChatSessionsController {
             sessionsDeleted: number;
         };
     }>;
+    sendMessageFeedback(sessionId: string, messageId: string, body: {
+        feedback: 'positive' | 'negative';
+    }): Promise<{
+        status: string;
+        message: string;
+        data?: any;
+    }>;
 }

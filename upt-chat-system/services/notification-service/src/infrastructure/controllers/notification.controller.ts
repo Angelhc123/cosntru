@@ -8,6 +8,7 @@ import {
   SendPasswordResetConfirmationDto,
   SendNewPasswordDto,
   SendGenericEmailDto,
+  SendChatTranscriptionDto,
   EmailResponseDto,
 } from '../../application/dtos/notification.dto';
 
@@ -110,6 +111,40 @@ export class NotificationController {
       this.logger.error(`Error: ${error.message}`);
       throw new HttpException(
         error.message || 'Error enviando email',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * POST /api/notifications/email/chat-transcription
+   * Envía transcripción de conversación del chatbot
+   */
+  @Post('email/chat-transcription')
+  async sendChatTranscription(@Body() dto: SendChatTranscriptionDto): Promise<EmailResponseDto> {
+    this.logger.log(`Enviando transcripción de chat a: ${dto.to}`);
+    
+    try {
+      const result = await this.emailService.sendChatTranscription(
+        dto.to,
+        dto.userName,
+        dto.messages,
+        dto.sessionEndTime,
+        dto.sessionId,
+      );
+
+      if (!result.success) {
+        throw new HttpException(
+          result.error || 'Error enviando transcripción',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
+      return result;
+    } catch (error) {
+      this.logger.error(`Error: ${error.message}`);
+      throw new HttpException(
+        error.message || 'Error enviando transcripción',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

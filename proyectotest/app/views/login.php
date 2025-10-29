@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../../config/session.php';
 
 // Captcha fijo y simple
 $_SESSION['captcha_num1'] = 5;

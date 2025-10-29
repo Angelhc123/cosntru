@@ -39,6 +39,9 @@ import { PasswordResetController } from './infrastructure/controllers/password-r
 import { NlpController } from './presentation/controllers/nlp.controller';
 import { ConfigController } from './presentation/controllers/config.controller';
 import { FaqsController } from './presentation/controllers/faqs.controller';
+import { SupportController } from './presentation/controllers/support.controller';
+import { AnalyticsController } from './presentation/controllers/analytics.controller';
+import { DialogflowController } from './presentation/controllers/dialogflow.controller';
 
 // Auth
 import { JwtStrategy } from './infrastructure/auth/strategies/jwt.strategy';
@@ -52,6 +55,9 @@ import { UserDocument, UserSchema } from './infrastructure/database/schemas/user
 import { ChatSessionDocument, ChatSessionSchema } from './infrastructure/database/schemas/chat-session.schema';
 import { MessageDocument, MessageSchema } from './infrastructure/database/schemas/message.schema';
 import { FaqDocument, FaqSchema } from './infrastructure/database/schemas/faq.schema';
+import { TicketDocument, TicketSchema } from './infrastructure/database/schemas/ticket.schema';
+import { TicketMessageDocument, TicketMessageSchema } from './infrastructure/database/schemas/ticket-message.schema';
+import { AnalyticsDocument, AnalyticsSchema } from './infrastructure/database/schemas/analytics.schema';
 
 // RF004 Services
 import { MySQLConnectionService } from './infrastructure/services/mysql-connection.service';
@@ -59,6 +65,12 @@ import { PasswordResetService } from './application/services/password-reset.serv
 
 // NLP Service
 import { NlpService } from './application/services/nlp.service';
+import { SupportService } from './application/services/support.service';
+import { AnalyticsService } from './application/services/analytics.service';
+import { DialogflowService } from './application/services/dialogflow.service';
+
+// Tickets Module
+import { TicketsModule } from './application/tickets/tickets.module';
 
 // Repository Interfaces
 import { IUserRepository } from './domain/repositories/user.repository.interface';
@@ -79,6 +91,9 @@ import { IChatSessionRepository } from './domain/repositories/chat-session.repos
       { name: 'ChatSession', schema: ChatSessionSchema },
       { name: 'Message', schema: MessageSchema },
       { name: 'Faq', schema: FaqSchema },
+      { name: 'Ticket', schema: TicketSchema },
+      { name: 'TicketMessage', schema: TicketMessageSchema },
+      { name: 'Analytics', schema: AnalyticsSchema },
       // RF004: Schemas para password reset
       { 
         name: 'PasswordResetToken', 
@@ -120,6 +135,9 @@ import { IChatSessionRepository } from './domain/repositories/chat-session.repos
 
     // Winston Logger
     WinstonModule.forRoot(winstonConfig),
+    
+    // Tickets Module
+    TicketsModule,
   ],
   
   controllers: [
@@ -131,6 +149,9 @@ import { IChatSessionRepository } from './domain/repositories/chat-session.repos
     NlpController, // NLP Integration
     ConfigController, // Widget Configuration
     FaqsController, // FAQs Management
+    SupportController, // Support Tickets
+    AnalyticsController, // Analytics Dashboard
+    DialogflowController, // Dialogflow Analytics
   ],
   
   providers: [
@@ -189,6 +210,15 @@ import { IChatSessionRepository } from './domain/repositories/chat-session.repos
 
     // NLP Service
     NlpService,
+    
+    // Support Service
+    SupportService,
+    
+    // Analytics Service
+    AnalyticsService,
+    
+    // Dialogflow Service
+    DialogflowService,
   ],
   exports: [
     MySQLConnectionService, // Para usar en UsersController

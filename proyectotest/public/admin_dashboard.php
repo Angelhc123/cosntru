@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../config/session.php';
 
 // Verificar que esté logeado
 if (!isset($_SESSION['user_id'])) {

@@ -1,7 +1,45 @@
 /**
  * DTOs para Notification Service
  */
-import { IsEmail, IsNotEmpty, IsString, IsOptional, IsUrl } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, IsOptional, IsUrl, IsArray, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class ChatMessageDto {
+  @IsString()
+  @IsNotEmpty()
+  sender: string; // 'user' o 'bot'
+
+  @IsString()
+  @IsNotEmpty()
+  text: string;
+
+  @IsString()
+  @IsNotEmpty()
+  timestamp: string; // ISO format
+}
+
+export class SendChatTranscriptionDto {
+  @IsEmail()
+  @IsNotEmpty()
+  to: string;
+
+  @IsString()
+  @IsNotEmpty()
+  userName: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ChatMessageDto)
+  messages: ChatMessageDto[];
+
+  @IsString()
+  @IsNotEmpty()
+  sessionEndTime: string; // ISO format
+
+  @IsString()
+  @IsOptional()
+  sessionId?: string;
+}
 
 export class SendPasswordResetConfirmationDto {
   @IsEmail()

@@ -28,10 +28,7 @@
                     <a href="#" onclick="showSection('academico')">Académico</a>
                 </li>
                 <li class="nav-tab">
-                    <a href="#" onclick="showSection('administrativo')">Administrativo</a>
-                </li>
-                <li class="nav-tab">
-                    <a href="#" onclick="showSection('presupuesto')">Presupuesto</a>
+                    <a href="#" onclick="showSection('tickets')">Mis Tickets</a>
                 </li>
             </ul>
         </nav>
@@ -137,139 +134,41 @@
                 </div>
             </div>
 
-            <!-- Sección Administrativa -->
-            <div id="administrativo" class="dashboard-section" style="display: none;">
-                <h2 style="color: #1e3c72; margin-bottom: 20px;">Panel Administrativo</h2>
+            <!-- Sección Mis Tickets -->
+            <div id="tickets" class="dashboard-section" style="display: none;">
+                <h2 style="color: #1e3c72; margin-bottom: 20px;">🎫 Mis Tickets de Soporte</h2>
                 
-                <div class="dashboard-grid">
-                    <div class="dashboard-card">
-                        <h3 class="card-title">👥 Gestión de Usuarios</h3>
-                        <ul class="menu-list">
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">👤</span> Usuarios del Sistema</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">🔐</span> Permisos y Roles</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">📊</span> Reportes de Acceso</a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="dashboard-card">
-                        <h3 class="card-title">📋 Gestión Académica</h3>
-                        <ul class="menu-list">
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">🏫</span> Facultades y Escuelas</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">📚</span> Cursos y Materias</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">👨‍🏫</span> Docentes</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">🎓</span> Estudiantes</a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="dashboard-card">
-                        <h3 class="card-title">⚙️ Configuración</h3>
-                        <ul class="menu-list">
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">🔧</span> Configuración General</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">📅</span> Calendario Académico</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">💾</span> Respaldo de Datos</a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="dashboard-card">
-                        <h3 class="card-title">📈 Estadísticas</h3>
-                        <ul class="menu-list">
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">📊</span> Dashboard Ejecutivo</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">📋</span> Reportes Personalizados</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">🔍</span> Auditoría del Sistema</a>
-                            </li>
-                        </ul>
+                <div id="tickets-container" style="min-height: 400px;">
+                    <div class="loading-tickets" style="text-align: center; padding: 40px;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">⏳</div>
+                        <p>Cargando tus tickets...</p>
                     </div>
                 </div>
-            </div>
-
-            <!-- Sección Presupuesto -->
-            <div id="presupuesto" class="dashboard-section" style="display: none;">
-                <h2 style="color: #1e3c72; margin-bottom: 20px;">Gestión Presupuestaria</h2>
                 
-                <div class="dashboard-grid">
-                    <div class="dashboard-card">
-                        <h3 class="card-title">💰 Control de Presupuesto</h3>
-                        <ul class="menu-list">
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">💵</span> Presupuesto Anual</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">📊</span> Ejecución Presupuestaria</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">📋</span> Informes Financieros</a>
-                            </li>
-                        </ul>
+                <!-- Chat de ticket (oculto inicialmente) -->
+                <div id="ticket-chat-container" style="display: none;">
+                    <div class="ticket-chat-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px 10px 0 0; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 18px;" id="ticket-chat-title">Ticket #TKT-20251029-0001</h3>
+                            <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.9;" id="ticket-chat-status">Estado: Asignado</p>
+                        </div>
+                        <button onclick="closeTicketChat()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: 600;">
+                            ← Volver a lista
+                        </button>
                     </div>
-
-                    <div class="dashboard-card">
-                        <h3 class="card-title">🧾 Gastos e Ingresos</h3>
-                        <ul class="menu-list">
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">📤</span> Registro de Gastos</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">📥</span> Registro de Ingresos</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">🔄</span> Transferencias</a>
-                            </li>
-                        </ul>
+                    
+                    <div id="ticket-messages" style="background: #f5f5f5; height: 400px; overflow-y: auto; padding: 20px; border: 1px solid #ddd; border-top: none;">
+                        <!-- Mensajes del ticket se cargarán aquí -->
                     </div>
-
-                    <div class="dashboard-card">
-                        <h3 class="card-title">📈 Análisis Financiero</h3>
-                        <ul class="menu-list">
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">📊</span> Gráficos de Gastos</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">📋</span> Balance General</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">🎯</span> Proyecciones</a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="dashboard-card">
-                        <h3 class="card-title">🔍 Auditoría</h3>
-                        <ul class="menu-list">
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">📝</span> Registros de Auditoría</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">⚠️</span> Alertas Presupuestarias</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#"><span class="menu-icon">📊</span> Compliance Financiero</a>
-                            </li>
-                        </ul>
+                    
+                    <div class="ticket-input-area" style="display: flex; gap: 10px; padding: 15px; background: white; border: 1px solid #ddd; border-top: none; border-radius: 0 0 10px 10px;">
+                        <input type="text" id="ticket-message-input" placeholder="Escribe tu mensaje..." style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+                        <button onclick="sendTicketMessage()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-weight: 600;">
+                            Enviar
+                        </button>
+                        <button onclick="confirmResolveTicket()" style="background: #28a745; color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-weight: 600;">
+                            Finalizar Ticket
+                        </button>
                     </div>
                 </div>
             </div>
@@ -277,6 +176,7 @@
     </div>
 
     <script src="js/script.js"></script>
+    <script src="js/tickets-user.js"></script>
     
     <!-- CHATBOX CON HISTORIAL - Se conecta a MongoDB Atlas vía API Gateway -->
     <link rel="stylesheet" href="css/chatbox-with-history.css">

@@ -687,3 +687,61 @@
 .faq-button:active {
     transform: scale(0.95);
 }
+
+/* ============================================
+   FEEDBACK BUTTONS
+   ============================================ */
+.feedback-buttons {
+    display: flex;
+    gap: 5px;
+    margin-top: 8px;
+    justify-content: flex-end;
+    opacity: 0.7;
+}
+
+.feedback-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    opacity: 0.6;
+}
+
+.feedback-btn:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+.feedback-btn.positive:hover {
+    background: rgba(76, 175, 80, 0.2);
+}
+
+.feedback-btn.negative:hover {
+    background: rgba(244, 67, 54, 0.2);
+}
+
+.feedback-sent {
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+.feedback-sent.positive {
+    color: #4caf50;
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.feedback-sent.negative {
+    color: #f44336;
+    background: rgba(244, 67, 54, 0.1);
+}
+
+.message-text {
+    margin-bottom: 5px;
+}

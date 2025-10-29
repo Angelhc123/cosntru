@@ -56,25 +56,58 @@ export class NlpService {
 
             console.log('✅ Respuesta de NLP Service:', response.data);
 
-            // 3. Guardar respuesta del BOT en MongoDB
-            // ✅ CORRECCIÓN: El NLP Service retorna directamente response, no data.data.response
-            const botResponse = response.data?.response || response.data?.data?.response;
+            // 3. Detectar si requiere escalamiento a soporte humano
+            // REGLA: Solo escalar si confidence < 0.5 (muy bajo) o 2+ mensajes consecutivos < 0.7
+            const confidence = response.data?.confidence || response.data?.data?.confidence || 1.0;
             
-            if (sessionId && botResponse) {
+            // Contar mensajes con baja confianza en esta sesión
+            let lowConfidenceCount = 0;
+            if (sessionId) {
+                lowConfidenceCount = await this.messageModel.countDocuments({
+                    sessionId: sessionId,
+                    sender: 'bot',
+                    'metadata.confidence': { $lt: 0.7 }
+                });
+            }
+            
+            // Escalar solo si:
+            // - Confidence < 0.5 (muy bajo, escalar inmediatamente)
+            // - O 2+ respuestas consecutivas con confidence < 0.7
+            const requiresEscalation = confidence < 0.5 || (confidence < 0.7 && lowConfidenceCount >= 1);
+            
+            if (requiresEscalation) {
+                console.log('⚠️ ESCALAMIENTO DETECTADO - Confidence:', confidence, 'Count:', lowConfidenceCount);
+            }
+
+            // 4. Guardar respuesta del BOT en MongoDB y obtener messageId
+            // Si requiere escalación, guardar mensaje especial con opciones
+            const botResponse = response.data?.response || response.data?.data?.response;
+            let botMessageId = null;
+            let finalResponse = botResponse;
+            
+            // Si requiere escalación, modificar la respuesta para incluir prompt
+            if (requiresEscalation) {
+                finalResponse = botResponse; // Mantener respuesta original
+            }
+            
+            if (sessionId && finalResponse) {
                 try {
-                    await this.messageModel.create({
+                    const savedMessage = await this.messageModel.create({
                         sessionId: sessionId,
                         userId: userId || 'anonymous',
                         sender: 'bot',
-                        text: botResponse,
+                        text: finalResponse,
                         timestamp: new Date(),
                         metadata: {
                             intent: response.data?.intent || response.data?.data?.intent,
-                            confidence: response.data?.confidence || response.data?.data?.confidence,
-                            source: response.data?.source || response.data?.data?.source
+                            confidence: confidence,
+                            source: response.data?.source || response.data?.data?.source,
+                            requires_escalation: requiresEscalation,
+                            escalation_prompt: requiresEscalation
                         }
                     });
-                    console.log('✅ Respuesta del bot guardada en MongoDB:', botResponse.substring(0, 50) + '...');
+                    botMessageId = (savedMessage._id as any).toString();
+                    console.log('✅ Respuesta del bot guardada en MongoDB con ID:', botMessageId);
                 } catch (dbError) {
                     console.error('⚠️  Error guardando respuesta del bot:', dbError.message);
                 }
@@ -82,7 +115,15 @@ export class NlpService {
                 console.warn('⚠️  No se pudo guardar respuesta del bot. sessionId:', sessionId, 'botResponse:', botResponse);
             }
 
-            return response.data;
+            // 5. Agregar campo de escalamiento, messageId Y prompt de escalación a la respuesta
+            return {
+                ...response.data,
+                response: finalResponse,
+                messageId: botMessageId,
+                requires_escalation: requiresEscalation,
+                show_escalation_prompt: requiresEscalation, // Nuevo campo para frontend
+                escalation_reason: requiresEscalation ? `Confianza baja (${(confidence * 100).toFixed(1)}%)` : null
+            };
 
         } catch (error) {
             console.error('❌ Error llamando a NLP Service:', {

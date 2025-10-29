@@ -20,10 +20,14 @@ async function bootstrap() {
     }),
   );
 
-  // CORS
+  // CORS - Configuración completa para permitir localhost:8000
   app.enableCors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
+    origin: ['http://localhost:3000', 'http://localhost:8000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204
   });
 
   const port = process.env.PORT || 3005;

@@ -8,7 +8,8 @@
         // ✅ LIMPIAR localStorage del chatbox al cerrar sesión
         localStorage.removeItem('chat_session_id');
         localStorage.removeItem('chat_session_token');
-        console.log('✅ Sesión de chatbox limpiada');
+        localStorage.removeItem('chat_user_id');
+        console.log('✅ Sesión de chatbox limpiada completamente');
     </script>
 </body>
 </html>

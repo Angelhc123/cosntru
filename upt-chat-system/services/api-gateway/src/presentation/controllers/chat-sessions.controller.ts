@@ -581,4 +581,74 @@ export class ChatSessionsController {
       );
     }
   }
+
+  @Put(':sessionId/message/:messageId/feedback')
+  @ApiOperation({ summary: 'Enviar feedback para un mensaje' })
+  @ApiResponse({ status: 200, description: 'Feedback registrado exitosamente' })
+  @ApiResponse({ status: 404, description: 'Mensaje no encontrado' })
+  async sendMessageFeedback(
+    @Param('sessionId') sessionId: string,
+    @Param('messageId') messageId: string,
+    @Body() body: { feedback: 'positive' | 'negative' }
+  ): Promise<{
+    status: string;
+    message: string;
+    data?: any;
+  }> {
+    try {
+      const { feedback } = body;
+
+      // Validar que el feedback sea válido
+      if (!['positive', 'negative'].includes(feedback)) {
+        throw new HttpException(
+          'Feedback debe ser "positive" o "negative"',
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+      // Actualizar el mensaje con el feedback
+      const updatedMessage = await this.messageModel.findOneAndUpdate(
+        { 
+          _id: messageId,
+          sessionId: sessionId,
+          sender: 'bot' // Solo mensajes del bot pueden recibir feedback
+        },
+        {
+          feedback: feedback,
+          feedbackTimestamp: new Date()
+        },
+        { new: true }
+      );
+
+      if (!updatedMessage) {
+        throw new HttpException(
+          'Mensaje no encontrado o no es un mensaje del bot',
+          HttpStatus.NOT_FOUND
+        );
+      }
+
+      console.log(`📝 Feedback "${feedback}" registrado para mensaje ${messageId}`);
+
+      return {
+        status: 'success',
+        message: 'Feedback registrado exitosamente',
+        data: {
+          messageId: messageId,
+          feedback: feedback,
+          timestamp: updatedMessage.feedbackTimestamp
+        }
+      };
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      console.error('❌ Error registrando feedback:', error);
+      throw new HttpException(
+        {
+          status: 'error',
+          message: 'Error al registrar feedback',
+          errorCode: 'FEEDBACK_ERROR'
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }

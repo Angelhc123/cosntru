@@ -1,5 +1,6 @@
 <?php
-session_start();
+// 🔒 SEGURIDAD: Configurar sesión para expirar al cerrar navegador
+require_once __DIR__ . '/../../config/session.php';
 require_once __DIR__ . '/../models/User.php';
 
 class AuthController {
@@ -40,10 +41,17 @@ class AuthController {
             }
 
             if ($this->user->login($usuario, $password)) {
+                // 🔒 SEGURIDAD: Regenerar ID de sesión para prevenir session fixation
+                session_regenerate_id(true);
+                
+                // 🔒 SEGURIDAD: Configurar cookie de sesión para que expire al cerrar navegador
+                ini_set('session.cookie_lifetime', 0);
+                ini_set('session.gc_maxlifetime', 1440); // 24 minutos de inactividad
+                
                 $_SESSION['user_id'] = $this->user->id;
                 $_SESSION['usuario'] = $this->user->usuario;
                 $_SESSION['nombre_completo'] = $this->user->nombre_completo;
-                $_SESSION['tipo_usuario'] = $this->user->tipo_usuario;  // ✅ Guardar tipo de usuario
+                $_SESSION['tipo_usuario'] = $this->user->tipo_usuario;
                 
                 // ✅ Redirigir según tipo de usuario
                 if ($this->user->tipo_usuario === 'administrativo') {

@@ -15,7 +15,6 @@ class ChatboxWidgetWithHistory {
         
         // ✅ VALIDACIÓN: Si el userId cambió, limpiar sesión anterior
         if (storedUserId && storedUserId !== String(userId)) {
-            console.warn('⚠️  Usuario cambió. Limpiando sesión anterior.');
             localStorage.removeItem('chat_session_id');
             localStorage.removeItem('chat_session_token');
             localStorage.removeItem('chat_user_id');
@@ -31,12 +30,6 @@ class ChatboxWidgetWithHistory {
         
         this.isOpen = false;
         this.historyOpen = false;
-        
-        console.log('🔧 Chatbox con historial inicializado:', {
-            userId: this.userId,
-            sessionToken: this.sessionToken,
-            sessionId: this.sessionId
-        });
         
         this.init();
     }
@@ -273,7 +266,6 @@ class ChatboxWidgetWithHistory {
 
     async loadConversation(sessionId) {
         try {
-            console.log('🔄 Cargando conversación:', sessionId);
             
             // Simplemente actualizar el sessionId actual
             this.sessionId = sessionId;
@@ -294,7 +286,6 @@ class ChatboxWidgetWithHistory {
             // Cerrar panel de historial
             this.toggleHistory();
             
-            console.log(`✅ Conversación ${sessionId} cargada`);
         } catch (error) {
             console.error('❌ Error cargando conversación:', error);
             this.showError('Error al cargar la conversación');
@@ -303,7 +294,6 @@ class ChatboxWidgetWithHistory {
 
     async startNewConversation() {
         try {
-            console.log('🆕 Iniciando nueva conversación...');
             
             // Finalizar la conversación actual si existe
             if (this.sessionToken && this.sessionId) {
@@ -347,7 +337,6 @@ class ChatboxWidgetWithHistory {
             // Hacer focus en el input
             document.getElementById('chat-input').focus();
             
-            console.log('✅ Nueva conversación lista');
         } catch (error) {
             console.error('❌ Error iniciando nueva conversación:', error);
             this.showError('Error al iniciar nueva conversación');
@@ -356,11 +345,9 @@ class ChatboxWidgetWithHistory {
 
     async startNewSession() {
         try {
-            console.log('🔄 Creando nueva sesión para userId:', this.userId);
             
             // ✅ PASO 1: Cerrar sesión anterior si existe
             if (this.sessionId && this.sessionId !== 'undefined' && this.sessionId !== 'null') {
-                console.log('🔒 Cerrando sesión anterior:', this.sessionId);
                 await this.endConversation(false); // false = no mostrar mensaje
             }
             
@@ -374,7 +361,6 @@ class ChatboxWidgetWithHistory {
             });
 
             const data = await response.json();
-            console.log('📦 Respuesta de creación de sesión:', data);
             
             if (data.status === 'success' && data.data) {
                 // ✅ CORRECCIÓN: El backend retorna "id" no "sessionId"
@@ -439,7 +425,6 @@ class ChatboxWidgetWithHistory {
             }
         }
         
-        console.log('📤 Enviando mensaje con sessionId:', this.sessionId);
         
         // Mostrar mensaje del usuario
         this.addMessage(message, 'user');
@@ -462,27 +447,37 @@ class ChatboxWidgetWithHistory {
             });
 
             const data = await response.json();
-            console.log('📥 Respuesta completa del bot:', JSON.stringify(data, null, 2));
             
             // Remover indicador de "escribiendo..."
             this.removeTypingIndicator();
             
-            // ✅ ARREGLO: Probar diferentes estructuras de respuesta
+            // ✅ ARREGLO: Extraer respuesta Y messageId del backend
             let botResponse = null;
+            let botMessageId = null;
             
             if (data.data?.data?.response) {
                 botResponse = data.data.data.response;
-                console.log('✅ Respuesta encontrada en data.data.data.response');
+                botMessageId = data.data.data.messageId;
             } else if (data.data?.response) {
                 botResponse = data.data.response;
-                console.log('✅ Respuesta encontrada en data.data.response');
+                botMessageId = data.data.messageId;
             } else if (data.response) {
                 botResponse = data.response;
-                console.log('✅ Respuesta encontrada en data.response');
+                botMessageId = data.messageId;
             }
             
             if (botResponse) {
-                this.addMessage(botResponse, 'bot');
+                // ✅ Mostrar respuesta CON botones de feedback usando el messageId del backend
+                this.addMessage(botResponse, 'bot', botMessageId);
+                
+                // ✅ Verificar si requiere escalamiento a soporte humano (nueva lógica)
+                const showEscalationPrompt = data.data?.show_escalation_prompt || data.show_escalation_prompt || false;
+                const escalationReason = data.data?.escalation_reason || data.escalation_reason || 'Confianza baja en la respuesta';
+                
+                if (showEscalationPrompt) {
+                    // Mostrar PROMPT DE CONFIRMACIÓN para escalar
+                    this.showEscalationPrompt(message, botResponse, data, escalationReason);
+                }
             } else {
                 console.error('❌ No se encontró respuesta del bot en la estructura de datos');
                 this.addMessage('Lo siento, hubo un error al procesar tu mensaje.', 'bot');
@@ -495,11 +490,29 @@ class ChatboxWidgetWithHistory {
         }
     }
 
-    addMessage(text, sender) {
+    addMessage(text, sender, messageId = null) {
         const messagesContainer = document.getElementById('chat-messages');
         const messageDiv = document.createElement('div');
         messageDiv.className = `chat-message ${sender}-message`;
-        messageDiv.textContent = text;
+        
+        if (sender === 'system') {
+            // Mensaje del sistema (escalamiento, notificaciones, etc.)
+            messageDiv.innerHTML = `<div class="system-notification">${text}</div>`;
+        } else if (sender === 'bot' && messageId) {
+            messageDiv.innerHTML = `
+                <div class="message-text">${text}</div>
+                <div class="feedback-buttons" data-message-id="${messageId}">
+                    <button class="feedback-btn positive" onclick="window.chatboxWidget.sendFeedback('${messageId}', 'positive')" title="Respuesta útil">
+                        👍
+                    </button>
+                    <button class="feedback-btn negative" onclick="window.chatboxWidget.sendFeedback('${messageId}', 'negative')" title="Respuesta no útil">
+                        👎
+                    </button>
+                </div>
+            `;
+        } else {
+            messageDiv.textContent = text;
+        }
         
         messagesContainer.appendChild(messageDiv);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -527,7 +540,6 @@ class ChatboxWidgetWithHistory {
         try {
             // ✅ VALIDACIÓN CRÍTICA: Verificar que el sessionId sea válido y no "undefined"
             if (!this.sessionId || this.sessionId === 'undefined' || this.sessionId === 'null') {
-                console.warn('⚠️  No hay sessionId válido. No se pueden cargar mensajes.');
                 const messagesContainer = document.getElementById('chat-messages');
                 messagesContainer.innerHTML = `
                     <div class="welcome-message">
@@ -537,14 +549,12 @@ class ChatboxWidgetWithHistory {
                 return;
             }
             
-            console.log('📥 Cargando mensajes para sessionId:', this.sessionId, 'userId:', this.userId);
             
             const response = await fetch(
                 `${this.apiGatewayUrl}/chat-sessions/${this.sessionId}/messages`
             );
 
             const data = await response.json();
-            console.log('📨 Mensajes recibidos:', data);
             
             if (data.status === 'success' && data.data && data.data.length > 0) {
                 const messagesContainer = document.getElementById('chat-messages');
@@ -556,9 +566,7 @@ class ChatboxWidgetWithHistory {
                     this.addMessage(msg.text, msg.sender);
                 });
                 
-                console.log(`✅ ${data.data.length} mensajes cargados correctamente`);
             } else {
-                console.log('ℹ️  No hay mensajes en esta conversación');
                 const messagesContainer = document.getElementById('chat-messages');
                 messagesContainer.innerHTML = `
                     <div class="welcome-message">
@@ -573,9 +581,168 @@ class ChatboxWidgetWithHistory {
     }
 
     async endConversation(showMessage = true) {
-        if (!this.sessionId) return;
+        // Mostrar modal de feedback antes de finalizar (incluso si no hay sessionId)
+        if (showMessage) {
+            this.showFeedbackModal();
+            return; // El modal llamará a finishEndConversation() después del feedback
+        }
+        
+        // Solo finalizar si hay sesión activa
+        if (!this.sessionId) {
+            this.resetChat();
+            return;
+        }
+        
+        this.finishEndConversation();
+    }
+
+    showFeedbackModal() {
+        // BLOQUEAR EL INPUT Y BOTONES DEL CHAT
+        const chatInput = document.getElementById('chat-input');
+        const sendButton = document.getElementById('send-button');
+        const endButton = document.getElementById('end-conversation');
+        const quickFaqs = document.getElementById('quick-faqs');
+        
+        if (chatInput) {
+            chatInput.disabled = true;
+            chatInput.placeholder = 'Por favor, completa el feedback para continuar...';
+            chatInput.style.background = '#f5f5f5';
+            chatInput.style.cursor = 'not-allowed';
+        }
+        if (sendButton) {
+            sendButton.disabled = true;
+            sendButton.style.opacity = '0.5';
+            sendButton.style.cursor = 'not-allowed';
+        }
+        if (endButton) {
+            endButton.disabled = true;
+            endButton.style.opacity = '0.5';
+            endButton.style.cursor = 'not-allowed';
+        }
+        
+        // BLOQUEAR PREGUNTAS FRECUENTES
+        if (quickFaqs) {
+            const faqButtons = quickFaqs.querySelectorAll('.faq-button');
+            faqButtons.forEach(button => {
+                button.disabled = true;
+                button.style.opacity = '0.5';
+                button.style.cursor = 'not-allowed';
+                button.style.pointerEvents = 'none';
+            });
+        }
+        
+        // Agregar el modal DESPUÉS de los mensajes existentes
+        const messagesContainer = document.getElementById('chat-messages');
+        
+        // Crear elemento del modal (más pequeño y discreto)
+        const feedbackDiv = document.createElement('div');
+        feedbackDiv.id = 'session-feedback-modal';
+        feedbackDiv.style.cssText = 'display: flex; flex-direction: column; align-items: center; width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);';
+        
+        feedbackDiv.innerHTML = `
+            <div style="text-align: center; margin-bottom: 12px; color: white;">
+                <h4 style="margin: 0 0 4px 0; font-size: 15px; font-weight: 600;">¿Cómo estuvo la atención?</h4>
+                <p style="margin: 0; font-size: 11px; opacity: 0.85;">Tu opinión nos ayuda</p>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; margin-bottom: 10px;">
+                <button onclick="window.chatboxWidget.submitSessionFeedback('excellent')" style="background: white; border: none; border-radius: 8px; padding: 12px 6px; cursor: pointer; font-size: 11px; font-weight: 600; color: #28a745; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="font-size: 24px; margin-bottom: 2px;">😄</div>
+                    <div style="font-size: 10px;">Excelente</div>
+                </button>
+                <button onclick="window.chatboxWidget.submitSessionFeedback('good')" style="background: white; border: none; border-radius: 8px; padding: 12px 6px; cursor: pointer; font-size: 11px; font-weight: 600; color: #17a2b8; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="font-size: 24px; margin-bottom: 2px;">🙂</div>
+                    <div style="font-size: 10px;">Buena</div>
+                </button>
+                <button onclick="window.chatboxWidget.submitSessionFeedback('regular')" style="background: white; border: none; border-radius: 8px; padding: 12px 6px; cursor: pointer; font-size: 11px; font-weight: 600; color: #ffc107; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="font-size: 24px; margin-bottom: 2px;">😐</div>
+                    <div style="font-size: 10px;">Regular</div>
+                </button>
+                <button onclick="window.chatboxWidget.submitSessionFeedback('bad')" style="background: white; border: none; border-radius: 8px; padding: 12px 6px; cursor: pointer; font-size: 11px; font-weight: 600; color: #dc3545; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="font-size: 24px; margin-bottom: 2px;">😞</div>
+                    <div style="font-size: 10px;">Mala</div>
+                </button>
+            </div>
+            <button onclick="window.chatboxWidget.finishEndConversation()" style="background: transparent; border: 1px solid rgba(255,255,255,0.5); color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+                Omitir
+            </button>
+        `;
+        
+        // Agregar al contenedor
+        messagesContainer.appendChild(feedbackDiv);
+        
+        // Scroll al final para mostrar el modal
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    async submitSessionFeedback(rating) {
+        try {
+            // Mapear rating a score numérico
+            const scoreMap = {
+                'excellent': 5,
+                'good': 4,
+                'regular': 3,
+                'bad': 2
+            };
+
+            // Enviar feedback de sesión al backend
+            await fetch(`${this.apiGatewayUrl}/chat-sessions/${this.sessionId}/satisfaction`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    score: scoreMap[rating] || 3
+                })
+            });
+
+            // Remover el modal de feedback
+            const feedbackModal = document.getElementById('session-feedback-modal');
+            if (feedbackModal) {
+                feedbackModal.remove();
+            }
+
+            // Agregar mensaje de agradecimiento
+            const messagesContainer = document.getElementById('chat-messages');
+            const thankYouDiv = document.createElement('div');
+            thankYouDiv.style.cssText = 'display: flex; flex-direction: column; align-items: center; padding: 30px; text-align: center; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); border-radius: 15px; margin-top: 10px; color: white; box-shadow: 0 5px 20px rgba(0,0,0,0.2);';
+            thankYouDiv.innerHTML = `
+                <div style="font-size: 48px; margin-bottom: 15px;">✅</div>
+                <h3 style="margin: 0 0 10px 0; font-size: 20px;">¡Gracias por tu feedback!</h3>
+                <p style="margin: 0; opacity: 0.9;">Tu opinión nos ayuda a mejorar el servicio</p>
+            `;
+            messagesContainer.appendChild(thankYouDiv);
+
+            // Scroll al final
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Esperar 2 segundos y finalizar
+            setTimeout(() => {
+                this.finishEndConversation();
+            }, 2000);
+
+        } catch (error) {
+            console.error('Error enviando feedback de sesión:', error);
+            this.finishEndConversation();
+        }
+    }
+
+    async finishEndConversation() {
+        if (!this.sessionId) {
+            this.resetChat();
+            return;
+        }
         
         try {
+            // Obtener mensajes de la conversación para enviar por email
+            const messagesResponse = await fetch(`${this.apiGatewayUrl}/chat-sessions/${this.sessionId}/messages`);
+            const messagesData = await messagesResponse.json();
+            
+            // Enviar transcripción por email (solo si el usuario está autenticado)
+            if (this.userId && messagesData.data) {
+                await this.sendTranscriptionEmail(messagesData.data);
+            }
+            
+            // Finalizar sesión en el backend
             await fetch(`${this.apiGatewayUrl}/chat-sessions/end/${this.sessionId}`, {
                 method: 'PUT',
                 headers: {
@@ -583,25 +750,35 @@ class ChatboxWidgetWithHistory {
                 }
             });
 
+            // Limpiar estado local
             localStorage.removeItem('chat_session_id');
             localStorage.removeItem('chat_session_token');
-            localStorage.removeItem('chat_user_id');  // ✅ Limpiar userId también
+            localStorage.removeItem('chat_user_id');
             
             this.sessionId = null;
             this.sessionToken = null;
             
-            if (showMessage) {
-                const messagesContainer = document.getElementById('chat-messages');
-                messagesContainer.innerHTML = `
-                    <div class="welcome-message">
-                        ✅ Conversación finalizada. ¿Deseas iniciar una nueva?
-                    </div>
-                `;
-            }
+            // Mostrar mensaje de finalización
+            const messagesContainer = document.getElementById('chat-messages');
+            messagesContainer.innerHTML = `
+                <div class="welcome-message" style="text-align: center; padding: 40px 20px;">
+                    <div style="font-size: 48px; margin-bottom: 15px;">✅</div>
+                    <h3 style="color: #4caf50; margin: 0 0 10px 0;">Conversación Finalizada</h3>
+                    <p style="color: #666;">Se ha enviado una copia de la conversación a tu correo electrónico.</p>
+                    <button onclick="window.chatboxWidget.startNewConversation()" style="margin-top: 20px; padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">
+                        Iniciar Nueva Conversación
+                    </button>
+                </div>
+            `;
             
-            console.log('✅ Conversación finalizada');
+            // Ocultar controles
+            document.getElementById('chat-input-area').style.display = 'none';
+            document.getElementById('chat-footer').style.display = 'none';
+            document.getElementById('quick-faqs').style.display = 'none';
+            
         } catch (error) {
-            console.error('Error al finalizar conversación:', error);
+            console.error('❌ Error al finalizar conversación:', error);
+            alert('Hubo un error al finalizar la conversación. Por favor, intenta de nuevo.');
         }
     }
 
@@ -661,10 +838,269 @@ class ChatboxWidgetWithHistory {
         }, 150);
     }
 
+    async saveMessage(text, sender) {
+        try {
+            const response = await fetch(`${this.apiGatewayUrl}/chat-sessions/${this.sessionId}/message`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: text,
+                    sender: sender,
+                    session_token: this.sessionToken
+                })
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                return data.data?.messageId || null;
+            }
+            return null;
+        } catch (error) {
+            console.error('⚠️ Error al guardar mensaje:', error);
+            return null;
+        }
+    }
+
+    async sendFeedback(messageId, feedbackType) {
+        try {
+            const response = await fetch(`${this.apiGatewayUrl}/chat-sessions/${this.sessionId}/message/${messageId}/feedback`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    feedback: feedbackType
+                })
+            });
+
+            if (response.ok) {
+                // Actualizar UI para mostrar que se envió el feedback
+                const feedbackContainer = document.querySelector(`[data-message-id="${messageId}"]`);
+                if (feedbackContainer) {
+                    feedbackContainer.innerHTML = `
+                        <span class="feedback-sent ${feedbackType}">
+                            ${feedbackType === 'positive' ? '👍 Útil' : '👎 No útil'}
+                        </span>
+                    `;
+                }
+                
+            } else {
+                console.error('❌ Error al enviar feedback');
+            }
+        } catch (error) {
+            console.error('❌ Error al enviar feedback:', error);
+        }
+    }
+
+    async sendTranscriptionEmail(messages) {
+        try {
+            
+            // Obtener datos del usuario desde la BD de PHP
+            const userResponse = await fetch(`/get_user_email.php?user_id=${this.userId}`);
+            
+            const userData = await userResponse.json();
+
+            if (!userData.email) {
+                console.error('❌ NO HAY EMAIL EN LA RESPUESTA');
+                console.error('❌ userData completo:', JSON.stringify(userData));
+                return;
+            }
+
+
+            // Formatear mensajes para el email
+            const formattedMessages = messages.map(msg => ({
+                sender: msg.sender,
+                text: msg.text,
+                timestamp: msg.timestamp || msg.createdAt || new Date().toISOString()
+            }));
+            
+
+            const emailPayload = {
+                to: userData.email,
+                userName: userData.nombre_completo || 'Usuario',
+                messages: formattedMessages,
+                sessionEndTime: new Date().toISOString(),
+                sessionId: this.sessionId
+            };
+            
+
+            // Llamar al notification-service
+            const response = await fetch('http://localhost:3005/api/notifications/email/chat-transcription', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(emailPayload)
+            });
+
+            const responseData = await response.json();
+
+            if (response.ok) {
+            } else {
+                console.error('❌ ERROR AL ENVIAR TRANSCRIPCIÓN');
+                console.error('❌ Respuesta:', responseData);
+            }
+        } catch (error) {
+            console.error('❌ ========== ERROR CRÍTICO AL ENVIAR EMAIL ==========');
+            console.error('❌ Error completo:', error);
+            console.error('❌ Stack:', error.stack);
+        }
+    }
+
     escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    /**
+     * Mostrar prompt de confirmación para escalar a soporte humano
+     */
+    showEscalationPrompt(userMessage, botResponse, nlpData, reason) {
+        const messagesContainer = document.getElementById('chat-messages');
+        const promptDiv = document.createElement('div');
+        promptDiv.className = 'chat-message system-message escalation-prompt';
+        promptDiv.innerHTML = `
+            <div class="escalation-prompt-content">
+                <div class="escalation-icon">🤔</div>
+                <div class="escalation-text">
+                    <strong>Parece que necesitas ayuda adicional</strong>
+                    <p style="margin: 8px 0; font-size: 14px; color: #666;">${reason}</p>
+                    <p style="margin: 8px 0;">¿Deseas hablar con un especialista de soporte humano?</p>
+                </div>
+                <div class="escalation-buttons" style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button class="escalation-btn escalation-yes" 
+                            style="flex: 1; padding: 12px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                        ✅ Sí, crear ticket
+                    </button>
+                    <button class="escalation-btn escalation-no" 
+                            style="flex: 1; padding: 12px; background: #6c757d; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                        ❌ No, continuar aquí
+                    </button>
+                </div>
+            </div>
+        `;
+
+        messagesContainer.appendChild(promptDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        // Event listeners para los botones
+        const yesBtn = promptDiv.querySelector('.escalation-yes');
+        const noBtn = promptDiv.querySelector('.escalation-no');
+
+        yesBtn.addEventListener('click', async () => {
+            // Deshabilitar botones
+            yesBtn.disabled = true;
+            noBtn.disabled = true;
+            yesBtn.textContent = '⏳ Creando ticket...';
+            
+            // Crear ticket
+            await this.createEscalationTicket(userMessage, botResponse, nlpData);
+            
+            // Remover prompt
+            promptDiv.remove();
+        });
+
+        noBtn.addEventListener('click', () => {
+            // Mostrar mensaje de confirmación
+            this.addMessage(
+                'De acuerdo, puedes seguir conversando conmigo. Si cambias de opinión, puedes solicitar soporte humano en cualquier momento.',
+                'system'
+            );
+            
+            // Remover prompt
+            promptDiv.remove();
+        });
+    }
+
+    async createEscalationTicket(userMessage, botResponse, nlpData) {
+        try {
+            // Obtener información del usuario
+            const userResponse = await fetch(`/get_user_email.php?user_id=${this.userId}`);
+            const userData = await userResponse.json();
+            
+            if (!userData.email) {
+                console.error('❌ No se pudo obtener email del usuario para crear ticket');
+                this.addMessage(
+                    '⚠️ Error al obtener información del usuario. No se pudo crear el ticket.',
+                    'system'
+                );
+                return;
+            }
+            
+            // Crear ticket usando la NUEVA API (puerto 3000 /api/v1/tickets)
+            const ticketResponse = await fetch(`http://localhost:3000/api/v1/tickets`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sessionId: this.sessionId,
+                    userId: this.userId,
+                    userName: userData.nombre_completo || 'Usuario',
+                    userEmail: userData.email,
+                    subject: userMessage.substring(0, 100), // Primeros 100 caracteres como asunto
+                    originalQuery: userMessage,
+                    escalationReason: nlpData.escalation_reason || nlpData.data?.escalation_reason || 'Solicitud de usuario',
+                    initialMessage: userMessage // Mensaje inicial del ticket
+                })
+            });
+            
+            if (ticketResponse.ok) {
+                const ticketData = await ticketResponse.json();
+                const ticketId = ticketData.data?.ticketId;
+                
+                this.addMessage(
+                    `✅ <strong>Ticket creado exitosamente</strong><br><br>` +
+                    `📋 Número de ticket: <strong>${ticketId}</strong><br>` +
+                    `📧 Recibirás un correo de confirmación en: ${userData.email}<br><br>` +
+                    `Un especialista te contactará pronto. Puedes ver tus tickets en la sección "Mis Tickets" del dashboard.`,
+                    'system'
+                );
+                
+                console.log('✅ Ticket creado:', ticketId);
+            } else {
+                const errorData = await ticketResponse.json();
+                console.error('❌ Error creando ticket:', errorData);
+                this.addMessage(
+                    `⚠️ Hubo un problema al crear tu ticket de soporte: ${errorData.message || 'Error desconocido'}`,
+                    'system'
+                );
+            }
+        } catch (error) {
+            console.error('❌ Error creando ticket de escalamiento:', error);
+            this.addMessage(
+                '⚠️ Error de conexión al crear el ticket. Por favor, intenta nuevamente.',
+                'system'
+            );
+        }
+    }
+    
+    async sendTicketNotificationEmail(ticketId, userData) {
+        try {
+            await fetch('http://localhost:3005/api/notifications/email/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    to: userData.email,
+                    subject: `Ticket de Soporte Creado: ${ticketId}`,
+                    body: `
+                        <h2>Ticket de Soporte Creado</h2>
+                        <p>Hola ${userData.nombre_completo},</p>
+                        <p>Tu consulta ha sido derivada a nuestro equipo de soporte especializado.</p>
+                        <p><strong>Número de Ticket:</strong> ${ticketId}</p>
+                        <p>Un especialista se pondrá en contacto contigo pronto.</p>
+                        <p>Gracias por tu paciencia.</p>
+                    `
+                })
+            });
+        } catch (error) {
+            console.error('❌ Error enviando email de notificación:', error);
+        }
     }
 }
 

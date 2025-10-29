@@ -234,15 +234,141 @@ class ChatboxWidget {
     }
 
     async endConversation() {
-        if (!this.sessionToken || !this.sessionId || this.sessionId === 'undefined') {
-            this.addSystemMessage('No hay conversación activa para finalizar.');
-            console.warn('⚠️ No se puede finalizar:', {
-                sessionToken: this.sessionToken,
-                sessionId: this.sessionId
-            });
-            return;
+        // SIEMPRE mostrar modal de feedback, incluso sin sesión activa
+        this.showFeedbackModal();
+    }
+
+    showFeedbackModal() {
+        // BLOQUEAR EL INPUT Y BOTONES DEL CHAT
+        const chatInput = document.getElementById('chat-input');
+        const sendButton = document.getElementById('send-button');
+        const endButton = document.getElementById('end-conversation');
+        const quickFaqs = document.getElementById('quick-faqs');
+        
+        if (chatInput) {
+            chatInput.disabled = true;
+            chatInput.placeholder = 'Por favor, completa el feedback para continuar...';
+            chatInput.style.background = '#f5f5f5';
+            chatInput.style.cursor = 'not-allowed';
+        }
+        if (sendButton) {
+            sendButton.disabled = true;
+            sendButton.style.opacity = '0.5';
+            sendButton.style.cursor = 'not-allowed';
+        }
+        if (endButton) {
+            endButton.disabled = true;
+            endButton.style.opacity = '0.5';
+            endButton.style.cursor = 'not-allowed';
         }
         
+        // BLOQUEAR PREGUNTAS FRECUENTES
+        if (quickFaqs) {
+            const faqButtons = quickFaqs.querySelectorAll('.faq-button');
+            faqButtons.forEach(button => {
+                button.disabled = true;
+                button.style.opacity = '0.5';
+                button.style.cursor = 'not-allowed';
+                button.style.pointerEvents = 'none';
+            });
+        }
+        
+        // Agregar el modal DESPUÉS de los mensajes existentes
+        const messagesContainer = document.getElementById('chat-messages');
+        
+        // Crear elemento del modal (más pequeño y discreto)
+        const feedbackDiv = document.createElement('div');
+        feedbackDiv.id = 'session-feedback-modal';
+        feedbackDiv.style.cssText = 'display: flex; flex-direction: column; align-items: center; width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);';
+        
+        feedbackDiv.innerHTML = `
+            <div style="text-align: center; margin-bottom: 12px; color: white;">
+                <h4 style="margin: 0 0 4px 0; font-size: 15px; font-weight: 600;">¿Cómo estuvo la atención?</h4>
+                <p style="margin: 0; font-size: 11px; opacity: 0.85;">Tu opinión nos ayuda</p>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; margin-bottom: 10px;">
+                <button onclick="window.chatboxWidget.submitSessionFeedback('excellent')" style="background: white; border: none; border-radius: 8px; padding: 12px 6px; cursor: pointer; font-size: 11px; font-weight: 600; color: #28a745; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="font-size: 24px; margin-bottom: 2px;">😄</div>
+                    <div style="font-size: 10px;">Excelente</div>
+                </button>
+                <button onclick="window.chatboxWidget.submitSessionFeedback('good')" style="background: white; border: none; border-radius: 8px; padding: 12px 6px; cursor: pointer; font-size: 11px; font-weight: 600; color: #17a2b8; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="font-size: 24px; margin-bottom: 2px;">🙂</div>
+                    <div style="font-size: 10px;">Buena</div>
+                </button>
+                <button onclick="window.chatboxWidget.submitSessionFeedback('regular')" style="background: white; border: none; border-radius: 8px; padding: 12px 6px; cursor: pointer; font-size: 11px; font-weight: 600; color: #ffc107; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="font-size: 24px; margin-bottom: 2px;">😐</div>
+                    <div style="font-size: 10px;">Regular</div>
+                </button>
+                <button onclick="window.chatboxWidget.submitSessionFeedback('bad')" style="background: white; border: none; border-radius: 8px; padding: 12px 6px; cursor: pointer; font-size: 11px; font-weight: 600; color: #dc3545; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="font-size: 24px; margin-bottom: 2px;">😞</div>
+                    <div style="font-size: 10px;">Mala</div>
+                </button>
+            </div>
+            <button onclick="window.chatboxWidget.finishEndConversation()" style="background: transparent; border: 1px solid rgba(255,255,255,0.5); color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+                Omitir
+            </button>
+        `;
+        
+        // Agregar al contenedor
+        messagesContainer.appendChild(feedbackDiv);
+        
+        // Scroll al final para mostrar el modal
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    async submitSessionFeedback(rating) {
+        try {
+            // Mapear rating a score numérico
+            const scoreMap = {
+                'excellent': 5,
+                'good': 4,
+                'regular': 3,
+                'bad': 2
+            };
+
+            // Enviar feedback de sesión al backend
+            await fetch(`${this.apiGatewayUrl}/chat-sessions/${this.sessionId}/satisfaction`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    score: scoreMap[rating] || 3
+                })
+            });
+
+            // Remover el modal de feedback
+            const feedbackModal = document.getElementById('session-feedback-modal');
+            if (feedbackModal) {
+                feedbackModal.remove();
+            }
+
+            // Agregar mensaje de agradecimiento
+            const messagesContainer = document.getElementById('chat-messages');
+            const thankYouDiv = document.createElement('div');
+            thankYouDiv.style.cssText = 'display: flex; flex-direction: column; align-items: center; padding: 30px; text-align: center; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); border-radius: 15px; margin-top: 10px; color: white; box-shadow: 0 5px 20px rgba(0,0,0,0.2);';
+            thankYouDiv.innerHTML = `
+                <div style="font-size: 48px; margin-bottom: 15px;">✅</div>
+                <h3 style="margin: 0 0 10px 0; font-size: 20px;">¡Gracias por tu feedback!</h3>
+                <p style="margin: 0; opacity: 0.9;">Tu opinión nos ayuda a mejorar el servicio</p>
+            `;
+            messagesContainer.appendChild(thankYouDiv);
+
+            // Scroll al final
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Esperar 2 segundos y finalizar
+            setTimeout(() => {
+                this.finishEndConversation();
+            }, 2000);
+
+        } catch (error) {
+            console.error('Error enviando feedback de sesión:', error);
+            this.finishEndConversation();
+        }
+    }
+
+    async finishEndConversation() {
         try {
             console.log('🛑 Finalizando conversación...', {
                 sessionId: this.sessionId,
@@ -281,17 +407,20 @@ class ChatboxWidget {
                 this.sessionToken = null;
                 this.sessionId = null;
                 
-                // Reiniciar interfaz
-                document.getElementById('chat-messages').innerHTML = `
+                // Limpiar mensajes y mostrar mensaje de inicio
+                const messagesContainer = document.getElementById('chat-messages');
+                messagesContainer.innerHTML = `
                     <div class="welcome-message">
-                        👋 Hola, soy tu asistente virtual. ¿En qué puedo ayudarte hoy?
+                        ¡Hola! 👋 Soy el asistente virtual de la UPT.<br>
+                        ¿En qué puedo ayudarte hoy?
                     </div>
                 `;
+                
             }, 2000);
             
         } catch (error) {
             console.error('❌ Error al finalizar conversación:', error);
-            this.addSystemMessage('Error al finalizar conversación. Por favor, intenta de nuevo.');
+            this.addSystemMessage('⚠️ Error al finalizar conversación. Intenta de nuevo.');
         }
     }
 
@@ -349,7 +478,7 @@ class ChatboxWidget {
                 if (msg.sender_type === 'user') {
                     this.addUserMessage(msg.message_text, false);
                 } else {
-                    this.addBotMessage(msg.message_text, false);
+                    this.addBotMessage(msg.message_text, msg.message_id, false);
                 }
             });
             
@@ -373,13 +502,29 @@ class ChatboxWidget {
         }
     }
 
-    addBotMessage(message, scroll = true) {
+    addBotMessage(message, messageId = null, scroll = true) {
         const messagesContainer = document.getElementById('chat-messages');
         const messageDiv = document.createElement('div');
         messageDiv.className = 'message bot-message';
+        
+        let feedbackButtons = '';
+        if (messageId) {
+            feedbackButtons = `
+                <div class="feedback-buttons" data-message-id="${messageId}">
+                    <button class="feedback-btn positive" onclick="window.chatboxWidget.sendFeedback('${messageId}', 'positive')" title="Respuesta útil">
+                        👍
+                    </button>
+                    <button class="feedback-btn negative" onclick="window.chatboxWidget.sendFeedback('${messageId}', 'negative')" title="Respuesta no útil">
+                        👎
+                    </button>
+                </div>
+            `;
+        }
+        
         messageDiv.innerHTML = `
             <div class="message-content">🤖 ${this.escapeHtml(message)}</div>
             <div class="message-time">${new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}</div>
+            ${feedbackButtons}
         `;
         messagesContainer.appendChild(messageDiv);
         
@@ -461,16 +606,16 @@ class ChatboxWidget {
                 botResponse = 'Disculpa, estoy teniendo problemas para procesar tu mensaje. Por favor, intenta de nuevo.';
             }
             
-            // Mostrar respuesta del bot
-            this.addBotMessage(botResponse);
+            // Guardar respuesta del bot en la BD primero
+            const messageId = await this.saveResponseToDatabase(botResponse, nlpData.data);
             
-            // Guardar respuesta del bot en la BD
-            await this.saveResponseToDatabase(botResponse, nlpData.data);
+            // Mostrar respuesta del bot con feedback
+            this.addBotMessage(botResponse, messageId);
             
         } catch (error) {
             console.error('❌ Error al procesar con NLP:', error);
             this.removeTypingIndicator();
-            this.addBotMessage('Lo siento, estoy teniendo problemas técnicos. Por favor, intenta de nuevo en un momento. 🔧');
+            this.addBotMessage('Lo siento, estoy teniendo problemas técnicos. Por favor, intenta de nuevo en un momento. 🔧', null);
         }
     }
 
@@ -517,10 +662,14 @@ class ChatboxWidget {
             });
             
             if (response.ok) {
+                const data = await response.json();
                 console.log('✅ Respuesta del bot guardada en BD');
+                return data.data?.messageId || null;
             }
+            return null;
         } catch (error) {
             console.error('⚠️ Error al guardar respuesta del bot:', error);
+            return null;
         }
     }
 
@@ -570,6 +719,38 @@ class ChatboxWidget {
         }, 150);
     }
 
+    async sendFeedback(messageId, feedbackType) {
+        try {
+            const response = await fetch(`${this.apiGatewayUrl}/chat-sessions/${this.sessionId}/message/${messageId}/feedback`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    feedback: feedbackType
+                })
+            });
+
+            if (response.ok) {
+                // Actualizar UI para mostrar que se envió el feedback
+                const feedbackContainer = document.querySelector(`[data-message-id="${messageId}"]`);
+                if (feedbackContainer) {
+                    feedbackContainer.innerHTML = `
+                        <span class="feedback-sent ${feedbackType}">
+                            ${feedbackType === 'positive' ? '👍 Útil' : '👎 No útil'}
+                        </span>
+                    `;
+                }
+                
+                console.log(`✅ Feedback "${feedbackType}" enviado para mensaje ${messageId}`);
+            } else {
+                console.error('❌ Error al enviar feedback');
+            }
+        } catch (error) {
+            console.error('❌ Error al enviar feedback:', error);
+        }
+    }
+
     escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
@@ -579,6 +760,6 @@ class ChatboxWidget {
 
 // Inicializar chatbox cuando se carga la página
 document.addEventListener('DOMContentLoaded', () => {
-    window.chatbox = new ChatboxWidget();
+    window.chatboxWidget = new ChatboxWidget();
     console.log('✅ Chatbox widget inicializado');
 });

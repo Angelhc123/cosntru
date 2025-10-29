@@ -5,6 +5,8 @@ export declare class MessageDocument extends Document {
     text: string;
     timestamp: Date;
     metadata: Record<string, any>;
+    feedback: string | null;
+    feedbackTimestamp: Date | null;
 }
 export declare const MessageSchema: import("mongoose").Schema<MessageDocument, import("mongoose").Model<MessageDocument, any, any, any, Document<unknown, any, MessageDocument, any, {}> & MessageDocument & Required<{
     _id: unknown;

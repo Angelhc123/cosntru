@@ -18,6 +18,8 @@ let MessageDocument = class MessageDocument extends mongoose_2.Document {
     text;
     timestamp;
     metadata;
+    feedback;
+    feedbackTimestamp;
 };
 exports.MessageDocument = MessageDocument;
 __decorate([
@@ -59,6 +61,23 @@ __decorate([
     }),
     __metadata("design:type", Object)
 ], MessageDocument.prototype, "metadata", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: String,
+        enum: ['positive', 'negative'],
+        required: false,
+        default: null
+    }),
+    __metadata("design:type", Object)
+], MessageDocument.prototype, "feedback", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: Date,
+        required: false,
+        default: null
+    }),
+    __metadata("design:type", Object)
+], MessageDocument.prototype, "feedbackTimestamp", void 0);
 exports.MessageDocument = MessageDocument = __decorate([
     (0, mongoose_1.Schema)({
         collection: 'messages',

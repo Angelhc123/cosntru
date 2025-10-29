@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../config/session.php';
 
 // Verificar que el usuario esté autenticado
 if (!isset($_SESSION['user_id'])) {

@@ -254,4 +254,146 @@ export class EmailService {
       };
     }
   }
+
+  /**
+   * Envía transcripción de conversación del chatbot
+   */
+  async sendChatTranscription(
+    to: string,
+    userName: string,
+    messages: Array<{ sender: string; text: string; timestamp: string }>,
+    sessionEndTime: string,
+    sessionId?: string,
+  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    try {
+      const mailOptions = {
+        from: `"${this.configService.get<string>('FROM_NAME')}" <${this.configService.get<string>('FROM_EMAIL')}>`,
+        to,
+        subject: 'Transcripción de tu Conversación con el Asistente Virtual UPT',
+        html: this.getChatTranscriptionTemplate(userName, messages, sessionEndTime, sessionId),
+      };
+
+      const info = await this.transporter.sendMail(mailOptions);
+      this.logger.log(`✅ Transcripción enviada a ${to}: ${info.messageId}`);
+      
+      return {
+        success: true,
+        messageId: info.messageId,
+      };
+    } catch (error) {
+      this.logger.error(`❌ Error enviando transcripción a ${to}:`, error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
+  /**
+   * Template HTML para transcripción de chat
+   */
+  private getChatTranscriptionTemplate(
+    userName: string,
+    messages: Array<{ sender: string; text: string; timestamp: string }>,
+    sessionEndTime: string,
+    sessionId?: string,
+  ): string {
+    const messagesHtml = messages.map(msg => {
+      const isUser = msg.sender === 'user';
+      const bgColor = isUser ? '#e3f2fd' : '#f1f8e9';
+      const icon = isUser ? '👤' : '🤖';
+      const senderLabel = isUser ? 'Tú' : 'Asistente Virtual';
+      const date = new Date(msg.timestamp);
+      const timeStr = date.toLocaleString('es-PE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      
+      return `
+        <div style="margin-bottom: 15px; padding: 12px; background-color: ${bgColor}; border-radius: 8px; border-left: 4px solid ${isUser ? '#2196F3' : '#8BC34A'};">
+          <div style="font-weight: bold; color: #333; margin-bottom: 5px;">
+            ${icon} ${senderLabel}
+          </div>
+          <div style="color: #555; line-height: 1.5;">
+            ${msg.text}
+          </div>
+          <div style="font-size: 11px; color: #999; margin-top: 8px;">
+            ${timeStr}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const endDate = new Date(sessionEndTime);
+    const endTimeStr = endDate.toLocaleString('es-PE', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5;">
+        <div style="max-width: 600px; margin: 20px auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+          
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; color: white;">
+            <h1 style="margin: 0; font-size: 24px;">💬 Transcripción de Conversación</h1>
+            <p style="margin: 10px 0 0 0; opacity: 0.9;">Asistente Virtual UPT</p>
+          </div>
+
+          <!-- Content -->
+          <div style="padding: 30px;">
+            <p style="color: #555; font-size: 16px; margin: 0 0 20px 0;">
+              Hola <strong>${userName}</strong>,
+            </p>
+            <p style="color: #666; line-height: 1.6; margin: 0 0 20px 0;">
+              A continuación encontrarás la transcripción completa de tu conversación con nuestro asistente virtual.
+            </p>
+
+            ${sessionId ? `<p style="color: #999; font-size: 12px; margin: 0 0 20px 0;">ID de sesión: <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">${sessionId}</code></p>` : ''}
+
+            <!-- Messages -->
+            <div style="margin: 20px 0;">
+              ${messagesHtml}
+            </div>
+
+            <!-- End time -->
+            <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin-top: 20px;">
+              <p style="margin: 0; color: #666; font-size: 14px;">
+                <strong>🏁 Conversación finalizada:</strong> ${endTimeStr}
+              </p>
+            </div>
+
+            <div style="margin-top: 25px; padding-top: 25px; border-top: 1px solid #e0e0e0;">
+              <p style="color: #999; font-size: 13px; margin: 0; line-height: 1.6;">
+                Este correo se generó automáticamente al finalizar tu conversación con el asistente virtual.
+                Si tienes alguna consulta adicional, no dudes en contactarnos.
+              </p>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div style="background-color: #f5f5f5; padding: 20px; text-align: center; color: #999; font-size: 12px;">
+            <p style="margin: 0;">Universidad Privada de Tacna</p>
+            <p style="margin: 5px 0 0 0;">Sistema de Asistencia Virtual</p>
+          </div>
+
+        </div>
+      </body>
+      </html>
+    `;
+  }
 }
