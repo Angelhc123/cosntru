@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/../config/session.php';
-require_once __DIR__ . '/../app/controllers/AuthController.php';
 
 // Verificar autenticación y tipo de usuario
 if (!isset($_SESSION['user_id']) || $_SESSION['tipo_usuario'] !== 'administrativo') {
@@ -8,556 +7,447 @@ if (!isset($_SESSION['user_id']) || $_SESSION['tipo_usuario'] !== 'administrativ
     exit();
 }
 
-$userName = $_SESSION['nombre_completo'] ?? 'Administrador';
+$adminId = $_SESSION['user_id'] ?? '1';
+$adminName = $_SESSION['nombre_completo'] ?? 'Administrador';
+$adminEmail = $_SESSION['correo'] ?? 'admin@upt.pe';
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Tickets - Sistema UPT</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Panel de Tickets - Administrador</title>
     <style>
-        .tickets-container {
-            padding: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .tickets-header {
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .admin-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 10px;
         }
 
-        .filter-tabs {
+        .admin-header h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .admin-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .content-wrapper {
+            display: flex;
+            height: calc(100vh - 180px);
+        }
+
+        .tickets-list-panel {
+            flex: 1;
+            border-right: 2px solid #e9ecef;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .ticket-chat-panel {
+            flex: 1.2;
+            display: none;
+            flex-direction: column;
+        }
+
+        .ticket-chat-panel.active {
+            display: flex;
+        }
+
+        .filter-bar {
+            margin-bottom: 20px;
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
-        .filter-tab {
-            padding: 10px 20px;
-            border: none;
-            background: #f0f0f0;
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 20px;
             cursor: pointer;
-            border-radius: 5px;
-            font-weight: 500;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .ticket-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
             transition: all 0.3s;
         }
 
-        .filter-tab.active {
-            background: #667eea;
+        .ticket-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .ticket-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            border-color: transparent;
         }
 
-        .tickets-table {
-            width: 100%;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        .ticket-header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
         }
 
-        .tickets-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .tickets-table th {
-            background: #f8f9fa;
-            padding: 15px;
-            text-align: left;
+        .ticket-id {
             font-weight: 600;
-            color: #495057;
-            border-bottom: 2px solid #dee2e6;
-        }
-
-        .tickets-table td {
-            padding: 15px;
-            border-bottom: 1px solid #dee2e6;
+            font-size: 16px;
         }
 
         .status-badge {
-            padding: 5px 12px;
-            border-radius: 20px;
+            padding: 4px 10px;
+            border-radius: 12px;
             font-size: 12px;
             font-weight: 600;
-            text-transform: uppercase;
         }
 
         .status-pending {
-            background: #fff3cd;
-            color: #856404;
+            background: #ffc107;
+            color: #000;
         }
 
-        .status-in-progress {
-            background: #cfe2ff;
-            color: #084298;
+        .status-assigned {
+            background: #17a2b8;
+            color: white;
         }
 
         .status-resolved {
-            background: #d1e7dd;
-            color: #0f5132;
+            background: #28a745;
+            color: white;
         }
 
-        .priority-badge {
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 11px;
-            font-weight: 600;
+        .ticket-subject {
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: 500;
         }
 
-        .priority-high {
-            background: #f8d7da;
-            color: #842029;
+        .ticket-meta {
+            font-size: 12px;
+            opacity: 0.8;
         }
 
-        .priority-medium {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .priority-low {
-            background: #d1e7dd;
-            color: #0f5132;
-        }
-
-        .action-btn {
-            padding: 8px 16px;
+        .assign-btn {
+            margin-top: 10px;
+            padding: 8px 15px;
+            background: #28a745;
+            color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
+            width: 100%;
             transition: all 0.3s;
         }
 
-        .btn-attend {
-            background: #0d6efd;
-            color: white;
+        .assign-btn:hover {
+            background: #218838;
         }
 
-        .btn-attend:hover {
-            background: #0b5ed7;
+        .assign-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
         }
 
-        .btn-close {
-            background: #198754;
-            color: white;
-        }
-
-        .btn-close:hover {
-            background: #157347;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-        }
-
-        .modal-content {
-            position: relative;
-            background: white;
-            width: 90%;
-            max-width: 900px;
-            margin: 50px auto;
-            border-radius: 10px;
-            overflow: hidden;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .modal-header {
+        .chat-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .modal-body {
-            padding: 20px;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .ticket-info {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .chat-container {
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            height: 400px;
-            display: flex;
-            flex-direction: column;
         }
 
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 15px;
-            background: #f8f9fa;
+            padding: 20px;
+            background: #f5f5f5;
         }
 
-        .chat-message {
+        .message {
             margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 8px;
+            display: flex;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.admin {
+            justify-content: flex-start;
+        }
+
+        .message.system {
+            justify-content: center;
+        }
+
+        .message-content {
             max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        .chat-message.admin {
-            background: #e7f3ff;
-            margin-left: auto;
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 15px;
         }
 
-        .chat-message.user {
-            background: white;
+        .message.admin .message-content {
+            background: #e9ecef;
+            color: #333;
+            border-radius: 15px 15px 15px 0;
+        }
+
+        .message.system .message-content {
+            background: #f0f0f0;
+            color: #666;
+            font-size: 13px;
+            padding: 8px 15px;
+            border-radius: 15px;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
         }
 
         .chat-input-area {
             display: flex;
             gap: 10px;
             padding: 15px;
-            border-top: 1px solid #dee2e6;
+            background: white;
+            border-top: 1px solid #ddd;
         }
 
-        .chat-input-area input {
+        .chat-input {
             flex: 1;
-            padding: 10px;
-            border: 1px solid #ced4da;
+            padding: 12px;
+            border: 1px solid #ddd;
             border-radius: 5px;
+            font-size: 14px;
+            resize: none;
+            font-family: inherit;
         }
 
-        .chat-input-area button {
-            padding: 10px 20px;
-            background: #0d6efd;
+        .send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
+            padding: 12px 25px;
             border-radius: 5px;
             cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
         }
 
-        .close-modal {
-            background: none;
-            border: none;
+        .send-btn:hover {
+            opacity: 0.9;
+        }
+
+        .resolve-btn {
+            background: #28a745;
             color: white;
-            font-size: 24px;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
             cursor: pointer;
+            font-weight: 600;
         }
 
-        .no-tickets {
+        .resolve-btn:hover {
+            background: #218838;
+        }
+
+        .close-chat-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .loading {
             text-align: center;
             padding: 40px;
-            color: #6c757d;
+            font-size: 18px;
+            color: #666;
         }
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h2>🎓 Sistema UPT</h2>
+    <div class="admin-container">
+        <div class="admin-header">
+            <div>
+                <h1>🎫 Panel de Tickets de Soporte</h1>
+                <p style="margin-top: 5px; opacity: 0.9;">Gestión de tickets de usuarios</p>
             </div>
-            <ul class="menu">
-                <li><a href="admin_dashboard.php">📊 Dashboard</a></li>
-                <li><a href="admin_faqs.php">❓ Gestión FAQs</a></li>
-                <li><a href="admin_tickets.php" class="active">🎫 Tickets de Soporte</a></li>
-                <li><a href="logout.php">🚪 Cerrar Sesión</a></li>
-            </ul>
+            <div class="admin-info">
+                <a href="admin_dashboard.php" class="back-btn">← Volver al Panel</a>
+                <div class="admin-avatar">👨‍💼</div>
+                <div>
+                    <div style="font-weight: 600;"><?php echo htmlspecialchars($adminName); ?></div>
+                    <div style="font-size: 13px; opacity: 0.8;">Soporte Técnico</div>
+                </div>
+                <a href="logout.php" class="logout-btn">Cerrar Sesión</a>
+            </div>
         </div>
 
-        <div class="main-content">
-            <div class="tickets-container">
-                <div class="tickets-header">
+        <div class="content-wrapper">
+            <!-- Panel izquierdo: Lista de tickets -->
+            <div class="tickets-list-panel">
+                <div class="filter-bar">
+                    <button class="filter-btn active" onclick="filterTickets('all')">Todos</button>
+                    <button class="filter-btn" onclick="filterTickets('pending')">⏳ Pendientes</button>
+                    <button class="filter-btn" onclick="filterTickets('assigned')">👤 Asignados</button>
+                    <button class="filter-btn" onclick="filterTickets('resolved')">✅ Resueltos</button>
+                    <button class="filter-btn" onclick="filterTickets('mine')">📋 Mis Tickets</button>
+                </div>
+
+                <div id="tickets-container">
+                    <div class="loading">
+                        ⏳ Cargando tickets...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel derecho: Chat del ticket -->
+            <div class="ticket-chat-panel" id="ticket-chat-panel">
+                <div class="chat-header">
                     <div>
-                        <h1>🎫 Gestión de Tickets de Soporte</h1>
-                        <p>Administrador: <?php echo htmlspecialchars($userName); ?></p>
+                        <h3 style="margin: 0; font-size: 18px;" id="chat-ticket-id">Ticket #TKT-20251029-0001</h3>
+                        <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.9;" id="chat-ticket-info">Usuario: Juan Pérez | Estado: Asignado</p>
                     </div>
-                    <button onclick="refreshTickets()" class="action-btn btn-attend">🔄 Actualizar</button>
+                    <button class="close-chat-btn" onclick="closeChatPanel()">← Cerrar</button>
                 </div>
 
-                <div class="filter-tabs">
-                    <button class="filter-tab active" onclick="filterTickets('all')">Todos</button>
-                    <button class="filter-tab" onclick="filterTickets('pending')">Pendientes</button>
-                    <button class="filter-tab" onclick="filterTickets('in-progress')">En Progreso</button>
-                    <button class="filter-tab" onclick="filterTickets('resolved')">Resueltos</button>
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Mensajes se cargarán aquí -->
                 </div>
 
-                <div class="tickets-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Ticket ID</th>
-                                <th>Usuario</th>
-                                <th>Consulta</th>
-                                <th>Prioridad</th>
-                                <th>Estado</th>
-                                <th>Fecha</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tickets-tbody">
-                            <tr>
-                                <td colspan="7" class="no-tickets">Cargando tickets...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="chat-input-area">
+                    <textarea class="chat-input" id="chat-input" rows="1" placeholder="Escribe tu respuesta..."></textarea>
+                    <button class="send-btn" onclick="sendAdminMessage()">Enviar</button>
+                    <button class="resolve-btn" onclick="confirmResolveTicket()">Finalizar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal para atender ticket -->
-    <div id="ticketModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modal-ticket-id">Ticket #...</h2>
-                <button class="close-modal" onclick="closeTicketModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="ticket-info" id="ticket-info">
-                    <!-- Info del ticket -->
-                </div>
-                <div class="chat-container">
-                    <div class="chat-messages" id="chat-messages">
-                        <!-- Mensajes del chat -->
-                    </div>
-                    <div class="chat-input-area">
-                        <input type="text" id="message-input" placeholder="Escribe tu respuesta...">
-                        <button onclick="sendMessage()">Enviar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Admin ID (desde sesión PHP) -->
+    <div id="admin-data" style="display: none;" 
+         data-admin-id="<?php echo $adminId; ?>" 
+         data-admin-name="<?php echo htmlspecialchars($adminName); ?>" 
+         data-admin-email="<?php echo htmlspecialchars($adminEmail); ?>"></div>
 
-    <script>
-        const API_URL = 'http://localhost:3000';
-        let currentFilter = 'all';
-        let currentTicketId = null;
-        let pollInterval = null;
-
-        // Cargar tickets al iniciar
-        document.addEventListener('DOMContentLoaded', () => {
-            loadTickets();
-            // Auto-refresh cada 30 segundos
-            setInterval(loadTickets, 30000);
-        });
-
-        async function loadTickets() {
-            try {
-                const statusParam = currentFilter !== 'all' ? `?status=${currentFilter}` : '';
-                const response = await fetch(`${API_URL}/support/tickets${statusParam}`);
-                const data = await response.json();
-
-                if (data.success) {
-                    displayTickets(data.data);
-                }
-            } catch (error) {
-                console.error('Error cargando tickets:', error);
-            }
-        }
-
-        function displayTickets(tickets) {
-            const tbody = document.getElementById('tickets-tbody');
-            
-            if (tickets.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="no-tickets">No hay tickets disponibles</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = tickets.map(ticket => `
-                <tr>
-                    <td><strong>${ticket.ticketId}</strong></td>
-                    <td>${ticket.userName}<br><small>${ticket.userEmail}</small></td>
-                    <td>${ticket.originalQuery.substring(0, 50)}...</td>
-                    <td><span class="priority-badge priority-${ticket.priority}">${ticket.priority}</span></td>
-                    <td><span class="status-badge status-${ticket.status}">${getStatusText(ticket.status)}</span></td>
-                    <td>${new Date(ticket.createdAt).toLocaleString('es-PE')}</td>
-                    <td>
-                        <button class="action-btn btn-attend" onclick="openTicket('${ticket.ticketId}')">
-                            ${ticket.status === 'resolved' ? 'Ver' : 'Atender'}
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function getStatusText(status) {
-            const texts = {
-                'pending': 'Pendiente',
-                'in-progress': 'En Progreso',
-                'resolved': 'Resuelto'
-            };
-            return texts[status] || status;
-        }
-
-        function filterTickets(filter) {
-            currentFilter = filter;
-            
-            // Actualizar UI de tabs
-            document.querySelectorAll('.filter-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            loadTickets();
-        }
-
-        function refreshTickets() {
-            loadTickets();
-        }
-
-        async function openTicket(ticketId) {
-            currentTicketId = ticketId;
-            
-            try {
-                // Cargar info del ticket
-                const ticketResponse = await fetch(`${API_URL}/support/tickets/${ticketId}`);
-                const ticketData = await ticketResponse.json();
-                
-                if (ticketData.success) {
-                    const ticket = ticketData.data;
-                    
-                    document.getElementById('modal-ticket-id').textContent = `Ticket ${ticketId}`;
-                    document.getElementById('ticket-info').innerHTML = `
-                        <h3>Información del Ticket</h3>
-                        <p><strong>Usuario:</strong> ${ticket.userName} (${ticket.userEmail})</p>
-                        <p><strong>Consulta Original:</strong> ${ticket.originalQuery}</p>
-                        <p><strong>Respuesta del Bot:</strong> ${ticket.botResponse}</p>
-                        <p><strong>Nivel de Confianza:</strong> ${(ticket.confidence * 100).toFixed(1)}%</p>
-                        <p><strong>Prioridad:</strong> <span class="priority-badge priority-${ticket.priority}">${ticket.priority}</span></p>
-                        <p><strong>Estado:</strong> <span class="status-badge status-${ticket.status}">${getStatusText(ticket.status)}</span></p>
-                    `;
-                    
-                    // Cargar mensajes del chat
-                    await loadTicketMessages(ticketId);
-                    
-                    // Cambiar estado a "in-progress" si está pendiente
-                    if (ticket.status === 'pending') {
-                        await fetch(`${API_URL}/support/tickets/${ticketId}/status`, {
-                            method: 'PUT',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ 
-                                status: 'in-progress',
-                                assignedTo: '<?php echo $_SESSION['nombre_completo']; ?>'
-                            })
-                        });
-                    }
-                    
-                    // Mostrar modal
-                    document.getElementById('ticketModal').style.display = 'block';
-                    
-                    // Iniciar polling de mensajes
-                    if (pollInterval) clearInterval(pollInterval);
-                    pollInterval = setInterval(() => loadTicketMessages(ticketId), 5000);
-                }
-            } catch (error) {
-                console.error('Error abriendo ticket:', error);
-                alert('Error al cargar el ticket');
-            }
-        }
-
-        async function loadTicketMessages(ticketId) {
-            try {
-                const response = await fetch(`${API_URL}/support/tickets/${ticketId}/messages`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    const messagesDiv = document.getElementById('chat-messages');
-                    messagesDiv.innerHTML = data.data.map(msg => `
-                        <div class="chat-message ${msg.sender}">
-                            <strong>${msg.senderName}</strong>
-                            <p>${msg.message}</p>
-                            <small>${new Date(msg.timestamp).toLocaleString('es-PE')}</small>
-                        </div>
-                    `).join('');
-                    
-                    // Scroll al final
-                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                    
-                    // Marcar como leídos
-                    if (data.data.length > 0) {
-                        await fetch(`${API_URL}/support/tickets/${ticketId}/messages/read`, {
-                            method: 'PUT',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ sender: 'admin' })
-                        });
-                    }
-                }
-            } catch (error) {
-                console.error('Error cargando mensajes:', error);
-            }
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('message-input');
-            const message = input.value.trim();
-            
-            if (!message) return;
-            
-            try {
-                const response = await fetch(`${API_URL}/support/tickets/${currentTicketId}/messages`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        sender: 'admin',
-                        senderName: '<?php echo $_SESSION['nombre_completo']; ?>',
-                        message: message
-                    })
-                });
-                
-                if (response.ok) {
-                    input.value = '';
-                    await loadTicketMessages(currentTicketId);
-                }
-            } catch (error) {
-                console.error('Error enviando mensaje:', error);
-                alert('Error al enviar mensaje');
-            }
-        }
-
-        // Permitir enviar con Enter
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('message-input')?.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') sendMessage();
-            });
-        });
-
-        function closeTicketModal() {
-            document.getElementById('ticketModal').style.display = 'none';
-            if (pollInterval) {
-                clearInterval(pollInterval);
-                pollInterval = null;
-            }
-            loadTickets(); // Refrescar lista
-        }
-
-        // Cerrar modal al hacer clic fuera
-        window.onclick = function(event) {
-            const modal = document.getElementById('ticketModal');
-            if (event.target === modal) {
-                closeTicketModal();
-            }
-        }
-    </script>
+    <script src="js/admin-tickets.js"></script>
 </body>
 </html>

@@ -46,12 +46,46 @@ export class TicketsService {
     originalQuery: string;
     escalationReason: string;
     initialMessage?: string;
+    conversationHistory?: Array<{
+      sender: 'user' | 'bot';
+      text: string;
+      timestamp: Date;
+    }>;
   }): Promise<TicketDocument> {
     const ticketId = await this.generateTicketId();
 
     const messages: any[] = [];
     
-    // Agregar mensaje inicial del usuario si existe
+    // Agregar historial de conversación como contexto para el admin (si existe)
+    if (data.conversationHistory && data.conversationHistory.length > 0) {
+      messages.push({
+        sender: 'system',
+        senderName: 'Sistema',
+        text: '📜 Historial de conversación previo:',
+        timestamp: new Date(),
+        visibleTo: 'admin', // Solo visible para admin
+      });
+
+      data.conversationHistory.forEach((msg) => {
+        messages.push({
+          sender: 'system',
+          senderName: msg.sender === 'user' ? data.userName : 'Chatbot',
+          text: msg.text,
+          timestamp: msg.timestamp || new Date(),
+          visibleTo: 'admin', // Solo visible para admin
+        });
+      });
+
+      messages.push({
+        sender: 'system',
+        senderName: 'Sistema',
+        text: '--- Fin del historial ---',
+        timestamp: new Date(),
+        visibleTo: 'admin', // Solo visible para admin
+      });
+    }
+    
+    // Agregar mensaje inicial del usuario (visible para ambos)
     if (data.initialMessage) {
       messages.push({
         sender: 'user',

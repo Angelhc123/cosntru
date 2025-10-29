@@ -212,6 +212,12 @@ function renderTicketMessages(messages) {
     
     let html = '';
     messages.forEach(msg => {
+        // FILTRAR: NO mostrar mensajes exclusivos para admin
+        if (msg.visibleTo === 'admin') {
+            console.log('🚫 Mensaje oculto para usuario (solo admin):', msg.text);
+            return; // Saltar este mensaje
+        }
+
         const isUser = msg.sender === 'user';
         const isSystem = msg.sender === 'system';
         

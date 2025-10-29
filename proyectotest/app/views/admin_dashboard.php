@@ -152,6 +152,15 @@
                 </div>
             </a>
 
+            <a href="admin_tickets.php" class="card" style="border-left: 4px solid #f39c12;">
+                <div class="card-icon">🎫</div>
+                <div class="card-title">Tickets de Soporte</div>
+                <div class="card-description">
+                    Gestiona los tickets de soporte generados por usuarios. 
+                    Asigna, responde y resuelve consultas escaladas desde el chatbot.
+                </div>
+            </a>
+
             <a href="admin_stats.php" class="card card-stats">
                 <div class="card-icon">📊</div>
                 <div class="card-title">Estadísticas del Modelo</div>

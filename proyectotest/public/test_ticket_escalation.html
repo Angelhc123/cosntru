@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Escalación de Tickets con Historial</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        #result {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            min-height: 100px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎫 Test de Escalación de Tickets</h1>
+        <p class="subtitle">Prueba la creación de tickets con historial completo de conversación</p>
+
+        <div class="info">
+            <strong>📋 Objetivo:</strong> Verificar que cuando se crea un ticket, el administrador reciba todo el historial de la conversación del chatbot, pero el usuario solo vea su mensaje inicial.
+        </div>
+
+        <div class="section">
+            <h2>1️⃣ Crear ticket con historial simulado</h2>
+            <p style="margin-bottom: 15px; color: #666;">Este test creará un ticket con 5 mensajes de conversación previa</p>
+            <button onclick="testCreateTicketWithHistory()">🚀 Crear Ticket con Historial</button>
+        </div>
+
+        <div class="section">
+            <h2>2️⃣ Ver ticket como ADMINISTRADOR</h2>
+            <p style="margin-bottom: 15px; color: #666;">Debería ver TODO el historial (5 mensajes previos + mensaje inicial)</p>
+            <button onclick="viewAsAdmin()">👨‍💼 Ver como Admin</button>
+        </div>
+
+        <div class="section">
+            <h2>3️⃣ Ver ticket como USUARIO</h2>
+            <p style="margin-bottom: 15px; color: #666;">Solo debería ver su mensaje inicial (sin historial previo)</p>
+            <button onclick="viewAsUser()">👤 Ver como Usuario</button>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Nota:</strong> Asegúrate de que el API Gateway esté corriendo en <code>localhost:3000</code>
+        </div>
+
+        <div id="result">
+Esperando acción...
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000/api/v1';
+        let lastTicketId = null;
+
+        function log(message, data = null) {
+            const resultDiv = document.getElementById('result');
+            const timestamp = new Date().toLocaleTimeString();
+            resultDiv.textContent += `\n[${timestamp}] ${message}`;
+            if (data) {
+                resultDiv.textContent += `\n${JSON.stringify(data, null, 2)}`;
+            }
+            resultDiv.scrollTop = resultDiv.scrollHeight;
+        }
+
+        async function testCreateTicketWithHistory() {
+            document.getElementById('result').textContent = '';
+            log('🚀 Iniciando creación de ticket con historial...');
+
+            // Simular historial de conversación
+            const conversationHistory = [
+                {
+                    sender: 'user',
+                    text: '¿Cuáles son los requisitos de matrícula?',
+                    timestamp: new Date(Date.now() - 5 * 60000) // 5 min atrás
+                },
+                {
+                    sender: 'bot',
+                    text: 'Los requisitos de matrícula incluyen: DNI vigente, constancia de no adeudar, ficha de matrícula...',
+                    timestamp: new Date(Date.now() - 4 * 60000)
+                },
+                {
+                    sender: 'user',
+                    text: '¿Y si soy de traslado externo?',
+                    timestamp: new Date(Date.now() - 3 * 60000)
+                },
+                {
+                    sender: 'bot',
+                    text: 'Para traslado externo necesitas certificados de estudios y sílabos...',
+                    timestamp: new Date(Date.now() - 2 * 60000)
+                },
+                {
+                    sender: 'user',
+                    text: 'No entiendo, necesito hablar con alguien',
+                    timestamp: new Date(Date.now() - 1 * 60000)
+                }
+            ];
+
+            const ticketData = {
+                sessionId: 'test-session-' + Date.now(),
+                userId: '3',
+                userName: 'Juan Carlos Pérez Mamani',
+                userEmail: 'angethernandez3@gmail.com',
+                subject: 'Consulta sobre traslado externo',
+                originalQuery: 'No entiendo los requisitos de traslado',
+                escalationReason: 'Usuario solicita hablar con agente humano',
+                initialMessage: 'Necesito ayuda personalizada con mi traslado externo',
+                conversationHistory: conversationHistory
+            };
+
+            log('📤 Enviando datos del ticket:', ticketData);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/tickets`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(ticketData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error al crear ticket');
+                }
+
+                const data = await response.json();
+                lastTicketId = data.data.ticketId;
+
+                log('✅ Ticket creado exitosamente!');
+                log('📋 Detalles del ticket:', {
+                    ticketId: data.data.ticketId,
+                    userId: data.data.userId,
+                    status: data.data.status,
+                    totalMessages: data.data.messages.length,
+                    messagesForAdmin: data.data.messages.filter(m => m.visibleTo === 'admin').length,
+                    messagesForBoth: data.data.messages.filter(m => !m.visibleTo).length
+                });
+
+                log('\n💡 Ahora puedes:');
+                log('1. Ver como Admin (verá TODO el historial)');
+                log('2. Ver como Usuario (verá solo mensaje inicial)');
+
+            } catch (error) {
+                log('❌ Error:', error.message);
+                console.error(error);
+            }
+        }
+
+        async function viewAsAdmin() {
+            if (!lastTicketId) {
+                log('⚠️ Primero crea un ticket');
+                return;
+            }
+
+            document.getElementById('result').textContent = '';
+            log('👨‍💼 Consultando ticket como ADMINISTRADOR...');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/tickets/${lastTicketId}`);
+                
+                if (!response.ok) {
+                    throw new Error('Error al obtener ticket');
+                }
+
+                const data = await response.json();
+                const ticket = data.data;
+
+                log('📨 Mensajes visibles para el ADMIN:');
+                log(`Total de mensajes: ${ticket.messages.length}\n`);
+
+                ticket.messages.forEach((msg, index) => {
+                    const visibilidad = msg.visibleTo === 'admin' ? '[SOLO ADMIN]' : '[TODOS]';
+                    log(`${index + 1}. ${visibilidad} [${msg.sender}] ${msg.senderName}: ${msg.text.substring(0, 80)}...`);
+                });
+
+                log('\n✅ El admin VE TODO el historial de conversación');
+
+            } catch (error) {
+                log('❌ Error:', error.message);
+            }
+        }
+
+        async function viewAsUser() {
+            if (!lastTicketId) {
+                log('⚠️ Primero crea un ticket');
+                return;
+            }
+
+            document.getElementById('result').textContent = '';
+            log('👤 Consultando ticket como USUARIO...');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/tickets/${lastTicketId}`);
+                
+                if (!response.ok) {
+                    throw new Error('Error al obtener ticket');
+                }
+
+                const data = await response.json();
+                const ticket = data.data;
+
+                // Filtrar mensajes como lo hace el frontend del usuario
+                const userVisibleMessages = ticket.messages.filter(msg => msg.visibleTo !== 'admin');
+
+                log('📨 Mensajes visibles para el USUARIO:');
+                log(`Total de mensajes (sin filtrar): ${ticket.messages.length}`);
+                log(`Mensajes visibles (filtrados): ${userVisibleMessages.length}\n`);
+
+                userVisibleMessages.forEach((msg, index) => {
+                    log(`${index + 1}. [${msg.sender}] ${msg.senderName}: ${msg.text.substring(0, 80)}...`);
+                });
+
+                log('\n✅ El usuario NO ve el historial de conversación (solo mensajes sin visibleTo="admin")');
+
+            } catch (error) {
+                log('❌ Error:', error.message);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Put, Body, Param, Query } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 
-@Controller('api/v1/tickets')
+@Controller('tickets')
 export class TicketsController {
   constructor(private readonly ticketsService: TicketsService) {}
 
@@ -18,6 +18,11 @@ export class TicketsController {
     originalQuery: string;
     escalationReason: string;
     initialMessage?: string;
+    conversationHistory?: Array<{
+      sender: 'user' | 'bot';
+      text: string;
+      timestamp: Date;
+    }>;
   }) {
     const ticket = await this.ticketsService.createTicket(body);
     return {
@@ -41,6 +46,7 @@ export class TicketsController {
 
   /**
    * GET /api/v1/tickets/user/:userId - Obtener tickets de un usuario
+   * IMPORTANTE: Esta ruta debe ir ANTES de /:ticketId para evitar conflictos
    */
   @Get('user/:userId')
   async getUserTickets(@Param('userId') userId: string) {
@@ -52,7 +58,21 @@ export class TicketsController {
   }
 
   /**
+   * GET /api/v1/tickets/admin/:adminId - Obtener tickets de un admin
+   * IMPORTANTE: Esta ruta debe ir ANTES de /:ticketId para evitar conflictos
+   */
+  @Get('admin/:adminId')
+  async getAdminTickets(@Param('adminId') adminId: string) {
+    const tickets = await this.ticketsService.getAdminTickets(adminId);
+    return {
+      status: 'success',
+      data: tickets,
+    };
+  }
+
+  /**
    * GET /api/v1/tickets/:ticketId - Obtener un ticket específico
+   * IMPORTANTE: Esta ruta debe ir AL FINAL para no interferir con rutas específicas
    */
   @Get(':ticketId')
   async getTicket(@Param('ticketId') ticketId: string) {
@@ -123,18 +143,6 @@ export class TicketsController {
       status: 'success',
       message: 'Ticket resuelto exitosamente',
       data: ticket,
-    };
-  }
-
-  /**
-   * GET /api/v1/tickets/admin/:adminId - Obtener tickets de un admin
-   */
-  @Get('admin/:adminId')
-  async getAdminTickets(@Param('adminId') adminId: string) {
-    const tickets = await this.ticketsService.getAdminTickets(adminId);
-    return {
-      status: 'success',
-      data: tickets,
     };
   }
 }

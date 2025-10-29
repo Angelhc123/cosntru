@@ -604,6 +604,58 @@
     background: #5a6268;
 }
 
+/* Estilos para los botones de escalación mejorados */
+.escalation-prompt .message-content {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.escalation-prompt p {
+    margin: 0 0 15px 0;
+    line-height: 1.5;
+}
+
+.escalation-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.escalation-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.escalation-btn.yes-btn {
+    background: #28a745;
+    color: white;
+}
+
+.escalation-btn.yes-btn:hover {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.escalation-btn.no-btn {
+    background: #6c757d;
+    color: white;
+}
+
+.escalation-btn.no-btn:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
 @keyframes slideInUp {
     from {
         opacity: 0;

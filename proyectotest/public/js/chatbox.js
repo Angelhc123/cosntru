@@ -751,6 +751,145 @@ class ChatboxWidget {
         }
     }
 
+    /**
+     * Obtener todo el historial de la conversación actual
+     */
+    async getConversationHistory() {
+        if (!this.sessionId) {
+            return [];
+        }
+
+        try {
+            const response = await fetch(
+                `${this.apiGatewayUrl}/chat-sessions/${this.sessionId}/messages?session_token=${this.sessionToken}`
+            );
+            
+            if (!response.ok) {
+                return [];
+            }
+            
+            const data = await response.json();
+            const messages = data.messages || data.data?.messages || [];
+            
+            // Convertir al formato que espera el backend
+            return messages.map(msg => ({
+                sender: msg.sender_type === 'user' ? 'user' : 'bot',
+                text: msg.message_text,
+                timestamp: msg.timestamp || new Date()
+            }));
+            
+        } catch (error) {
+            console.error('❌ Error al obtener historial:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Crear ticket de soporte con todo el historial de conversación
+     */
+    async createSupportTicket(subject, escalationReason) {
+        try {
+            // Obtener datos del usuario
+            const userId = this.userId || '1';
+            const userName = localStorage.getItem('user_name') || 'Usuario';
+            const userEmail = localStorage.getItem('user_email') || 'usuario@upt.pe';
+            
+            // Obtener todo el historial de conversación
+            const conversationHistory = await this.getConversationHistory();
+            
+            console.log('📋 Creando ticket con historial completo:', {
+                subject,
+                escalationReason,
+                messagesCount: conversationHistory.length
+            });
+
+            const response = await fetch(`${this.apiGatewayUrl}/tickets`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sessionId: this.sessionId,
+                    userId: userId,
+                    userName: userName,
+                    userEmail: userEmail,
+                    subject: subject,
+                    originalQuery: subject,
+                    escalationReason: escalationReason,
+                    initialMessage: subject,
+                    conversationHistory: conversationHistory // ← TODO EL HISTORIAL
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al crear ticket');
+            }
+
+            const data = await response.json();
+            console.log('✅ Ticket creado exitosamente:', data);
+            
+            return data.data;
+            
+        } catch (error) {
+            console.error('❌ Error al crear ticket:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Mostrar mensaje de escalación al usuario
+     * (Esta función se puede llamar desde el NLP service cuando detecte baja confianza)
+     */
+    showEscalationPrompt(subject, reason) {
+        const messagesContainer = document.getElementById('chat-messages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message bot-message escalation-prompt';
+        messageDiv.innerHTML = `
+            <div class="message-content">
+                <p><strong>🎫 ¿Necesitas ayuda personalizada?</strong></p>
+                <p>Parece que necesitas asistencia específica. Puedo crear un ticket de soporte y un agente te ayudará personalmente.</p>
+                <div class="escalation-buttons">
+                    <button class="escalation-btn yes-btn" onclick="window.chatboxWidget.handleEscalationResponse('yes', '${subject}', '${reason}')">
+                        ✅ Sí, necesito ayuda
+                    </button>
+                    <button class="escalation-btn no-btn" onclick="window.chatboxWidget.handleEscalationResponse('no')">
+                        ❌ No, gracias
+                    </button>
+                </div>
+            </div>
+        `;
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    /**
+     * Manejar respuesta del usuario al prompt de escalación
+     */
+    async handleEscalationResponse(response, subject = '', reason = '') {
+        if (response === 'yes') {
+            this.addSystemMessage('🎫 Creando ticket de soporte...');
+            
+            try {
+                const ticket = await this.createSupportTicket(subject, reason);
+                
+                this.addSystemMessage(
+                    `✅ Ticket creado exitosamente!\n\n` +
+                    `🎫 Número: ${ticket.ticketId}\n` +
+                    `📧 Recibirás notificaciones en: ${ticket.userEmail}\n\n` +
+                    `Un agente revisará tu caso pronto. Puedes ver el estado de tu ticket en "Mis Tickets" en tu panel de usuario.`
+                );
+                
+            } catch (error) {
+                this.addSystemMessage(
+                    '❌ Error al crear el ticket. Por favor, intenta nuevamente o contacta al soporte técnico.'
+                );
+            }
+        } else {
+            this.addSystemMessage('Entendido. ¿En qué más puedo ayudarte? 😊');
+        }
+    }
+
     escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
