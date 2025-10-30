@@ -6,6 +6,14 @@ echo "🚀 Iniciando UPT Chat System en Railway..."
 # Crear directorio de logs
 mkdir -p logs
 
+# Crear credenciales de Dialogflow desde variable de entorno
+if [ ! -z "$GOOGLE_APPLICATION_CREDENTIALS_JSON" ]; then
+    echo "🔐 Creando archivo de credenciales de Dialogflow..."
+    mkdir -p upt-chat-system/services/nlp-service/credentials
+    echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > upt-chat-system/services/nlp-service/credentials/dialogflow-credentials.json
+    echo "✅ Credenciales de Dialogflow creadas"
+fi
+
 # Variables de entorno por defecto
 export PORT=${PORT:-8000}
 export API_GATEWAY_PORT=${API_GATEWAY_PORT:-3000}
