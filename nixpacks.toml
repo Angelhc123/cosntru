@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ['nodejs_20', 'python310', 'python310Packages.fastapi', 'python310Packages.uvicorn', 'python310Packages.pydantic', 'python310Packages.requests', 'python310Packages.spacy', 'python310Packages.scikit-learn', 'python310Packages.numpy', 'python310Packages.python-multipart', 'python310Packages.python-dotenv', 'php82', 'php82Packages.composer']
+nixPkgs = ['nodejs_20', 'python310', 'python310Packages.fastapi', 'python310Packages.uvicorn', 'python310Packages.pydantic', 'python310Packages.requests', 'python310Packages.scikit-learn', 'python310Packages.numpy', 'python310Packages.pip', 'php82', 'php82Packages.composer']
 
 [phases.install]
 cmds = [
