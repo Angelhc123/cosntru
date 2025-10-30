@@ -31,7 +31,7 @@ echo "  Analytics: $ANALYTICS_SERVICE_PORT"
 # Iniciar NLP Service
 echo "🤖 Iniciando NLP Service..."
 cd upt-chat-system/services/nlp-service
-python3 -m uvicorn presentation.main:app --host 0.0.0.0 --port $NLP_SERVICE_PORT > ../../../logs/nlp-service.log 2>&1 &
+python3 -m uvicorn main:app --host 0.0.0.0 --port $NLP_SERVICE_PORT > ../../../logs/nlp-service.log 2>&1 &
 NLP_PID=$!
 echo "  PID: $NLP_PID"
 cd ../../..
