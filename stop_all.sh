@@ -34,6 +34,7 @@ kill_port 8000 "Frontend PHP"
 kill_port 3000 "API Gateway" 
 kill_port 8001 "NLP Service"
 kill_port 3005 "Notification Service"
+kill_port 3006 "Analytics Service"
 
 # Detener por proceso (por si quedaron zombies)
 echo ""
@@ -59,6 +60,11 @@ if pkill -9 -f "notification-service" 2>/dev/null; then
     echo -e "${GREEN}✅ Proceso Notification Service limpiado${NC}"
 fi
 
+# Analytics Service
+if pkill -9 -f "analytics-service" 2>/dev/null; then
+    echo -e "${GREEN}✅ Proceso Analytics Service limpiado${NC}"
+fi
+
 # ngrok
 if pkill -9 ngrok 2>/dev/null; then
     echo -e "${GREEN}✅ ngrok detenido${NC}"
@@ -74,6 +80,7 @@ if [[ "$clean_logs" == "s" ]]; then
     rm -f /home/desci/Documentos/constru/upt-chat-system/services/nlp-service/nlp-service.log
     rm -f /home/desci/Documentos/constru/upt-chat-system/services/api-gateway/api-gateway.log
     rm -f /home/desci/Documentos/constru/upt-chat-system/services/notification-service/notification-service.log
+    rm -f /home/desci/Documentos/constru/upt-chat-system/services/analytics-service/analytics-service.log
     rm -f /home/desci/Documentos/constru/proyectotest/public/frontend.log
     echo -e "${GREEN}✅ Logs limpiados${NC}"
 fi

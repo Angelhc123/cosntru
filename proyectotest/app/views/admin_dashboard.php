@@ -161,13 +161,12 @@
                 </div>
             </a>
 
-            <a href="admin_stats.php" class="card card-stats">
+            <a href="admin_analytics.php" class="card" style="border-left: 4px solid #6610f2;">
                 <div class="card-icon">📊</div>
-                <div class="card-title">Estadísticas del Modelo</div>
+                <div class="card-title">Dashboard de Métricas</div>
                 <div class="card-description">
-                    Visualiza métricas de uso, rendimiento del modelo NLP y análisis de conversaciones.
-                    <br><br>
-                    <span style="color: #999; font-style: italic;">(Próximamente)</span>
+                    Visualiza métricas en tiempo real del chatbot: consultas, feedback, intents, FAQs y tickets.
+                    Exporta reportes en Excel y PDF.
                 </div>
             </a>
         </div>

@@ -37,6 +37,7 @@ check_service 8000 "Frontend PHP" "http://localhost:8000"
 check_service 3000 "API Gateway (NestJS)" "http://localhost:3000"
 check_service 8001 "NLP Service (Python)" "http://localhost:8001"
 check_service 3005 "Notification Service" "http://localhost:3005"
+check_service 3006 "Analytics Service" "http://localhost:3006/api/v1/analytics/health"
 
 # Verificar ngrok
 echo -e "${YELLOW}🌐 Túnel HTTPS (ngrok):${NC}"

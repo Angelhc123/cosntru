@@ -1,14 +1,40 @@
 {
   "name": "analytics-service",
-  "version": "0.0.1",
-  "description": "Microservicio de análisis y métricas UPT Chat System",
+  "version": "1.0.0",
+  "description": "Microservicio de análisis y métricas en tiempo real - UPT Chat System",
   "private": true,
   "license": "MIT",
   "scripts": {
-    "build": "echo 'Analytics Service - Pendiente de implementación'",
-    "start": "echo 'Analytics Service - Pendiente de implementación'",
-    "start:dev": "echo 'Analytics Service - Pendiente de implementación'"
+    "build": "nest build",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main"
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^10.0.0",
+    "@nestjs/mongoose": "^10.0.1",
+    "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/schedule": "^4.0.0",
+    "cors": "^2.8.5",
+    "exceljs": "^4.3.0",
+    "express": "^4.18.2",
+    "moment": "^2.29.4",
+    "mongoose": "^7.5.0",
+    "pdfkit": "^0.13.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.0.0",
+    "@nestjs/schematics": "^10.0.0",
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.3.1",
+    "ts-loader": "^9.4.3",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.1.3"
+  }
 }

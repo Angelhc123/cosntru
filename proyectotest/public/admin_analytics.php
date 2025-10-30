@@ -1,122 +1,146 @@
-<?php
-require_once __DIR__ . '/../config/session.php';
-require_once __DIR__ . '/../app/controllers/AuthController.php';
-
-// Verificar autenticación y tipo de usuario
-if (!isset($_SESSION['user_id']) || $_SESSION['tipo_usuario'] !== 'administrativo') {
-    header('Location: login.php');
-    exit();
-}
-
-$userName = $_SESSION['nombre_completo'] ?? 'Administrador';
-?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Métricas - Sistema UPT</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Dashboard de Métricas - UPT Chat System</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        .analytics-container {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             padding: 20px;
+        }
+
+        .container {
             max-width: 1400px;
             margin: 0 auto;
         }
 
-        .analytics-header {
+        header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 10px;
         }
 
-        .period-selector {
+        header h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        header p {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .date-selector {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
+            align-items: center;
         }
 
-        .period-btn {
+        .date-selector select,
+        .date-selector input {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .btn {
             padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             border: none;
-            background: #f0f0f0;
+            border-radius: 8px;
             cursor: pointer;
-            border-radius: 5px;
-            font-weight: 500;
+            font-weight: 600;
             transition: all 0.3s;
         }
 
-        .period-btn.active {
-            background: #667eea;
-            color: white;
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .metrics-grid {
+        .btn-export {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
-        .metric-card {
+        .stat-card {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
         }
 
-        .metric-value {
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card .icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
             font-size: 36px;
             font-weight: bold;
             color: #667eea;
             margin: 10px 0;
         }
 
-        .metric-label {
-            color: #6c757d;
+        .stat-card .label {
+            color: #666;
             font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .metric-change {
-            font-size: 12px;
-            margin-top: 5px;
-        }
-
-        .metric-change.positive {
-            color: #28a745;
-        }
-
-        .metric-change.negative {
-            color: #dc3545;
+            font-weight: 600;
         }
 
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .chart-card {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
 
-        .chart-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
+        .chart-card h3 {
             color: #333;
+            margin-bottom: 20px;
+            font-size: 18px;
         }
 
         .chart-container {
@@ -124,271 +148,158 @@ $userName = $_SESSION['nombre_completo'] ?? 'Administrador';
             height: 300px;
         }
 
-        .refresh-info {
-            text-align: center;
-            color: #6c757d;
-            font-size: 12px;
-            margin-top: 20px;
-        }
-
         .loading {
             text-align: center;
             padding: 40px;
-            color: #6c757d;
+            color: white;
+            font-size: 18px;
+        }
+
+        .export-menu {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .export-menu h3 {
+            color: #333;
+            font-size: 18px;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-excel {
+            background: linear-gradient(135deg, #217346 0%, #34a853 100%);
+        }
+
+        .btn-pdf {
+            background: linear-gradient(135deg, #d32f2f 0%, #f44336 100%);
+        }
+
+        .back-button {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
         }
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h2>🎓 Sistema UPT</h2>
+    <div class="container">
+        <header>
+            <div>
+                <h1>📊 Dashboard de Métricas en Tiempo Real</h1>
+                <p>UPT Chat System - Análisis y Reportes</p>
             </div>
-            <ul class="menu">
-                <li><a href="admin_dashboard.php">📊 Dashboard</a></li>
-                <li><a href="admin_faqs.php">❓ Gestión FAQs</a></li>
-                <li><a href="admin_tickets.php">🎫 Tickets de Soporte</a></li>
-                <li><a href="admin_analytics.php" class="active">📈 Métricas</a></li>
-                <li><a href="logout.php">🚪 Cerrar Sesión</a></li>
-            </ul>
-        </div>
-
-        <div class="main-content">
-            <div class="analytics-container">
-                <div class="analytics-header">
-                    <div>
-                        <h1>📈 Dashboard de Métricas</h1>
-                        <p>Administrador: <?php echo htmlspecialchars($userName); ?></p>
-                    </div>
-                    <div id="last-update"></div>
+            <div class="controls">
+                <div class="date-selector">
+                    <select id="period-select" onchange="updateDashboard()">
+                        <option value="7">Últimos 7 días</option>
+                        <option value="30" selected>Últimos 30 días</option>
+                        <option value="90">Últimos 90 días</option>
+                        <option value="custom">Personalizado</option>
+                    </select>
+                    <input type="date" id="start-date" style="display:none;">
+                    <input type="date" id="end-date" style="display:none;">
                 </div>
+                <button class="btn" onclick="updateDashboard()">🔄 Actualizar</button>
+                <button class="btn back-button" onclick="window.location.href='../app/views/admin_dashboard.php'">← Volver</button>
+            </div>
+        </header>
 
-                <div class="period-selector">
-                    <button class="period-btn active" onclick="changePeriod('day')">Hoy</button>
-                    <button class="period-btn" onclick="changePeriod('week')">Esta Semana</button>
-                    <button class="period-btn" onclick="changePeriod('month')">Este Mes</button>
+        <div id="loading" class="loading">⏳ Cargando métricas...</div>
+
+        <div id="content" style="display: none;">
+            <!-- Estadísticas Generales -->
+            <div class="stats-grid" id="stats-grid"></div>
+
+            <!-- Menú de Exportación -->
+            <div class="export-menu">
+                <h3>📥 Exportar Reportes</h3>
+                <div class="export-buttons">
+                    <button class="btn btn-excel" onclick="exportExcel()">
+                        📊 Descargar Excel
+                    </button>
+                    <button class="btn btn-pdf" onclick="exportPDF()">
+                        📄 Descargar PDF
+                    </button>
                 </div>
+            </div>
 
-                <div id="loading" class="loading">Cargando métricas...</div>
-
-                <div id="metrics-content" style="display: none;">
-                    <div class="metrics-grid">
-                        <div class="metric-card">
-                            <div class="metric-label">Total de Consultas</div>
-                            <div class="metric-value" id="total-queries">0</div>
-                        </div>
-
-                        <div class="metric-card">
-                            <div class="metric-label">Confianza Promedio</div>
-                            <div class="metric-value" id="avg-confidence">0%</div>
-                        </div>
-
-                        <div class="metric-card">
-                            <div class="metric-label">Tickets Escalados</div>
-                            <div class="metric-value" id="escalated-tickets">0</div>
-                            <div class="metric-change" id="escalation-rate"></div>
-                        </div>
-
-                        <div class="metric-card">
-                            <div class="metric-label">Satisfacción</div>
-                            <div class="metric-value" id="satisfaction-rate">0%</div>
-                            <div class="metric-change" id="feedback-details"></div>
-                        </div>
-                    </div>
-
-                    <div class="charts-grid">
-                        <div class="chart-card">
-                            <div class="chart-title">📊 Consultas por Día</div>
-                            <div class="chart-container">
-                                <canvas id="queriesChart"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="chart-card">
-                            <div class="chart-title">🎯 Top 10 Intents</div>
-                            <div class="chart-container">
-                                <canvas id="intentsChart"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="chart-card">
-                            <div class="chart-title">⚠️ Tasa de Escalamiento</div>
-                            <div class="chart-container">
-                                <canvas id="escalationChart"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="chart-card">
-                            <div class="chart-title">👍 Feedback de Usuarios</div>
-                            <div class="chart-container">
-                                <canvas id="feedbackChart"></canvas>
-                            </div>
-                        </div>
+            <!-- Gráficos -->
+            <div class="charts-grid">
+                <!-- Gráfico de Consultas por Día -->
+                <div class="chart-card">
+                    <h3>📈 Consultas por Día</h3>
+                    <div class="chart-container">
+                        <canvas id="queries-chart"></canvas>
                     </div>
                 </div>
 
-                <div class="refresh-info">
-                    Auto-actualización cada 30 segundos
+                <!-- Gráfico de Feedback -->
+                <div class="chart-card">
+                    <h3>👍👎 Distribución de Feedback</h3>
+                    <div class="chart-container">
+                        <canvas id="feedback-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Top Intents -->
+                <div class="chart-card">
+                    <h3>🎯 Top 10 Intents</h3>
+                    <div class="chart-container">
+                        <canvas id="intents-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Top FAQs -->
+                <div class="chart-card">
+                    <h3>❓ Top 10 Preguntas Frecuentes</h3>
+                    <div class="chart-container">
+                        <canvas id="faqs-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Tickets por Estado -->
+                <div class="chart-card">
+                    <h3>🎫 Tickets por Estado</h3>
+                    <div class="chart-container">
+                        <canvas id="tickets-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Patrones de Uso por Hora -->
+                <div class="chart-card">
+                    <h3>⏰ Patrones de Uso por Hora</h3>
+                    <div class="chart-container">
+                        <canvas id="usage-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Intents con Baja Confianza -->
+                <div class="chart-card">
+                    <h3>⚠️ Intents con Baja Confianza (<70%)</h3>
+                    <div class="chart-container">
+                        <canvas id="low-confidence-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Razones de Escalación -->
+                <div class="chart-card">
+                    <h3>📊 Razones de Escalación</h3>
+                    <div class="chart-container">
+                        <canvas id="escalation-chart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        const API_URL = 'http://localhost:3000/api/v1';
-        let currentPeriod = 'day';
-        let charts = {};
-        let refreshInterval;
-
-        // Cargar datos al iniciar
-        document.addEventListener('DOMContentLoaded', () => {
-            loadAnalytics();
-            startAutoRefresh();
-        });
-
-        async function loadAnalytics() {
-            try {
-                const response = await fetch(`${API_URL}/analytics/dashboard?period=${currentPeriod}`);
-                const result = await response.json();
-
-                if (result.success) {
-                    displayMetrics(result.data);
-                    updateCharts(result.data);
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('metrics-content').style.display = 'block';
-                    updateTimestamp();
-                }
-            } catch (error) {
-                console.error('Error cargando analytics:', error);
-                document.getElementById('loading').innerHTML = '❌ Error cargando métricas';
-            }
-        }
-
-        function displayMetrics(data) {
-            document.getElementById('total-queries').textContent = data.totalQueries.toLocaleString();
-            document.getElementById('avg-confidence').textContent = Math.round(data.avgConfidence * 100) + '%';
-            document.getElementById('escalated-tickets').textContent = data.escalatedTickets.toLocaleString();
-            document.getElementById('escalation-rate').textContent = `Tasa: ${data.escalationRate}%`;
-            document.getElementById('escalation-rate').className = data.escalationRate < 10 ? 'metric-change positive' : 'metric-change negative';
-            
-            document.getElementById('satisfaction-rate').textContent = data.feedbackStats.ratio + '%';
-            document.getElementById('feedback-details').textContent = 
-                `👍 ${data.feedbackStats.positive} | 👎 ${data.feedbackStats.negative}`;
-            document.getElementById('feedback-details').className = 
-                data.feedbackStats.ratio > 70 ? 'metric-change positive' : 'metric-change negative';
-        }
-
-        async function updateCharts(data) {
-            // Gráfico de consultas por día
-            const timeSeriesResponse = await fetch(`${API_URL}/analytics/timeseries?period=${currentPeriod}`);
-            const timeSeriesResult = await timeSeriesResponse.json();
-
-            if (timeSeriesResult.success) {
-                const dates = [...new Set(timeSeriesResult.data.map(d => d._id.date))];
-                const userQueries = dates.map(date => {
-                    const item = timeSeriesResult.data.find(d => d._id.date === date && d._id.sender === 'user');
-                    return item ? item.count : 0;
-                });
-
-                updateOrCreateChart('queriesChart', 'line', {
-                    labels: dates,
-                    datasets: [{
-                        label: 'Consultas de Usuarios',
-                        data: userQueries,
-                        borderColor: '#667eea',
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        tension: 0.4
-                    }]
-                });
-            }
-
-            // Gráfico de intents
-            const intents = Object.keys(data.intentBreakdown);
-            const intentCounts = Object.values(data.intentBreakdown);
-
-            updateOrCreateChart('intentsChart', 'bar', {
-                labels: intents,
-                datasets: [{
-                    label: 'Consultas por Intent',
-                    data: intentCounts,
-                    backgroundColor: '#764ba2'
-                }]
-            }, {
-                indexAxis: 'y'
-            });
-
-            // Gráfico de escalamiento
-            const resolvedAuto = data.totalQueries - data.escalatedTickets;
-            updateOrCreateChart('escalationChart', 'doughnut', {
-                labels: ['Resueltas Automáticamente', 'Escaladas'],
-                datasets: [{
-                    data: [resolvedAuto, data.escalatedTickets],
-                    backgroundColor: ['#28a745', '#ffc107']
-                }]
-            });
-
-            // Gráfico de feedback
-            updateOrCreateChart('feedbackChart', 'pie', {
-                labels: ['Positivo', 'Negativo'],
-                datasets: [{
-                    data: [data.feedbackStats.positive, data.feedbackStats.negative],
-                    backgroundColor: ['#28a745', '#dc3545']
-                }]
-            });
-        }
-
-        function updateOrCreateChart(canvasId, type, data, options = {}) {
-            const canvas = document.getElementById(canvasId);
-            const ctx = canvas.getContext('2d');
-
-            if (charts[canvasId]) {
-                charts[canvasId].data = data;
-                charts[canvasId].update();
-            } else {
-                charts[canvasId] = new Chart(ctx, {
-                    type: type,
-                    data: data,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        ...options
-                    }
-                });
-            }
-        }
-
-        function changePeriod(period) {
-            currentPeriod = period;
-            
-            // Actualizar UI
-            document.querySelectorAll('.period-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // Recargar datos
-            loadAnalytics();
-        }
-
-        function updateTimestamp() {
-            const now = new Date();
-            document.getElementById('last-update').textContent = 
-                `Última actualización: ${now.toLocaleTimeString('es-PE')}`;
-        }
-
-        function startAutoRefresh() {
-            // Actualizar cada 30 segundos
-            refreshInterval = setInterval(() => {
-                loadAnalytics();
-            }, 30000);
-        }
-
-        // Limpiar interval al salir
-        window.addEventListener('beforeunload', () => {
-            if (refreshInterval) {
-                clearInterval(refreshInterval);
-            }
-        });
-    </script>
+    <script src="js/admin-analytics.js"></script>
 </body>
 </html>

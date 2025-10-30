@@ -34,6 +34,7 @@ check_port 8000 || { echo "Ejecuta: pkill -f 'php -S localhost:8000'"; }
 check_port 3000 || { echo "Ejecuta: pkill -f 'npm.*api-gateway'"; }
 check_port 8001 || { echo "Ejecuta: pkill -f 'python3 main.py'"; }
 check_port 3005 || { echo "Ejecuta: pkill -f 'npm.*notification'"; }
+check_port 3006 || { echo "Ejecuta: pkill -f 'npm.*analytics'"; }
 check_port 4040 || { echo "Puerto 4040 (ngrok web interface) en uso"; }
 echo ""
 
@@ -81,6 +82,7 @@ case $option in
         read -p "¿Iniciar API Gateway? (s/n): " api
         read -p "¿Iniciar NLP Service? (s/n): " nlp
         read -p "¿Iniciar Notification Service? (s/n): " notif
+        read -p "¿Iniciar Analytics Service? (s/n): " analytics
         read -p "¿Iniciar Frontend PHP? (s/n): " php
         read -p "¿Iniciar ngrok? (s/n): " ngrok_opt
         if [[ "$ngrok_opt" == "s" ]]; then
@@ -153,7 +155,29 @@ if [[ "$INIT_ALL" == true ]] || [[ "$INIT_BACKEND" == true ]] || [[ "$notif" == 
     sleep 2
 fi
 
-# 4. FRONTEND PHP - Puerto 8000
+# 4. ANALYTICS SERVICE (NestJS) - Puerto 3006
+if [[ "$INIT_ALL" == true ]] || [[ "$INIT_BACKEND" == true ]] || [[ "$analytics" == "s" ]]; then
+    echo -e "${BLUE}📊 Iniciando Analytics Service (Puerto 3006)...${NC}"
+    cd "$BASE_PATH/upt-chat-system/services/analytics-service"
+    
+    if [ ! -d "node_modules" ]; then
+        echo -e "${YELLOW}⚠️  Instalando dependencias...${NC}"
+        npm install
+    fi
+    
+    nohup npm run start:dev > analytics-service.log 2>&1 &
+    ANALYTICS_PID=$!
+    echo -e "${GREEN}✅ Analytics Service iniciado (PID: $ANALYTICS_PID)${NC}"
+    echo "   📄 Logs: $BASE_PATH/upt-chat-system/services/analytics-service/analytics-service.log"
+    echo "   🌐 URL: http://localhost:3006"
+    echo "   📊 Dashboard API: http://localhost:3006/api/v1/analytics/dashboard"
+    echo "   📥 Exportar Excel: http://localhost:3006/api/v1/analytics/export/excel"
+    echo "   📥 Exportar PDF: http://localhost:3006/api/v1/analytics/export/pdf"
+    echo ""
+    sleep 2
+fi
+
+# 5. FRONTEND PHP - Puerto 8000
 if [[ "$INIT_ALL" == true ]] || [[ "$INIT_FRONTEND" == true ]] || [[ "$php" == "s" ]]; then
     echo -e "${BLUE}🌐 Iniciando Frontend PHP (Puerto 8000)...${NC}"
     cd "$BASE_PATH/proyectotest/public"
@@ -235,6 +259,9 @@ if [[ "$INIT_ALL" == true ]] || [[ "$INIT_BACKEND" == true ]] || [[ "$nlp" == "s
 fi
 if [[ "$INIT_ALL" == true ]] || [[ "$INIT_BACKEND" == true ]] || [[ "$notif" == "s" ]]; then
     echo "   📧 Notifications:  http://localhost:3005"
+fi
+if [[ "$INIT_ALL" == true ]] || [[ "$INIT_BACKEND" == true ]] || [[ "$analytics" == "s" ]]; then
+    echo "   📊 Analytics:      http://localhost:3006/api/v1/analytics/dashboard"
 fi
 if [[ "$INIT_NGROK" == true ]]; then
     echo "   🌐 ngrok Dashboard: http://localhost:4040"
