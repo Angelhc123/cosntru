@@ -23,7 +23,8 @@ cd ../../..
 echo "📧 Notification Service..."
 cd upt-chat-system/services/notification-service
 npm ci
-npm run build
+echo "🔨 Compilando Notification Service..."
+npx --package=typescript tsc
 cd ../../..
 
 # NLP Service
@@ -32,4 +33,4 @@ cd upt-chat-system/services/nlp-service
 pip install --no-cache-dir -r requirements.txt
 cd ../../..
 
-echo "✅ Todas las dependencias instaladas"
+echo "✅ Todas las dependencias instaladas y compiladas"
