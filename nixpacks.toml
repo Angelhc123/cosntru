@@ -1,0 +1,16 @@
+[phases.setup]
+nixPkgs = ['nodejs-18_x', 'python310', 'php82', 'php82Packages.composer']
+
+[phases.install]
+cmds = [
+    'npm --version',
+    'node --version',
+    'python3 --version',
+    'php --version'
+]
+
+[phases.build]
+cmds = ['bash setup_railway.sh']
+
+[start]
+cmd = 'bash start_railway.sh'
