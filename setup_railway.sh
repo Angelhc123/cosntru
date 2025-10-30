@@ -1,39 +1,17 @@
 #!/bin/bash
 set -e
 
-echo "📦 Instalando dependencias..."
+echo "📦 Instalando dependencias del Frontend PHP..."
 
-# API Gateway
-echo "📦 API Gateway..."
-cd upt-chat-system/services/api-gateway
-npm ci
-echo "🔨 Compilando API Gateway..."
-npx --package=typescript tsc -p tsconfig.build.json
-cd ../../..
+# Frontend PHP
+echo "🔨 Instalando dependencias del Frontend PHP..."
+cd proyectotest
+if [ -f "composer.json" ]; then
+    composer install --no-dev --optimize-autoloader
+    echo "✅ Dependencias PHP instaladas"
+else
+    echo "⚠️  No se encontró composer.json, omitiendo instalación de dependencias PHP"
+fi
+cd ..
 
-# Analytics Service
-echo "📊 Analytics Service..."
-cd upt-chat-system/services/analytics-service
-npm ci
-echo "🔨 Compilando Analytics Service..."
-npx --package=typescript tsc -p tsconfig.build.json
-cd ../../..
-
-# Notification Service
-echo "📧 Notification Service..."
-cd upt-chat-system/services/notification-service
-npm ci
-echo "🔨 Compilando Notification Service..."
-npx --package=typescript tsc
-cd ../../..
-
-# NLP Service
-echo "🤖 NLP Service..."
-cd upt-chat-system/services/nlp-service
-echo "📥 Instalando paquetes Python específicos..."
-python3 -m pip install --no-cache-dir spacy python-multipart python-dotenv
-echo "📥 Descargando modelo spaCy..."
-python3 -m spacy download es_core_news_sm
-cd ../../..
-
-echo "✅ Todas las dependencias instaladas y compiladas"
+echo "✅ Setup completado - Servicios se compilarán en Railway por separado"

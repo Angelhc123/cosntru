@@ -15,21 +15,24 @@
 - Múltiples procesos en background sin proceso principal claro para Railway
 - Railway espera un proceso web principal que escuche en $PORT
 
-## Arquitectura Final para Railway
-- Proceso principal: PHP Frontend (escucha en $PORT)
-- Servicios en background: API Gateway, NLP, Analytics, Notification
-- Todos los servicios compilados e iniciados correctamente
+## Nueva Arquitectura Simplificada para Railway
+- **Servicio Principal**: Solo Frontend PHP (escucha en $PORT)
+- **Servicios Separados**: Cada microservicio en su propio servicio Railway
+- **Ventajas**: Mejor escalabilidad, debugging, y compatibilidad con Railway
+
+## Servicios a Crear por Separado
+- 🔄 API Gateway Service (NestJS/Node.js)
+- 🔄 Analytics Service (NestJS/Node.js) - IMPLEMENTADO
+- 🔄 Notification Service (NestJS/Node.js)
+- 🔄 NLP Service (FastAPI/Python)
 
 ## Próximos Pasos
-- [ ] Probar deploy en Railway con estos cambios
-- [ ] Verificar que todos los servicios se inicien correctamente
-- [ ] Confirmar que el frontend PHP responda en el puerto correcto
-- [ ] Monitorear logs para detectar errores en runtime
-- [ ] Verificar comunicación entre servicios
+- [ ] Probar deploy del Frontend PHP en Railway
+- [ ] Crear servicios separados para cada microservicio
+- [ ] Configurar variables de entorno para comunicación entre servicios
+- [ ] Actualizar frontend para usar URLs de servicios separados
+- [ ] Probar integración completa
 
-## Servicios Incluidos
-- ✅ API Gateway (NestJS)
-- ✅ NLP Service (FastAPI/Python)
-- ✅ Analytics Service (NestJS) - IMPLEMENTADO
-- ✅ Notification Service (NestJS)
-- ✅ Frontend PHP
+## Estado Actual
+- ✅ Frontend PHP - Listo para deploy simplificado
+- ⏳ Servicios - Requieren configuración por separado
