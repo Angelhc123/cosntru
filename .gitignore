@@ -33,3 +33,7 @@ logs/
 # Build outputs
 dist/
 build/
+
+
+# Otros
+.MIGRATION_GUIDE.md
