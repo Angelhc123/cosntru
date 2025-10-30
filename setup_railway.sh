@@ -7,14 +7,16 @@ echo "📦 Instalando dependencias..."
 echo "📦 API Gateway..."
 cd upt-chat-system/services/api-gateway
 npm ci
-npm run build
+echo "🔨 Compilando API Gateway..."
+npx --package=typescript tsc -p tsconfig.build.json
 cd ../../..
 
 # Analytics Service
 echo "📊 Analytics Service..."
 cd upt-chat-system/services/analytics-service
 npm ci
-npm run build
+echo "🔨 Compilando Analytics Service..."
+npx --package=typescript tsc -p tsconfig.build.json
 cd ../../..
 
 # Notification Service
