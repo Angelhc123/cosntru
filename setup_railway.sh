@@ -30,7 +30,7 @@ cd ../../..
 # NLP Service
 echo "🤖 NLP Service..."
 cd upt-chat-system/services/nlp-service
-pip install --no-cache-dir -r requirements.txt
+python3 -m pip install --no-cache-dir -r requirements.txt
 cd ../../..
 
 echo "✅ Todas las dependencias instaladas y compiladas"
