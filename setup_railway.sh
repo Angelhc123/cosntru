@@ -30,7 +30,7 @@ cd ../../..
 # NLP Service
 echo "🤖 NLP Service..."
 cd upt-chat-system/services/nlp-service
-python3 -m pip install --no-cache-dir -r requirements.txt
+pip3 install --no-cache-dir -r requirements.txt
 echo "📥 Descargando modelo de spaCy..."
 python3 -m spacy download es_core_news_sm
 cd ../../..
