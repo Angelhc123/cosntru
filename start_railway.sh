@@ -92,7 +92,7 @@ cleanup() {
 
 trap cleanup SIGTERM SIGINT
 
-# Mantener el script corriendo y mostrar logs
-echo "📋 Mostrando logs (Ctrl+C para detener)..."
-tail -f logs/*.log &
-wait $API_GATEWAY_PID
+# Iniciar Frontend PHP como proceso principal
+echo "🌐 Iniciando Frontend PHP..."
+cd proyectotest/public
+exec php -S 0.0.0.0:$PORT -t .

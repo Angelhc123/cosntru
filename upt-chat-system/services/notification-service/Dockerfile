@@ -1,7 +1,7 @@
 # Notification Service Dockerfile
 # Estado: PENDIENTE DE IMPLEMENTACIÓN
 
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /usr/src/app
 
