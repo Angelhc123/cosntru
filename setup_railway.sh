@@ -30,10 +30,21 @@ cd ../../..
 # NLP Service
 echo "🤖 NLP Service..."
 cd upt-chat-system/services/nlp-service
-echo "🐍 Instalando dependencias Python..."
-python3 -m pip install --user --no-cache-dir -r requirements.txt
+echo "✅ Paquetes Python ya instalados via Nix"
+echo "📥 Verificando spaCy..."
+python3 -c "import spacy; print('spaCy funciona correctamente')"
 echo "📥 Descargando modelo de spaCy..."
-python3 -m spacy download es_core_news_sm
+python3 -c "
+import spacy
+import subprocess
+import sys
+try:
+    nlp = spacy.load('es_core_news_sm')
+    print('Modelo es_core_news_sm ya existe')
+except OSError:
+    print('Descargando modelo es_core_news_sm...')
+    subprocess.check_call([sys.executable, '-m', 'spacy', 'download', 'es_core_news_sm'])
+"
 cd ../../..
 
 echo "✅ Todas las dependencias instaladas y compiladas"
