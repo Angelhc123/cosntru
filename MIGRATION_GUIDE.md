@@ -156,24 +156,20 @@ INSERT INTO faqs (question, answer, category) VALUES
 
 ## 🤖 Configuración Dialogflow
 
-### Archivo de Credenciales Dialogflow (REAL)
+### Archivo de Credenciales Dialogflow
 **Ubicación:** `/upt-chat-system/services/nlp-service/credentials/dialogflow-credentials.json`
 
-```json
-{
-  "type": "service_account",
-  "project_id": "upt-chat-fhps",
-  "private_key_id": "112fa0e6fc0ca74f4ab9754a3d0f7a2e94229445",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDH8qOZStlIAEPX\n/DDSm4O/OWra4U9ovgeUmTaXyDzyABD+EdZaF0arI+lzvTlfsREVUUG4Hmq90j5j\nP0j05tx/+dPDpiSW+dr9vqaVvUiWSaeKaTXptBhdKSfAOexCCF+Danv9ZEXFDWhM\nbvAunLL1mO/8wHHR6Oh4eQjqEQCsNY648RCYGQE/i7UG96cBINMa+NtjrTvcMq0f\nCLZGdJzLwRuw8oqYUN7ZbsE3uFsbmDkjlv3WwURPCXBIu9Ev5DDcnTtjCoJBT1f/\nCiwBY8nkgEs2pVyaNfZTqYjs/8kkSKHbiZ08H8vvTUAlVpxjBGZgO6sBLKzpWnu7\n00sExsr5AgMBAAECggEAB7egQ97lMwe7lp8HvWE+PQe4zZjrqTXIch5Vwpb6bza8\ncSn8FX8XfayFqq9vgveBGssHl9UotoniWY9MQBOXCCN63m7Ps7oSD0AoCtiC8DYI\njumPqKUIWbQoch1qNoQ/N4HJJlcT8E6bq3OOtqXarGsKPD2rRvhP3LKDOxGL7pmT\nGeh/AH/o015XujReVNqI9mv2y2/FEQylg9ov9RTVInJ4Tio47yZVZYO6XuxwIv9x\ndS0mF6oqmw8+DAeNSQPdVmMU1PtBN/xD9p/aJCqB28aQNAZ6tUCE/kjU6Ce1Oyp4\naFN8OpLiZsziJATF9UzDawZaEoFaQbh76FExqahd2QKBgQDvgVPa46OLalN0vG0n\nHgm1un9ba7IT0o8mVQ33CqDjNRyYbpdNTLDA0mh/GHMeQR+Qmfsmfcqv0SGke6O7\nS/OiOt7xNSqIU9mAZHddJue+GRI3yC54kHl4MntEc8FsXUQQWySyCJT0TLVGtJ7q\n8Zqgl022LKyABFo0/Ktkdbl/NQKBgQDVt+HwBnHIsTlazWPvv2DPp7scI6UUn9tv\nqeBz6M8ZJiRPYKorfwLJyfwZRTD9jkFamNRWYS9uKZ3NzDlMvLUQJlTCtXtbhChF\n7eJuGVF8j1JZAGJ5ZPNFUolIXxH+xSAJziGPjbSKpkJCUYEYT7BxWaBfUCGScnZe\n2pKF3ydBNQKBgHezGSfCsZAR+dfT/HGab5vls5ULRBroFyc/RxV6uGIVv07nprK5\na3VTM2qh25b5UT9B1eWs5MnuKXQ9Xt1S3lbsOVQwECvGTGQA0i86LIQzn4lFgQQ8\noJjUEgtqFveDvWq3QqW/6EIYvFi0GOCvE2rDc9FijmwEwNjOlxJETAspAoGAZ75E\nQeSO9VH6Ona7TVUEJKkSLf2rk9Bpj9HRr9JSPa4DMDkHQef8rYGMC6RHvL2CQf0w\nDeJNSNeQz6aUJgjwh69js8Su5eTIO/HW2YUWxjU4TxXdt3nmkT8YfvYPYTHFdJ0I\nM4whGLDONy0jUm7UgqF0NPBL66/+f9rwB2YkwwUCgYAtoixy+mOwIWdJ0MVOgNsG\nGNI8Ck7ZfMdxCDxeivBcGhmVoF/it/gtulwTxgw7bVAbkKZbck0Tc77anWD8e+t/\nGyUyhc7FrBPMwIlfOcOnXnAmI5wuVlBroS3WjMKWh4t68eMS77gO3DnyXJ1FcdPM\nB0fTyUh45kRIG39RnoG7Jg==\n-----END PRIVATE KEY-----\n",
-  "client_email": "dialogflow-client@upt-chat-fhps.iam.gserviceaccount.com",
-  "client_id": "106936197559669141182",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/dialogflow-client%40upt-chat-fhps.iam.gserviceaccount.com",
-  "universe_domain": "googleapis.com"
-}
-```
+**⚠️ NOTA:** Este archivo YA EXISTE en tu proyecto local y NO se sube a Git por seguridad.
+
+Para copiarlo a otra computadora:
+- Copia directamente el archivo desde la carpeta `credentials/` de tu proyecto actual
+- El archivo contiene las credenciales reales del proyecto `upt-chat-fhps`
+
+Si necesitas regenerarlo:
+1. Ve a Google Cloud Console: https://console.cloud.google.com/
+2. Proyecto: `upt-chat-fhps`  
+3. IAM & Admin > Service Accounts
+4. Descarga nuevas credenciales JSON
 
 ### Script ngrok para Webhook
 **Ubicación:** `/get_ngrok_url.sh`
