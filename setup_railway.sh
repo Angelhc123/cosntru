@@ -6,21 +6,21 @@ echo "📦 Instalando dependencias..."
 # API Gateway
 echo "📦 API Gateway..."
 cd upt-chat-system/services/api-gateway
-npm ci --only=production
+npm ci
 npm run build
 cd ../../..
 
 # Analytics Service
 echo "📊 Analytics Service..."
 cd upt-chat-system/services/analytics-service
-npm ci --only=production
+npm ci
 npm run build
 cd ../../..
 
 # Notification Service
 echo "📧 Notification Service..."
 cd upt-chat-system/services/notification-service
-npm ci --only=production
+npm ci
 npm run build
 cd ../../..
 
