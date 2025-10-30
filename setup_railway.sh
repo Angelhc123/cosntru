@@ -30,9 +30,10 @@ cd ../../..
 # NLP Service
 echo "🤖 NLP Service..."
 cd upt-chat-system/services/nlp-service
-echo "✅ Paquetes Python ya instalados via Nix"
+echo "🐍 Instalando dependencias Python..."
+python3 -m pip install --user --no-cache-dir -r requirements.txt
 echo "📥 Descargando modelo de spaCy..."
-python3 -c "import spacy; spacy.cli.download('es_core_news_sm')"
+python3 -m spacy download es_core_news_sm
 cd ../../..
 
 echo "✅ Todas las dependencias instaladas y compiladas"
