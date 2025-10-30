@@ -1,14 +1,11 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "nixpacks",
     "buildCommand": "chmod +x setup_railway.sh && ./setup_railway.sh"
   },
   "deploy": {
     "startCommand": "chmod +x start_railway.sh && ./start_railway.sh",
     "healthcheckPath": "/api/v1/health",
-    "healthcheckTimeout": 300,
-    "restartPolicyType": "on_failure",
-    "numReplicas": 1
+    "healthcheckTimeout": 60
   }
 }

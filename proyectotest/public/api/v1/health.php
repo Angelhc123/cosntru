@@ -12,17 +12,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 // Health check endpoint
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $response = [
-        'status' => 'healthy',
-        'service' => 'UPT Frontend PHP',
-        'timestamp' => date('c'),
-        'version' => '1.0.0',
-        'environment' => getenv('RAILWAY_ENVIRONMENT') ?: 'development'
-    ];
+    try {
+        // Verificar conexión a base de datos si está configurada
+        $dbStatus = 'not_configured';
+        $dbError = null;
+        
+        if (file_exists('../../config/database.php')) {
+            try {
+                require_once '../../config/database.php';
+                if (isset($pdo) && $pdo instanceof PDO) {
+                    $stmt = $pdo->query('SELECT 1');
+                    $dbStatus = 'connected';
+                } else {
+                    $dbStatus = 'disconnected';
+                }
+            } catch (Exception $e) {
+                $dbStatus = 'error';
+                $dbError = $e->getMessage();
+            }
+        }
 
-    http_response_code(200);
-    echo json_encode($response);
-    exit();
+        // Verificar que los directorios necesarios existen
+        $directories = [
+            'logs' => is_dir('../../logs'),
+            'config' => is_dir('../../config'),
+            'app' => is_dir('../../app')
+        ];
+
+        $response = [
+            'status' => 'healthy',
+            'service' => 'UPT Chat System',
+            'timestamp' => date('c'),
+            'version' => '1.0.0',
+            'environment' => getenv('RAILWAY_ENVIRONMENT') ?: 'development',
+            'port' => getenv('PORT') ?: '8000',
+            'php_version' => PHP_VERSION,
+            'database' => $dbStatus,
+            'directories' => $directories,
+            'components' => [
+                'frontend' => 'active',
+                'api' => 'active',
+                'health_check' => 'active'
+            ]
+        ];
+
+        // Si hay error de DB, incluirlo en el response pero mantener healthy
+        if ($dbError && $dbStatus === 'error') {
+            $response['database_error'] = $dbError;
+        }
+
+        http_response_code(200);
+        echo json_encode($response, JSON_PRETTY_PRINT);
+        exit();
+        
+    } catch (Exception $e) {
+        $response = [
+            'status' => 'unhealthy',
+            'service' => 'UPT Chat System',
+            'timestamp' => date('c'),
+            'error' => $e->getMessage()
+        ];
+        
+        http_response_code(503);
+        echo json_encode($response, JSON_PRETTY_PRINT);
+        exit();
+    }
 }
 
 // Method not allowed

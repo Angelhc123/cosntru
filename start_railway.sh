@@ -30,31 +30,23 @@ echo "   - NOTIFICATION_SERVICE_URL: URL del servicio Notification"
 echo "   - ANALYTICS_SERVICE_URL: URL del servicio Analytics"
 echo ""
 
-# Iniciar Frontend PHP
-echo "🌐 Iniciando Frontend PHP..."
-cd proyectotest/public
-php -S 0.0.0.0:$PORT -t . > ../../logs/frontend.log 2>&1 &
-PHP_PID=$!
-echo "  PID: $PHP_PID"
-cd ../..
-
 # Función para limpiar procesos al salir
 cleanup() {
     echo "🛑 Deteniendo servicios..."
-    kill $PHP_PID 2>/dev/null || true
     exit 0
 }
 
 trap cleanup SIGTERM SIGINT
 
 echo ""
-echo "✅ Frontend PHP iniciado"
+echo "✅ Configuración completada"
 echo ""
 echo "🌐 URL disponible:"
 echo "  Frontend: http://0.0.0.0:$PORT"
+echo "  Health Check: http://0.0.0.0:$PORT/api/v1/health"
 echo ""
 
-# Iniciar Frontend PHP como proceso principal
-echo "🌐 Iniciando Frontend PHP..."
+# Iniciar Frontend PHP como proceso principal con router
+echo "🌐 Iniciando Frontend PHP con router..."
 cd proyectotest/public
-exec php -S 0.0.0.0:$PORT -t .
+exec php -S 0.0.0.0:$PORT -t . router.php
