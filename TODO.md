@@ -1,12 +1,12 @@
 # TODO - Corrección Deploy Railway
 
 ## Cambios Realizados
-- [x] Actualizar nixpacks.toml para usar Node.js 22, Python 311, PHP 83
+- [x] Simplificar nixpacks.toml para solo PHP (Railway detectará automáticamente)
 - [x] Revertir omisión del Analytics Service (está implementado)
 - [x] Actualizar versiones de dependencias en package.json de todos los servicios
 - [x] Actualizar versiones en requirements.txt del NLP Service
-- [x] Actualizar Dockerfiles para usar Node.js 22 y Python 3.12
-- [x] Cambiar start_railway.sh para que el proceso principal sea el servidor PHP (exec php -S)
+- [x] Actualizar Dockerfiles para usar Node.js 20 y Python 3.11
+- [x] Cambiar start_railway.sh para ejecutar setup y servicios en background, PHP como principal
 
 ## Problemas Identificados y Solucionados
 - Versiones incompatibles de Node.js causando warnings en build

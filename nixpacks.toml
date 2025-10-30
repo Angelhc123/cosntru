@@ -1,16 +1,13 @@
 [phases.setup]
-nixPkgs = ['nodejs_22', 'python311', 'python311Packages.fastapi', 'python311Packages.uvicorn', 'python311Packages.pydantic', 'python311Packages.requests', 'python311Packages.scikit-learn', 'python311Packages.numpy', 'python311Packages.pip', 'php83', 'php83Packages.composer']
+nixPkgs = ['php83', 'php83Packages.composer']
 
 [phases.install]
 cmds = [
-    'npm --version',
-    'node --version',
-    'python3 --version',
     'php --version'
 ]
 
 [phases.build]
-cmds = ['bash setup_railway.sh']
+cmds = ['echo "Build phase - setup handled in start script"']
 
 [start]
 cmd = 'bash start_railway.sh'
