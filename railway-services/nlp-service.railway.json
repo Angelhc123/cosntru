@@ -1,0 +1,11 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "buildCommand": "cd upt-chat-system/services/nlp-service && pip install -r requirements.txt || echo 'requirements.txt not found'"
+  },
+  "deploy": {
+    "startCommand": "cd upt-chat-system/services/nlp-service && python main.py",
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 60
+  }
+}

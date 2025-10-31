@@ -36,8 +36,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $directories = [
             'logs' => is_dir('../../logs'),
             'config' => is_dir('../../config'),
-            'app' => is_dir('../../app')
+            'app' => is_dir('../../app'),
+            'upt_chat_system' => is_dir('../../upt-chat-system')
         ];
+
+        // Verificar microservicios
+        $microservices = [
+            'api_gateway' => is_dir('../../upt-chat-system/services/api-gateway/dist'),
+            'analytics' => is_dir('../../upt-chat-system/services/analytics-service'),
+            'notifications' => is_dir('../../upt-chat-system/services/notification-service'),
+            'nlp' => is_dir('../../upt-chat-system/services/nlp-service')
+        ];
+
+        // Verificar si API Gateway está respondiendo
+        $apiGatewayStatus = 'unknown';
+        $apiGatewayPort = getenv('API_GATEWAY_PORT') ?: '3000';
+        $apiGatewayUrl = "http://localhost:$apiGatewayPort/health";
+        
+        $context = stream_context_create([
+            'http' => [
+                'timeout' => 2,
+                'ignore_errors' => true
+            ]
+        ]);
+        
+        $apiGatewayResponse = @file_get_contents($apiGatewayUrl, false, $context);
+        if ($apiGatewayResponse !== false) {
+            $apiGatewayStatus = 'responding';
+        } else {
+            $apiGatewayStatus = 'not_responding';
+        }
 
         $response = [
             'status' => 'healthy',
@@ -45,14 +73,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             'timestamp' => date('c'),
             'version' => '1.0.0',
             'environment' => getenv('RAILWAY_ENVIRONMENT') ?: 'development',
-            'port' => getenv('PORT') ?: '8000',
+            'ports' => [
+                'frontend' => getenv('PORT') ?: '8000',
+                'api_gateway' => $apiGatewayPort
+            ],
             'php_version' => PHP_VERSION,
             'database' => $dbStatus,
             'directories' => $directories,
+            'microservices' => $microservices,
             'components' => [
                 'frontend' => 'active',
                 'api' => 'active',
-                'health_check' => 'active'
+                'health_check' => 'active',
+                'api_gateway' => $apiGatewayStatus
             ]
         ];
 
