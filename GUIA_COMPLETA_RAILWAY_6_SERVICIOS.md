@@ -307,15 +307,20 @@ npm run start:prod
 
 **CONTINUAR** con todas las variables de la lista hasta completar.
 
-#### **PASO 2I: CONFIGURAR BUILD/DEPLOY**
+#### **PASO 2I: CONFIGURAR DIRECTORIO RAÍZ**
 1. **CLICK PESTAÑA:** `"Settings"`
-2. **SCROLL DOWN:** Hasta sección "Build"
-3. **LLENAR CAMPOS:**
-   - **Build Command:** `cd upt-chat-system/services/api-gateway && npm ci && npm run build`
-   - **Start Command:** `cd upt-chat-system/services/api-gateway && npm run start:prod`
+2. **SCROLL DOWN:** Hasta sección "Source"
+3. **CAMPO "Root Directory":** escribir `/upt-chat-system/services/api-gateway`
+4. **CLICK:** "Update"
+
+#### **PASO 2J: CONFIGURAR BUILD/DEPLOY**
+1. **SCROLL DOWN:** Hasta sección "Build"
+2. **LLENAR CAMPOS:**
+   - **Build Command:** `npm ci && npm run build`
+   - **Start Command:** `npm run start:prod`
    - **Health Check Path:** `/health`
 
-#### **PASO 2J: DEPLOY Y VERIFICAR**
+#### **PASO 2K: DEPLOY Y VERIFICAR**
 1. **DEPLOY AUTOMÁTICO:** Railway inicia deploy después de configurar
 2. **VER PROGRESO:** Click pestaña "Logs"
 3. **RESULTADO:** Servicio 🔴 → 🟢 cuando está listo
