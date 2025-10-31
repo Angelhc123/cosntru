@@ -4,7 +4,7 @@
     "buildCommand": "composer install --no-dev --optimize-autoloader || echo 'No composer.json'"
   },
   "deploy": {
-    "startCommand": "cd proyectotest/public && php -S 0.0.0.0:$PORT -t . router.php",
+    "startCommand": "cd public && php -S 0.0.0.0:$PORT -t . router.php",
     "healthcheckPath": "/api/v1/health",
     "healthcheckTimeout": 60
   }

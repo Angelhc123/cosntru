@@ -1,39 +1,34 @@
-# Dependencias
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Credenciales y secretos - ¡NUNCA SUBIR!
-*.json.credentials
-*credentials*.json
-dialogflow-credentials.json
-upt-chat-system/services/nlp-service/credentials/
+# Variables de entorno - ¡NUNCA SUBIR!
 .env
 .env.local
 .env.production
+
+# Credenciales y secretos
+*credentials*.json
 *.pem
 *.key
 *.cert
 
+# Dependencias
+vendor/
+node_modules/
+
 # Archivos de sistema
 .DS_Store
 Thumbs.db
+*.swp
+*.swo
 
 # IDEs
 .vscode/
 .idea/
-*.swp
-*.swo
+*.sublime-*
 
 # Logs
-logs/
 *.log
+logs/
 
-# Build outputs
-dist/
-build/
-
-
-# Otros
-.MIGRATION_GUIDE.md
+# Cache
+cache/
+tmp/
+temp/
