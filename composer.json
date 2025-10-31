@@ -1,0 +1,8 @@
+{
+  "name": "upt/frontend-php",
+  "description": "UPT Chat System - PHP Frontend",
+  "type": "project",
+  "require": {
+    "php": ">=7.4"
+  }
+}
