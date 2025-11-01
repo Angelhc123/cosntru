@@ -1,10 +1,10 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "buildCommand": "composer install --no-dev --optimize-autoloader || echo 'No composer.json'"
+    "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "frankenphp run",
+    "startCommand": "php -S 0.0.0.0:$PORT -t public router.php",
     "healthcheckPath": "/api/v1/health",
     "healthcheckTimeout": 60
   },
