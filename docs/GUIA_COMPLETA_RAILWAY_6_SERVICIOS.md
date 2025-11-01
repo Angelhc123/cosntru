@@ -57,7 +57,35 @@
 **Nombre del Servicio:** `frontend-php`  
 **Puerto:** `8000`  
 **Función:** Interface de usuario principal
+PORT=3000
+NODE_ENV=production
+RAILWAY_ENVIRONMENT=production
 
+# === SEGURIDAD ===
+JWT_SECRET=cc93abd1b09e368c58e24a2360f9379c4331704b626a32f27933cbb12b119aa9
+JWT_EXPIRES_IN=24h
+BCRYPT_ROUNDS=12
+
+# === MONGODB ===
+MONGODB_URI=${{MONGO_URL}}
+DATABASE_NAME=upt_chat_system
+
+# === MICROSERVICIOS (Actualizar después) ===
+ANALYTICS_SERVICE_URL=https://analytics-service-production-xxxx.up.railway.app
+NOTIFICATION_SERVICE_URL=https://notification-service-production-xxxx.up.railway.app
+NLP_SERVICE_URL=https://nlp-service-production-xxxx.up.railway.app
+FRONTEND_URL=https://frontend-php-production-xxxx.up.railway.app
+DB_SEEDER_URL=https://db-seeder-production-xxxx.up.railway.app
+
+# === CORS ===
+CORS_ORIGIN=https://frontend-php-production-xxxx.up.railway.app,http://localhost:8000
+
+# === CONFIGURACIÓN ===
+THROTTLE_TTL=60
+THROTTLE_LIMIT=100
+LOG_LEVEL=info
+LOG_FORMAT=json
+HEALTH_CHECK_TIMEOUT=5000
 ### 📝 **VARIABLES DE ENTORNO:**
 ```env
 PORT=8000
@@ -197,31 +225,33 @@ PORT=3000
 NODE_ENV=production
 RAILWAY_ENVIRONMENT=production
 
-# === SEGURIDAD ===
-JWT_SECRET=cc93abd1b09e368c58e24a2360f9379c4331704b626a32f27933cbb12b119aa9
-JWT_EXPIRES_IN=24h
-BCRYPT_ROUNDS=12
-
-# === MONGODB ===
-MONGODB_URI=${{MONGO_URL}}
+# === MONGODB ATLAS (CREDENCIAL REAL) ===
+MONGODB_URI=mongodb+srv://pp2020067576:Piero123-@basededatos2.h1ccthn.mongodb.net/?retryWrites=true&w=majority&appName=BASEDEDATOS2
 DATABASE_NAME=upt_chat_system
 
-# === MICROSERVICIOS (Actualizar después) ===
-ANALYTICS_SERVICE_URL=https://analytics-service-production-xxxx.up.railway.app
-NOTIFICATION_SERVICE_URL=https://notification-service-production-xxxx.up.railway.app
-NLP_SERVICE_URL=https://nlp-service-production-xxxx.up.railway.app
-FRONTEND_URL=https://frontend-php-production-xxxx.up.railway.app
-DB_SEEDER_URL=https://db-seeder-production-xxxx.up.railway.app
+# === SEGURIDAD ===
+JWT_SECRET=upt-chat-system-jwt-secret-2024-super-secure-key
+JWT_EXPIRES_IN=7d
 
-# === CORS ===
-CORS_ORIGIN=https://frontend-php-production-xxxx.up.railway.app,http://localhost:8000
+# === MICROSERVICIOS URLS ===
+CHAT_SERVICE_URL=https://chat-service-production.up.railway.app
+NLP_SERVICE_URL=https://nlp-service-production.up.railway.app
+KNOWLEDGE_BASE_SERVICE_URL=https://knowledge-base-service-production.up.railway.app
+ANALYTICS_SERVICE_URL=https://analytics-service-production.up.railway.app
+NOTIFICATION_SERVICE_URL=https://notification-service-production.up.railway.app
+FRONTEND_URL=https://frontend-php-production.up.railway.app
+DB_SEEDER_URL=https://db-seeder-production.up.railway.app
 
-# === CONFIGURACIÓN ===
-THROTTLE_TTL=60
-THROTTLE_LIMIT=100
+# === RATE LIMITING ===
+RATE_LIMIT_MAX=100
+RATE_LIMIT_WINDOW_MS=60000
+
+# === CORS CONFIGURATION ===
+CORS_ORIGIN=*
+ALLOWED_ORIGINS=https://frontend-php-production.up.railway.app,http://localhost:3000,http://localhost:4200
+
+# === LOGGING ===
 LOG_LEVEL=info
-LOG_FORMAT=json
-HEALTH_CHECK_TIMEOUT=5000
 ```
 
 ### 🛠️ **BUILD/DEPLOY:**
@@ -337,33 +367,16 @@ npm run start:prod
 
 ### 📝 **VARIABLES DE ENTORNO:**
 ```env
-PORT=3001
+PORT=3004
 NODE_ENV=production
 RAILWAY_ENVIRONMENT=production
 
-# === MONGODB ===
-MONGODB_URI=${{MONGO_URL}}
+# === MONGODB ATLAS (CREDENCIAL REAL) ===
+MONGODB_URI=mongodb+srv://pp2020067576:Piero123-@basededatos2.h1ccthn.mongodb.net/?retryWrites=true&w=majority&appName=BASEDEDATOS2
 DATABASE_NAME=upt_analytics
-
-# === SEGURIDAD ===
-JWT_SECRET=cc93abd1b09e368c58e24a2360f9379c4331704b626a32f27933cbb12b119aa9
-
-# === CONFIGURACIÓN ANALYTICS ===
-ANALYTICS_RETENTION_DAYS=365
-BATCH_SIZE=100
-PROCESSING_INTERVAL=60000
-
-# === MICROSERVICIOS (Actualizar después) ===
-API_GATEWAY_URL=https://api-gateway-production-xxxx.up.railway.app
 
 # === LOGGING ===
 LOG_LEVEL=info
-ENABLE_METRICS=true
-HEALTH_CHECK_TIMEOUT=5000
-
-# === REDIS (Opcional para cache) ===
-REDIS_URL=${{REDIS_URL}}
-CACHE_TTL=3600
 ```
 
 ### 🛠️ **BUILD/DEPLOY:**
@@ -470,44 +483,15 @@ cd upt-chat-system/services/analytics-service && npm run start:prod
 
 ### 📝 **VARIABLES DE ENTORNO:**
 ```env
-PORT=3003
-NODE_ENV=production
+PORT=3001
+NODE_ENV=development
 RAILWAY_ENVIRONMENT=production
 
-# === MONGODB ===
-MONGODB_URI=${{MONGO_URL}}
-DATABASE_NAME=upt_chat_system
+# === MONGODB ATLAS CONNECTION (CREDENCIAL REAL) ===
+MONGODB_URI=mongodb+srv://pp2020067576:Piero123-@basededatos2.h1ccthn.mongodb.net/?retryWrites=true&w=majority&appName=BASEDEDATOS2
 
-# === SEGURIDAD ===
-JWT_SECRET=cc93abd1b09e368c58e24a2360f9379c4331704b626a32f27933cbb12b119aa9
-
-# === SEEDER CONFIGURACIÓN ===
-SEED_USERS=true
-SEED_CHAT_SESSIONS=true
-SEED_KNOWLEDGE_BASE=true
-SEED_ADMIN_USER=true
-
-# === ADMIN USER DEFAULT ===
-ADMIN_USERNAME=admin
-ADMIN_EMAIL=admin@upt.edu.pe
-ADMIN_PASSWORD=Admin123*UPT
-ADMIN_FULL_NAME=Administrador UPT
-
-# === MICROSERVICIOS (Actualizar después) ===
-API_GATEWAY_URL=https://api-gateway-production-xxxx.up.railway.app
-
-# === CONFIGURACIÓN ===
-BATCH_SIZE=50
-SEED_DELAY=1000
+# === LOGGING ===
 LOG_LEVEL=info
-ENABLE_SEEDER_LOGS=true
-HEALTH_CHECK_TIMEOUT=5000
-
-# === DATOS INICIALES ===
-UNIVERSITY_NAME=Universidad Privada de Tacna
-UNIVERSITY_CODE=UPT
-DEFAULT_LANGUAGE=es
-TIMEZONE=America/Lima
 ```
 
 ### 🛠️ **BUILD/DEPLOY:**
@@ -569,54 +553,13 @@ cd upt-chat-system/services/db-seeder && npm run start
 
 ### 📝 **VARIABLES DE ENTORNO:**
 ```env
-PORT=3002
+PORT=3005
 NODE_ENV=production
 RAILWAY_ENVIRONMENT=production
 
-# === MONGODB ===
-MONGODB_URI=${{MONGO_URL}}
+# === MONGODB ATLAS (CREDENCIAL REAL) ===
+MONGODB_URI=mongodb+srv://pp2020067576:Piero123-@basededatos2.h1ccthn.mongodb.net/?retryWrites=true&w=majority&appName=BASEDEDATOS2
 DATABASE_NAME=upt_notifications
-
-# === SEGURIDAD ===
-JWT_SECRET=cc93abd1b09e368c58e24a2360f9379c4331704b626a32f27933cbb12b119aa9
-WEBHOOK_SECRET=a0810fe9d8df334ae627004d7a3a875c
-
-# === EMAIL CONFIGURACIÓN ===
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_SECURE=false
-SMTP_USER=sistema.upt.chat@gmail.com
-SMTP_PASSWORD=uptp4ss2024*
-EMAIL_FROM=Sistema UPT <noreply@upt.edu.pe>
-
-# === SMS CONFIGURACIÓN (Opcional - Twilio) ===
-TWILIO_ACCOUNT_SID=ACabcd1234567890abcd1234567890abcd12
-TWILIO_AUTH_TOKEN=ef123456789abcdef123456789abcdef12
-TWILIO_PHONE_NUMBER=+51987654321
-
-# === PUSH NOTIFICATIONS (Opcional - Firebase) ===
-FIREBASE_SERVER_KEY=AAAA1234567:APA91bFx...YourFirebaseServerKeyHere...
-FIREBASE_PROJECT_ID=upt-chat-notifications
-
-# === MICROSERVICIOS (Actualizar después) ===
-API_GATEWAY_URL=https://api-gateway-production-xxxx.up.railway.app
-
-# === CONFIGURACIÓN NOTIFICACIONES ===
-MAX_RETRY_ATTEMPTS=3
-RETRY_DELAY=5000
-NOTIFICATION_QUEUE_SIZE=1000
-EMAIL_BATCH_SIZE=10
-SMS_BATCH_SIZE=5
-
-# === TEMPLATES ===
-EMAIL_TEMPLATE_PATH=templates/email
-SMS_TEMPLATE_PATH=templates/sms
-DEFAULT_EMAIL_TEMPLATE=default
-
-# === LOGGING ===
-LOG_LEVEL=info
-ENABLE_NOTIFICATION_LOGS=true
-HEALTH_CHECK_TIMEOUT=5000
 ```
 
 ### 🛠️ **BUILD/DEPLOY:**
@@ -680,55 +623,41 @@ cd upt-chat-system/services/notification-service && npm run start:prod
 
 ### 📝 **VARIABLES DE ENTORNO:**
 ```env
+# === SERVER CONFIGURATION ===
+HOST=0.0.0.0
 PORT=8001
-PYTHON_ENV=production
+ENVIRONMENT=development
+DEBUG=True
 RAILWAY_ENVIRONMENT=production
 
-# === DIALOGFLOW CONFIGURACIÓN ===
-GOOGLE_APPLICATION_CREDENTIALS_JSON={"type":"service_account","project_id":"upt-chat-system-442016","private_key_id":"8a5d6c3e4f7b2a9c1d8e5f2a3b6c9d0e1f4a7b2c","private_key":"-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC8xVz2H5K9L3mN\nP8Q6R7X4Y1Z5W2V8T9K6M3L0N4P7Q8R1S5U6X2Y9Z3A6B7C8D9E0F1G2H3I4J5K6\nL7M8N9O0P1Q2R3S4T5U6V7W8X9Y0Z1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8\nR9S0T1U2V3W4X5Y6Z7A8B9C0D1E2F3G4H5I6J7K8L9M0N1O2P3Q4R5S6T7U8V9W0\nX1Y2Z3A4B5C6D7E8F9G0H1I2J3K4L5M6N7O8P9Q0R1S2T3U4V5W6X7Y8Z9A0B1C2\nD3E4F5G6H7I8J9K0L1M2N3O4P5Q6R7S8T9U0V1W2X3Y4Z5A6B7C8D9E0F1G2H3I4\nJ5K6L7M8N9O0P1Q2R3S4T5U6V7W8X9Y0Z1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O6\nP7Q8R9S0T1U2V3W4X5Y6Z7A8B9C0D1E2F3G4H5I6J7K8L9M0N1O2P3Q4R5S6T7U8\nV9W0X1Y2Z3A4B5C6D7E8F9G0H1I2J3K4L5M6N7O8P9Q0R1S2T3U4V5W6X7Y8Z9A0B1\nC2D3E4F5G6H7I8J9K0L1M2N3O4P5Q6R7S8T9U0V1W2X3Y4Z5A6B7C8D9E0F1G2H3I4\nJ5K6L7M8N9O0P1Q2R3S4T5U6V7W8X9Y0Z1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8\nR9S0T1U2V3W4X5Y6Z7A8B9C0D1E2F3G4H5I6J7K8L9M0N1O2P3Q4R5S6T7U8V9W0X1Y2\nZ3A4B5C6D7E8F9G0H1I2J3K4L5M6N7O8P9Q0R1S2T3U4V5W6X7Y8Z9A0B1C2D3E4F5G6\nH7I8J9K0L1M2N3O4P5Q6R7S8T9U0V1W2X3Y4Z5A6B7C8D9E0F1G2H3I4J5K6L7M8N9O0\nP1Q2R3S4T5U6V7W8X9Y0Z1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8R9S0T1U2V3W4\nX5Y6Z7A8B9C0D1E2F3G4H5I6J7K8L9M0N1O2P3Q4R5S6T7U8V9W0X1Y2Z3A4B5C6D7E8\nF9G0H1I2J3K4L5M6N7O8P9Q0R1S2T3U4V5W6X7Y8Z9A0B1C2D3E4F5G6H7I8J9K0L1M2\nN3O4P5Q6R7S8T9U0V1W2X3Y4Z5A6B7C8D9E0F1G2H3I4J5K6L7M8N9O0P1Q2R3S4T5U6\nV7W8X9Y0Z1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8R9S0T1U2V3W4X5Y6Z7A8\n-----END PRIVATE KEY-----\n","client_email":"upt-chat-service@upt-chat-system-442016.iam.gserviceaccount.com","client_id":"112345678901234567890","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"https://www.googleapis.com/robots/v1/metadata/x509/upt-chat-service%40upt-chat-system-442016.iam.gserviceaccount.com"}
-
-GOOGLE_PROJECT_ID=upt-chat-system-442016
-GOOGLE_LOCATION=global
-DIALOGFLOW_LANGUAGE_CODE=es
-DIALOGFLOW_SESSION_ID=upt-chat-session
-
-# === MONGODB ===
-MONGODB_URI=${{MONGO_URL}}
-DATABASE_NAME=upt_nlp
-
-# === SEGURIDAD ===
-JWT_SECRET=cc93abd1b09e368c58e24a2360f9379c4331704b626a32f27933cbb12b119aa9
-
-# === MICROSERVICIOS (Actualizar después) ===
-API_GATEWAY_URL=https://api-gateway-production-xxxx.up.railway.app
-
-# === CONFIGURACIÓN NLP ===
-NLP_MODEL_VERSION=latest
-CONFIDENCE_THRESHOLD=0.7
-MAX_TOKENS=2048
-RESPONSE_TIMEOUT=30
-DEFAULT_FALLBACK_MESSAGE=Lo siento, no pude entender tu consulta. ¿Podrías reformularla?
-
-# === CACHE REDIS (Opcional) ===
-REDIS_URL=${{REDIS_URL}}
-CACHE_TTL=3600
-CACHE_ENABLED=true
-
-# === UNIVERSIDAD ESPECÍFICA ===
-UNIVERSITY_CONTEXT=Universidad Privada de Tacna
-UNIVERSITY_DOMAIN=upt.edu.pe
-SUPPORT_AREAS=sistemas,academico,biblioteca,laboratorios
-
 # === LOGGING ===
-LOG_LEVEL=info
-ENABLE_NLP_LOGS=true
-ENABLE_DEBUG_MODE=false
-HEALTH_CHECK_TIMEOUT=10000
+LOG_LEVEL=INFO
+LOG_FILE=logs/nlp-service.log
 
-# === INTENTS CONFIGURACIÓN ===
-MAX_INTENT_MATCHES=5
-INTENT_SCORE_THRESHOLD=0.5
-ENABLE_SPELL_CORRECTION=true
+# === CORS ORIGINS ===
+CORS_ORIGINS=http://localhost:3000,http://localhost:3001,http://localhost:4000,http://localhost:5173
+
+# === DATA PATHS ===
+INTENTS_DATA_PATH=data/intents.json
+FAQS_DATA_PATH=data/faqs.json
+
+# === NLP CONFIGURATION ===
+SPACY_MODEL=es_core_news_sm
+
+# === DIALOGFLOW CONFIGURATION ===
+USE_DIALOGFLOW=False
+GOOGLE_PROJECT_ID=
+GOOGLE_CREDENTIALS_PATH=
+DIALOGFLOW_LANGUAGE_CODE=es
+
+# === DIALOGFLOW ES (ALTERNATIVA GRATUITA) ===
+USE_DIALOGFLOW_ES=True
+DIALOGFLOW_ES_ACCESS_TOKEN=obtener-de-dialogflow-console
+
+# === CONFIDENCE THRESHOLDS ===
+MIN_CONFIDENCE=0.6
+HIGH_CONFIDENCE=0.8
+DIALOGFLOW_CONFIDENCE_THRESHOLD=0.7
 ```
 
 ### 🛠️ **BUILD/DEPLOY:**
