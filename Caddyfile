@@ -5,14 +5,13 @@
 
 {$SERVER_NAME}
 
+root * /app/public
+
 # Enable compression
 encode gzip
 
 # PHP files
 php_fastcgi unix//tmp/php.sock
-
-# Serve static files
-root * /app/public
 
 # Handle PHP files
 @php {
