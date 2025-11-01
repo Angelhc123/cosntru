@@ -1,0 +1,35 @@
+{
+    # Debug
+    {$DEBUG}
+}
+
+{$SERVER_NAME}
+
+# Enable compression
+encode gzip
+
+# PHP files
+php_fastcgi unix//tmp/php.sock
+
+# Serve static files
+root * /app/public
+
+# Handle PHP files
+@php {
+    path *.php
+}
+handle @php {
+    try_files {path} {path}/ /index.php
+    php_fastcgi unix//tmp/php.sock
+}
+
+# Handle static files
+handle {
+    try_files {path} {path}/ /index.php
+    php_fastcgi unix//tmp/php.sock
+}
+
+# Health check
+handle /api/v1/health {
+    respond "OK" 200
+}
