@@ -16,8 +16,5 @@ WORKDIR /app
 # Copiar archivos del proyecto
 COPY . /app
 
-# Exponer puerto
-EXPOSE 80
-
 # Comando para iniciar FrankenPHP
 CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
