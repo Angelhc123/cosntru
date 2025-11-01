@@ -4,7 +4,7 @@
     "buildCommand": "composer install --no-dev --optimize-autoloader || echo 'No composer.json'"
   },
   "deploy": {
-    "startCommand": "frankenphp run --listen=0.0.0.0:$PORT",
+    "startCommand": "frankenphp run",
     "healthcheckPath": "/api/v1/health",
     "healthcheckTimeout": 60
   },
