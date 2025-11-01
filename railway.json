@@ -7,5 +7,14 @@
     "startCommand": "cd public && php -S 0.0.0.0:$PORT -t . router.php",
     "healthcheckPath": "/api/v1/health",
     "healthcheckTimeout": 60
+  },
+  "variables": {
+    "MYSQL_ADDON_HOST": "${MYSQL_ADDON_HOST}",
+    "MYSQL_ADDON_DB": "${MYSQL_ADDON_DB}",
+    "MYSQL_ADDON_USER": "${MYSQL_ADDON_USER}",
+    "MYSQL_ADDON_PORT": "${MYSQL_ADDON_PORT}",
+    "MYSQL_ADDON_PASSWORD": "${MYSQL_ADDON_PASSWORD}",
+    "APP_ENV": "production",
+    "APP_DEBUG": "false"
   }
 }
