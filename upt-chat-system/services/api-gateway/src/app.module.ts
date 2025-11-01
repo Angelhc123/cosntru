@@ -129,7 +129,7 @@ import { IChatSessionRepository } from './domain/repositories/chat-session.repos
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'default_secret_change_in_production',
       signOptions: {
-        expiresIn: (process.env.JWT_EXPIRES_IN as string) || '7d',
+        expiresIn: '7d',
       },
     }),
 
