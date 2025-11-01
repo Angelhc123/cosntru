@@ -1,20 +1,17 @@
-FROM dunglas/frankenphp:php8.4.14-bookworm
+# Imagen base oficial de PHP con Apache
+FROM php:8.2-apache
 
-# Instalar extensiones PHP necesarias para MySQL
-RUN apt-get update && apt-get install -y \
-    libpq-dev \
-    libzip-dev \
-    unzip \
-    && docker-php-ext-install pdo pdo_mysql mysqli
+# Instalar extensiones necesarias para MySQL y utilidades básicas
+RUN docker-php-ext-install pdo pdo_mysql mysqli
 
-# Copiar configuración personalizada de PHP
-COPY php.ini /usr/local/etc/php/conf.d/php.ini
+# Copiar los archivos del proyecto al contenedor
+COPY . /var/www/html
 
-# Configurar el directorio de trabajo
-WORKDIR /app
+# Establecer el directorio de trabajo
+WORKDIR /var/www/html
 
-# Copiar archivos del proyecto
-COPY . /app
+# Exponer el puerto (Railway asigna uno dinámico)
+EXPOSE 8000
 
-# Comando para iniciar FrankenPHP
-CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
+# Comando de inicio — usa el puerto dinámico $PORT de Railway
+CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8000} -t ."]
