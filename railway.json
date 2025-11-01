@@ -6,9 +6,5 @@
   "deploy": {
     "healthcheckPath": "/",
     "healthcheckTimeout": 60
-  },
-  "variables": {
-    "APP_ENV": "production",
-    "APP_DEBUG": "false"
   }
 }
