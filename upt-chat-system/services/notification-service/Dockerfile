@@ -44,6 +44,9 @@ USER nestjs
 # Expose port
 EXPOSE 3005
 
+# Copy healthcheck file
+COPY healthcheck.js ./
+
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node healthcheck.js
