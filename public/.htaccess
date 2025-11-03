@@ -10,7 +10,7 @@ RewriteRule ^(.*)$ index.php [QSA,L]
 
 # Configuración de seguridad
 # Ocultar información del servidor
-ServerTokens Prod
+# ServerTokens Prod
 ServerSignature Off
 
 # Prevenir acceso a archivos sensibles

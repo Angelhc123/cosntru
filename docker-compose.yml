@@ -1,0 +1,15 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      MYSQL_ADDON_HOST: hopper.proxy.rlwy.net
+      MYSQL_ADDON_DB: bj7lnbakskgcgngpmtma
+      MYSQL_ADDON_USER: root
+      MYSQL_ADDON_PASSWORD: CzoLqmmZqbBGamQvqWrmyGSBMgzOxnAP
+      MYSQL_ADDON_PORT: 12354
+      APP_ENV: production
+      APP_DEBUG: false
+    volumes:
+      - .:/var/www/html
