@@ -20,8 +20,8 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy application code
 COPY . .
 
-# Try to download spaCy model, continue if fails
-RUN python -m spacy download es_core_news_sm || echo "SpaCy model download failed, will use fallback"
+# Download spaCy model (silent fail for Railway)
+RUN python -m spacy download es_core_news_sm 2>/dev/null || echo "⚠️ SpaCy model will be downloaded on first request"
 
 # Create logs directory and set permissions
 RUN mkdir -p logs && chmod 755 logs
@@ -31,12 +31,12 @@ RUN groupadd -r appuser && useradd -r -g appuser appuser
 RUN chown -R appuser:appuser /app
 USER appuser
 
-# Expose port
+# Expose port (Railway usa variable $PORT)
 EXPOSE 8001
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8001/health', timeout=5)"
+# Health check con más tiempo de inicio
+HEALTHCHECK --interval=30s --timeout=15s --start-period=90s --retries=5 \
+    CMD curl -f http://localhost:8001/health || exit 1
 
 # Run application with uvicorn for production
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001", "--log-level", "info"]
