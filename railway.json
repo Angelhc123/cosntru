@@ -4,7 +4,8 @@
     "builder": "DOCKERFILE"
   },
   "deploy": {
-    "healthcheckPath": "/",
+    "startCommand": "bash -c 'cd public && php -S 0.0.0.0:$PORT -t . router.php'",
+    "healthcheckPath": "/api/v1/health",
     "healthcheckTimeout": 60
   }
 }
