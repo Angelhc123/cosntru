@@ -5,7 +5,7 @@
   },
   "deploy": {
     "startCommand": "apache2-foreground",
-    "healthcheckPath": "/",
+    "healthcheckPath": "/api/v1/health",
     "healthcheckTimeout": 60
   }
 }
