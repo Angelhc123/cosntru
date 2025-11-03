@@ -17,11 +17,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Download spaCy model
-RUN python -m spacy download es_core_news_sm
-
 # Copy application code
 COPY . .
+
+# Try to download spaCy model, continue if fails
+RUN python -m spacy download es_core_news_sm || echo "SpaCy model download failed, will use fallback"
 
 # Create logs directory and set permissions
 RUN mkdir -p logs && chmod 755 logs
