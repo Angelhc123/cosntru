@@ -12,8 +12,14 @@ RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 # Copia los archivos del proyecto al contenedor
 COPY . /var/www/html/
 
-# Configura el directorio de trabajo
+# Configura Apache para usar /public como raíz del sitio
+RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf
+
+# Establece el directorio de trabajo
 WORKDIR /var/www/html/public
 
-# Expone el puerto de Apache
+# Expone el puerto
 EXPOSE 80
+
+# Comando de inicio
+CMD ["apache2-foreground"]
