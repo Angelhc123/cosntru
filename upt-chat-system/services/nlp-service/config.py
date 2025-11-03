@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     spacy_model: str = "es_core_news_sm"
     
     # DialogFlow Configuration
-    use_dialogflow: bool = False  # Temporalmente desactivado por permisos
+    use_dialogflow: bool = True
     google_project_id: str = "upt-chat-fhps"
     google_credentials_path: str = "credentials/dialogflow-credentials.json"
     dialogflow_session_path: str = ""

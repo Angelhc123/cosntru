@@ -99,7 +99,7 @@ exports.AppModule = AppModule = __decorate([
             jwt_1.JwtModule.register({
                 secret: process.env.JWT_SECRET || 'default_secret_change_in_production',
                 signOptions: {
-                    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+                    expiresIn: '7d',
                 },
             }),
             nest_winston_1.WinstonModule.forRoot(winston_config_1.winstonConfig),
