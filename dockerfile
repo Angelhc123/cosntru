@@ -1,28 +1,20 @@
-# Usa la imagen base oficial de PHP con Apache
 FROM php:8.2-apache
 
-# Instala extensiones necesarias
 RUN apt-get update && apt-get install -y libzip-dev unzip \
     && docker-php-ext-install pdo pdo_mysql mysqli
 
-# Habilita mod_rewrite y configura Apache
-RUN a2enmod rewrite
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+RUN a2enmod rewrite
 
-# Cambia el DocumentRoot para servir desde /public
+# Configurar DocumentRoot correctamente
 RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf
 
-# Copia los archivos del proyecto al contenedor
+# Copiar todo el código
 COPY . /var/www/html/
 
-# Establece el directorio de trabajo
-WORKDIR /var/www/html/public
-
-# Asigna permisos a Apache
+# Cambiar permisos (importante)
 RUN chown -R www-data:www-data /var/www/html
+RUN chmod -R 755 /var/www/html
 
-# Expone el puerto por defecto de Apache
-EXPOSE 80
-
-# Inicia Apache
-CMD ["apache2-foreground"]
+# Directorio de trabajo
+WORKDIR /var/www/html/public
