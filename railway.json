@@ -5,7 +5,7 @@
   },
   "deploy": {
     "startCommand": "bash -c 'cd public && php -S 0.0.0.0:$PORT -t . router.php'",
-    "healthcheckPath": "/api/v1/health",
+    "healthcheckPath": "/api/v1/health.php",
     "healthcheckTimeout": 60
   }
 }
