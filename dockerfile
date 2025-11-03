@@ -3,7 +3,8 @@ FROM php:8.2-apache
 
 # Instala extensiones necesarias
 RUN apt-get update && apt-get install -y libzip-dev unzip \
-    && docker-php-ext-install pdo pdo_mysql mysqli
+    && docker-php-ext-install pdo pdo_mysql mysqli \
+    && rm -rf /var/lib/apt/lists/*
 
 # Habilita mod_rewrite de Apache
 RUN a2enmod rewrite
@@ -14,6 +15,9 @@ COPY . /var/www/html/
 
 # Configura el directorio de trabajo
 WORKDIR /var/www/html/public
+
+# Asigna permisos adecuados
+RUN chown -R www-data:www-data /var/www/html
 
 # Expone el puerto de Apache
 EXPOSE 80
