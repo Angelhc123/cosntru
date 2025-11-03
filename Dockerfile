@@ -9,7 +9,7 @@ RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 RUN a2enmod rewrite
 
 # Copiar todos los archivos del proyecto al contenedor
-WORKDIR /var/www/html/public
+WORKDIR /var/www/html
 COPY . /var/www/html
 
 # Copiar el archivo php.ini personalizado
