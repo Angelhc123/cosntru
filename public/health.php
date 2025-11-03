@@ -1,23 +1,23 @@
 <?php
+/**
+ * Healthcheck endpoint super simple para Railway
+ * Ruta: /health
+ */
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
-// Handle preflight OPTIONS request
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
+// Siempre responder OK - Railway solo necesita un 200
+http_response_code(200);
 
-// Health check endpoint
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $response = [
-        'status' => 'healthy',
-        'service' => 'UPT Frontend PHP',
-        'timestamp' => date('c'),
-        'version' => '1.0.0',
-        'environment' => getenv('RAILWAY_ENVIRONMENT') ?: 'development'
+echo json_encode([
+    'status' => 'ok',
+    'service' => 'frontend-php',
+    'timestamp' => date('c'),
+    'php' => PHP_VERSION
+], JSON_PRETTY_PRINT);
+exit();
+?>
     ];
 
     http_response_code(200);

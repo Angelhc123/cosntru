@@ -10,21 +10,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-// Health check endpoint
+// Health check endpoint - SIMPLIFICADO para Railway
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
         // Verificar conexión a base de datos si está configurada
         $dbStatus = 'not_configured';
         $dbError = null;
         
-        if (file_exists('../../config/database.php')) {
+        $configPath = __DIR__ . '/../../../config/database.php';
+        if (file_exists($configPath)) {
             try {
-                require_once '../../config/database.php';
-                if (isset($pdo) && $pdo instanceof PDO) {
-                    $stmt = $pdo->query('SELECT 1');
+                require_once $configPath;
+                $database = new Database();
+                $conn = $database->getConnection();
+                if ($conn instanceof PDO) {
+                    $stmt = $conn->query('SELECT 1');
                     $dbStatus = 'connected';
-                } else {
-                    $dbStatus = 'disconnected';
                 }
             } catch (Exception $e) {
                 $dbStatus = 'error';
@@ -33,65 +34,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
 
         // Verificar que los directorios necesarios existen
+        $basePath = __DIR__ . '/../../..';
         $directories = [
-            'logs' => is_dir('../../logs'),
-            'config' => is_dir('../../config'),
-            'app' => is_dir('../../app'),
-            'upt_chat_system' => is_dir('../../upt-chat-system')
+            'config' => is_dir($basePath . '/config'),
+            'app' => is_dir($basePath . '/app'),
+            'public' => is_dir($basePath . '/public')
         ];
 
-        // Verificar microservicios
+        // Microservicios no son necesarios para el frontend
         $microservices = [
-            'api_gateway' => is_dir('../../upt-chat-system/services/api-gateway/dist'),
-            'analytics' => is_dir('../../upt-chat-system/services/analytics-service'),
-            'notifications' => is_dir('../../upt-chat-system/services/notification-service'),
-            'nlp' => is_dir('../../upt-chat-system/services/nlp-service')
+            'status' => 'not_required_for_frontend'
         ];
 
-        // Verificar si API Gateway está respondiendo
-        $apiGatewayStatus = 'unknown';
-        $apiGatewayPort = getenv('API_GATEWAY_PORT') ?: '3000';
-        $apiGatewayUrl = "http://localhost:$apiGatewayPort/health";
-        
-        $context = stream_context_create([
-            'http' => [
-                'timeout' => 2,
-                'ignore_errors' => true
-            ]
-        ]);
-        
-        $apiGatewayResponse = @file_get_contents($apiGatewayUrl, false, $context);
-        if ($apiGatewayResponse !== false) {
-            $apiGatewayStatus = 'responding';
-        } else {
-            $apiGatewayStatus = 'not_responding';
-        }
+        // Microservicios no son necesarios para el frontend
+        $microservices = [
+            'status' => 'not_required_for_frontend'
+        ];
 
         $response = [
             'status' => 'healthy',
-            'service' => 'UPT Chat System',
+            'service' => 'UPT Frontend PHP',
             'timestamp' => date('c'),
             'version' => '1.0.0',
-            'environment' => getenv('RAILWAY_ENVIRONMENT') ?: 'development',
-            'ports' => [
-                'frontend' => getenv('PORT') ?: '8000',
-                'api_gateway' => $apiGatewayPort
-            ],
+            'environment' => getenv('RAILWAY_ENVIRONMENT') ?: 'production',
+            'port' => getenv('PORT') ?: $_SERVER['SERVER_PORT'] ?? '8000',
             'php_version' => PHP_VERSION,
             'database' => $dbStatus,
             'directories' => $directories,
-            'microservices' => $microservices,
             'components' => [
                 'frontend' => 'active',
                 'api' => 'active',
-                'health_check' => 'active',
-                'api_gateway' => $apiGatewayStatus
+                'health_check' => 'active'
             ]
         ];
 
         // Si hay error de DB, incluirlo en el response pero mantener healthy
         if ($dbError && $dbStatus === 'error') {
-            $response['database_error'] = $dbError;
+            $response['database_error'] = substr($dbError, 0, 200); // Limitar tamaño
         }
 
         http_response_code(200);
