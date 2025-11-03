@@ -2,13 +2,14 @@
 const http = require('http');
 
 const options = {
-  host: 'localhost',
+  hostname: 'localhost',
   port: process.env.PORT || 3005,
-  path: '/health',
+  path: '/api/notifications/health',
+  method: 'GET',
   timeout: 2000
 };
 
-const request = http.request(options, (res) => {
+const req = http.request(options, (res) => {
   if (res.statusCode === 200) {
     process.exit(0);
   } else {
@@ -16,8 +17,13 @@ const request = http.request(options, (res) => {
   }
 });
 
-request.on('error', () => {
+req.on('error', () => {
   process.exit(1);
 });
 
-request.end();
+req.on('timeout', () => {
+  req.destroy();
+  process.exit(1);
+});
+
+req.end();
