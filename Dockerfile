@@ -9,10 +9,9 @@ RUN a2enmod rewrite
 WORKDIR /var/www/html
 COPY . /var/www/html
 COPY php.ini /usr/local/etc/php/conf.d/php.ini
-
 RUN chown -R www-data:www-data /var/www/html
 
-# 🔹 Mover la configuración de puerto al ENTRYPOINT para que use el valor real de $PORT en runtime
-CMD sed -i "s/Listen 80/Listen ${PORT}/" /etc/apache2/ports.conf && \
-    sed -i "s/:80/:${PORT}/" /etc/apache2/sites-available/000-default.conf && \
-    apache2-foreground
+# 👇 Este comando se ejecuta solo cuando el contenedor inicia (y $PORT ya existe)
+CMD bash -c "sed -i 's/Listen 80/Listen ${PORT}/' /etc/apache2/ports.conf && \
+    sed -i 's/:80/:${PORT}/' /etc/apache2/sites-available/000-default.conf && \
+    apache2-foreground"
