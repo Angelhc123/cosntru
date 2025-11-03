@@ -7,13 +7,15 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements
+# Copy requirements first for better caching
 COPY requirements.txt .
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Download spaCy model
 RUN python -m spacy download es_core_news_sm
@@ -21,15 +23,20 @@ RUN python -m spacy download es_core_news_sm
 # Copy application code
 COPY . .
 
-# Create logs directory
-RUN mkdir -p logs
+# Create logs directory and set permissions
+RUN mkdir -p logs && chmod 755 logs
+
+# Create non-root user for security
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN chown -R appuser:appuser /app
+USER appuser
 
 # Expose port
 EXPOSE 8001
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8001/health')"
+    CMD python -c "import requests; requests.get('http://localhost:8001/health', timeout=5)"
 
-# Run application
-CMD ["python", "main.py"]
+# Run application with uvicorn for production
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
