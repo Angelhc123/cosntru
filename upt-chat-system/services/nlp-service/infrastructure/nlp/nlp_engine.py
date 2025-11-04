@@ -30,12 +30,25 @@ class NLPEngine:
         """
         try:
             self.nlp = spacy.load(model_name)
+            print(f"✅ Loaded spaCy model: {model_name}")
         except OSError:
-            # Si no está instalado, dar instrucciones
-            raise OSError(
-                f"spaCy model '{model_name}' not found. "
-                f"Install it with: python -m spacy download {model_name}"
-            )
+            # Fallback: intentar descargar el modelo automáticamente
+            print(f"⚠️ Model {model_name} not found. Attempting to download...")
+            try:
+                import subprocess
+                subprocess.run(
+                    ["python", "-m", "spacy", "download", model_name],
+                    check=True,
+                    capture_output=True
+                )
+                self.nlp = spacy.load(model_name)
+                print(f"✅ Downloaded and loaded: {model_name}")
+            except Exception as e:
+                # Si falla todo, usar modelo blank como último recurso
+                print(f"❌ Could not download {model_name}: {e}")
+                print("🔧 Using blank Spanish model as fallback...")
+                self.nlp = spacy.blank("es")
+                print("✅ Fallback model initialized")
         
         # Vectorizador TF-IDF (se inicializa con fit cuando se necesite)
         self.vectorizer = None
