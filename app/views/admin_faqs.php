@@ -250,8 +250,9 @@
         </div>
     </div>
 
+    <script src="js/config.js"></script>
     <script>
-        const API_URL = 'http://localhost:3000/api/v1';
+        const API_URL = API_BASE_URL; // Usar configuración centralizada
         let editingRow = null;
 
         // Cargar FAQs al iniciar
