@@ -5,7 +5,7 @@
 
 class ChatboxWidgetWithHistory {
     constructor(userId) {
-        this.apiGatewayUrl = 'http://localhost:3000/api/v1';
+        this.apiGatewayUrl = API_CONFIG.API_GATEWAY;
         this.userId = userId; // ID del usuario logeado
         
         // Obtener valores del localStorage
@@ -927,7 +927,7 @@ class ChatboxWidgetWithHistory {
             
 
             // Llamar al notification-service
-            const response = await fetch('http://localhost:3005/api/notifications/email/chat-transcription', {
+            const response = await fetch(`${API_CONFIG.NOTIFICATION_SERVICE}/email/chat-transcription`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1030,8 +1030,8 @@ class ChatboxWidgetWithHistory {
                 return;
             }
             
-            // Crear ticket usando la NUEVA API (puerto 3000 /api/v1/tickets)
-            const ticketResponse = await fetch(`http://localhost:3000/api/v1/tickets`, {
+            // Crear ticket usando la NUEVA API (Railway)
+            const ticketResponse = await fetch(`${this.apiGatewayUrl}/tickets`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1080,7 +1080,7 @@ class ChatboxWidgetWithHistory {
     
     async sendTicketNotificationEmail(ticketId, userData) {
         try {
-            await fetch('http://localhost:3005/api/notifications/email/send', {
+            await fetch(`${API_CONFIG.NOTIFICATION_SERVICE}/email/send`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

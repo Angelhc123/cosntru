@@ -5,7 +5,7 @@
 
 class ChatboxWidget {
     constructor() {
-        this.apiGatewayUrl = 'http://localhost:3000/api/v1';
+        this.apiGatewayUrl = API_CONFIG.API_GATEWAY;
         
         // Obtener valores del localStorage y validar que no sean 'undefined' como string
         const storedToken = localStorage.getItem('chat_session_token');

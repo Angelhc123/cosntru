@@ -176,6 +176,7 @@
     </div>
 
     <script src="js/script.js"></script>
+    <script src="js/config.js"></script>
     <script src="js/tickets-user.js"></script>
     
     <!-- CHATBOX CON HISTORIAL - Se conecta a MongoDB Atlas vía API Gateway -->

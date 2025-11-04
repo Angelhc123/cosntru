@@ -1,9 +1,10 @@
 /**
  * Sistema de Gestión de Tickets - Panel de Administración
- * Conecta con API Gateway puerto 3000
+ * Conecta con API Gateway en Railway
  */
 
-const API_BASE_URL = 'http://localhost:3000/api/v1';
+// Importar configuración centralizada
+// const API_BASE_URL se define en config.js
 let currentFilter = 'all';
 let selectedTicketId = null;
 let currentAdminTicket = null; // Ticket actualmente asignado al admin

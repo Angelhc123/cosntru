@@ -448,6 +448,7 @@ $adminEmail = $_SESSION['correo'] ?? 'admin@upt.pe';
          data-admin-name="<?php echo htmlspecialchars($adminName); ?>" 
          data-admin-email="<?php echo htmlspecialchars($adminEmail); ?>"></div>
 
+    <script src="js/config.js"></script>
     <script src="js/admin-tickets.js"></script>
 </body>
 </html>

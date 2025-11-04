@@ -1,9 +1,9 @@
 /**
  * Sistema de Tickets de Soporte para Usuarios
- * Conecta con API Gateway en puerto 3000
+ * Conecta con API Gateway en Railway
  */
 
-const API_BASE_URL = 'http://localhost:3000/api/v1';
+// const API_BASE_URL se define en config.js
 let currentTicketId = null;
 let pollingInterval = null;
 let lastMessageCount = 0;
