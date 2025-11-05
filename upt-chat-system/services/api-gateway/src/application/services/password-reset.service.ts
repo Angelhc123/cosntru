@@ -104,24 +104,32 @@ export class PasswordResetService {
       const expiresAt = new Date();
       expiresAt.setHours(expiresAt.getHours() + 1); // Expira en 1 hora
 
-      // 3. Guardar token en MongoDB
-      await this.tokenModel.create({
-        token,
-        email,
-        session_id: sessionId,
-        created_at: new Date(),
-        expires_at: expiresAt,
-        used: false,
-      });
+      // 3. Guardar token en MongoDB (actualizar si existe - permite múltiples solicitudes)
+      await this.tokenModel.updateOne(
+        { session_id: sessionId },
+        {
+          token,
+          email,
+          session_id: sessionId,
+          created_at: new Date(),
+          expires_at: expiresAt,
+          used: false,
+        },
+        { upsert: true } // Crea si no existe, actualiza si ya existe
+      );
 
-      // 4. Crear notificación pendiente
-      await this.notificationModel.create({
-        session_id: sessionId,
-        status: 'pending',
-        message: 'Esperando confirmación por email',
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
+      // 4. Crear/Actualizar notificación pendiente (permite múltiples solicitudes)
+      await this.notificationModel.updateOne(
+        { session_id: sessionId },
+        {
+          session_id: sessionId,
+          status: 'pending',
+          message: 'Esperando confirmación por email',
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        { upsert: true } // Crea si no existe, actualiza si ya existe
+      );
 
       // 5. Enviar email de confirmación via Notification Service
       const confirmationUrl = `${process.env.API_GATEWAY_URL || 'http://localhost:3000'}/api/v1/password-reset/confirm/${token}`;
