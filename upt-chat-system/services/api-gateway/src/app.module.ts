@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
@@ -85,7 +85,9 @@ import { IChatSessionRepository } from './domain/repositories/chat-session.repos
     }),
 
     // Database
-    MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/upt_chat_system'),
+    MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/upt_chat_system', {
+      dbName: 'BASEDEDATOS2' // Nombre correcto de la base de datos en Atlas
+    }),
     MongooseModule.forFeature([
       { name: 'User', schema: UserSchema },
       { name: 'ChatSession', schema: ChatSessionSchema },
