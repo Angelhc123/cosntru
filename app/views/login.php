@@ -98,14 +98,15 @@ echo '<!-- RECAPTCHA DEBUG site: ' . htmlspecialchars($recaptcha_site_key) . ' s
 
                         <div class="form-group">
                             <label>Captcha:</label>
-                            <?php
-                            // Para depuración siempre incluimos el DIV del widget con la site key.
-                            // En producción, esto debe condicionarse a recaptcha_is_configured().
-                            ?>
-                            <div class="g-recaptcha" data-sitekey="<?= htmlspecialchars($recaptcha_site_key) ?>"></div>
-                            <?php if (!recaptcha_is_configured()): ?>
-                                <div class="alert alert-warning">Nota: la secret de reCAPTCHA no está disponible en el servidor (solo modo debug). Contacte al administrador.</div>
-                            <?php endif; ?>
+                            <?php // Usamos un captcha simple (imagen) en lugar de Google reCAPTCHA ?>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <img id="captchaImg" src="/captcha_image.php?ts=<?= time() ?>" alt="CAPTCHA" style="border:1px solid #ccc;">
+                                <button type="button" onclick="document.getElementById('captchaImg').src='/captcha_image.php?ts=' + Date.now();" class="btn">Recargar</button>
+                            </div>
+                            <div style="margin-top:8px;">
+                                <input type="text" name="simple_captcha" placeholder="Ingresa las letras" class="form-control" required>
+                            </div>
+                            <div style="margin-top:6px; font-size:12px; color:#666;">Si no ves la imagen, pulsa "Recargar".</div>
                         </div>
 
                         <button type="submit" class="btn">Enviar</button>

@@ -31,58 +31,69 @@ class AuthController {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $usuario = $_POST['usuario'] ?? '';
             $password = $_POST['password'] ?? '';
-            // Validar Google reCAPTCHA v2 (checkbox)
-            require_once __DIR__ . '/../../config/recaptcha.php';
-            $recaptchaResponse = $_POST['g-recaptcha-response'] ?? '';
-
-            // Logs temporales para depuración (no exponen la secret):
-            // - Indica si recaptcha está configurado en el servidor
-            // - Indica si el cliente envió un token
-            error_log('[reCAPTCHA][DEBUG] configured=' . (recaptcha_is_configured() ? 'YES' : 'NO') . ' site_key=' . $recaptcha_site_key);
-            error_log('[reCAPTCHA][DEBUG] client_token_present=' . (!empty($recaptchaResponse) ? 'YES' : 'NO') . ' token_length=' . strlen($recaptchaResponse));
-
-            if (!recaptcha_is_configured()) {
-                // Si no está configurado, denegar por seguridad
-                $_SESSION['error'] = "Captcha no configurado. Contacte al administrador.";
-                header("Location: login.php");
-                exit();
-            }
-
-            if (empty($recaptchaResponse)) {
-                $_SESSION['error'] = "Por favor complete el captcha de Google.";
-                header("Location: login.php");
-                exit();
-            }
-
-            // Verificar con la API de Google
-            $secret = $recaptcha_secret_key;
-            $remoteIp = $_SERVER['REMOTE_ADDR'] ?? '';
-
-            // Usar cURL si está disponible, si no usar file_get_contents
-            $verifyResponse = null;
-            $params = http_build_query([
-                'secret' => $secret,
-                'response' => $recaptchaResponse,
-                'remoteip' => $remoteIp
-            ]);
-
-            if (function_exists('curl_version')) {
-                $ch = curl_init('https://www.google.com/recaptcha/api/siteverify');
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-                $verifyResponse = curl_exec($ch);
-                curl_close($ch);
+            // Validar captcha simple (imagen) si se envió
+            $simpleCaptcha = $_POST['simple_captcha'] ?? null;
+            if ($simpleCaptcha !== null) {
+                // Comprobar valor guardado en sesión (case-insensitive)
+                if (empty($_SESSION['simple_captcha']) || strcasecmp($simpleCaptcha, $_SESSION['simple_captcha']) !== 0) {
+                    $_SESSION['error'] = "Captcha incorrecto. Intente nuevamente.";
+                    header("Location: login.php");
+                    exit();
+                }
+                // Consumir el captcha para que no pueda reutilizarse
+                unset($_SESSION['simple_captcha']);
             } else {
-                $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?' . $params);
-            }
-            // Log the raw response from Google's siteverify for debugging (json). This helps to see error-codes.
-            error_log('[reCAPTCHA][DEBUG] siteverify_raw=' . substr($verifyResponse, 0, 1000));
+                // Si no hay captcha simple, caer a la validación de Google reCAPTCHA (legacy)
+                require_once __DIR__ . '/../../config/recaptcha.php';
+                $recaptchaResponse = $_POST['g-recaptcha-response'] ?? '';
 
-            $responseData = json_decode($verifyResponse, true);
-            if (!isset($responseData['success']) || $responseData['success'] !== true) {
-                $_SESSION['error'] = "Captcha inválido. Intente nuevamente.";
-                header("Location: login.php");
-                exit();
+                // Logs temporales para depuración (no exponen la secret):
+                error_log('[reCAPTCHA][DEBUG] configured=' . (recaptcha_is_configured() ? 'YES' : 'NO') . ' site_key=' . $recaptcha_site_key);
+                error_log('[reCAPTCHA][DEBUG] client_token_present=' . (!empty($recaptchaResponse) ? 'YES' : 'NO') . ' token_length=' . strlen($recaptchaResponse));
+
+                if (!recaptcha_is_configured()) {
+                    // Si no está configurado, denegar por seguridad
+                    $_SESSION['error'] = "Captcha no configurado. Contacte al administrador.";
+                    header("Location: login.php");
+                    exit();
+                }
+
+                if (empty($recaptchaResponse)) {
+                    $_SESSION['error'] = "Por favor complete el captcha de Google.";
+                    header("Location: login.php");
+                    exit();
+                }
+
+                // Verificar con la API de Google
+                $secret = $recaptcha_secret_key;
+                $remoteIp = $_SERVER['REMOTE_ADDR'] ?? '';
+
+                // Usar cURL si está disponible, si no usar file_get_contents
+                $verifyResponse = null;
+                $params = http_build_query([
+                    'secret' => $secret,
+                    'response' => $recaptchaResponse,
+                    'remoteip' => $remoteIp
+                ]);
+
+                if (function_exists('curl_version')) {
+                    $ch = curl_init('https://www.google.com/recaptcha/api/siteverify');
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+                    $verifyResponse = curl_exec($ch);
+                    curl_close($ch);
+                } else {
+                    $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?' . $params);
+                }
+                // Log the raw response from Google's siteverify for debugging (json). This helps to see error-codes.
+                error_log('[reCAPTCHA][DEBUG] siteverify_raw=' . substr($verifyResponse, 0, 1000));
+
+                $responseData = json_decode($verifyResponse, true);
+                if (!isset($responseData['success']) || $responseData['success'] !== true) {
+                    $_SESSION['error'] = "Captcha inválido. Intente nuevamente.";
+                    header("Location: login.php");
+                    exit();
+                }
             }
 
             if ($this->user->login($usuario, $password)) {
