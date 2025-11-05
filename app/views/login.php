@@ -127,6 +127,7 @@ $_SESSION['captcha_result'] = 8;
     
     <!-- CHATBOX WIDGET - Se conecta a MongoDB Atlas vía API Gateway -->
     <link rel="stylesheet" href="css/chatbox.css">
+    <script src="js/config.js"></script>
     <script src="js/chatbox.js"></script>
 </body>
 </html>
