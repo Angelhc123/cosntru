@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../../config/session.php';
 require_once __DIR__ . '/../../config/recaptcha.php';
+// Debug temporal: muestra en el código fuente qué valores está leyendo PHP
+echo '<!-- RECAPTCHA DEBUG site: ' . htmlspecialchars($recaptcha_site_key) . ' secret: ' . (empty($recaptcha_secret_key) ? 'EMPTY' : 'SET') . ' -->';
 ?>
 
 <!DOCTYPE html>
