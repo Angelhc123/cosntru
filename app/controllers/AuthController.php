@@ -35,6 +35,12 @@ class AuthController {
             require_once __DIR__ . '/../../config/recaptcha.php';
             $recaptchaResponse = $_POST['g-recaptcha-response'] ?? '';
 
+            // Logs temporales para depuración (no exponen la secret):
+            // - Indica si recaptcha está configurado en el servidor
+            // - Indica si el cliente envió un token
+            error_log('[reCAPTCHA][DEBUG] configured=' . (recaptcha_is_configured() ? 'YES' : 'NO') . ' site_key=' . $recaptcha_site_key);
+            error_log('[reCAPTCHA][DEBUG] client_token_present=' . (!empty($recaptchaResponse) ? 'YES' : 'NO') . ' token_length=' . strlen($recaptchaResponse));
+
             if (!recaptcha_is_configured()) {
                 // Si no está configurado, denegar por seguridad
                 $_SESSION['error'] = "Captcha no configurado. Contacte al administrador.";
@@ -69,6 +75,8 @@ class AuthController {
             } else {
                 $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?' . $params);
             }
+            // Log the raw response from Google's siteverify for debugging (json). This helps to see error-codes.
+            error_log('[reCAPTCHA][DEBUG] siteverify_raw=' . substr($verifyResponse, 0, 1000));
 
             $responseData = json_decode($verifyResponse, true);
             if (!isset($responseData['success']) || $responseData['success'] !== true) {
