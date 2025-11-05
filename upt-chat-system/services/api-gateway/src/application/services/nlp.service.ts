@@ -40,11 +40,11 @@ export class NlpService {
 
             // 2. Enviar mensaje al servicio NLP
             const response = await axios.post(
-                'http://127.0.0.1:8001/api/v1/nlp/process',
+                `${this.nlpServiceUrl}/api/v1/nlp/process`,
                 {
-                    message: text,
                     session_id: sessionId || 'default_session',
-                    user_id: userId || 'anonymous_user'
+                    user_id: userId || 'anonymous_user',
+                    message: text
                 },
                 {
                     timeout: 10000, // 10 segundos
@@ -153,8 +153,7 @@ export class NlpService {
             const response = await axios.post(
                 `${this.nlpServiceUrl}/api/v1/nlp/detect-intent`,
                 {
-                    message: text,
-                    language: language
+                    message: text
                 },
                 {
                     timeout: 5000,
