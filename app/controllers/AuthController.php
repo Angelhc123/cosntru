@@ -31,11 +31,48 @@ class AuthController {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $usuario = $_POST['usuario'] ?? '';
             $password = $_POST['password'] ?? '';
-            $captcha = $_POST['captcha'] ?? '';
+            // Validar Google reCAPTCHA v2 (checkbox)
+            require_once __DIR__ . '/../../config/recaptcha.php';
+            $recaptchaResponse = $_POST['g-recaptcha-response'] ?? '';
 
-            // Validar captcha fijo (siempre debe ser 8)
-            if ($captcha != '8') {
-                $_SESSION['error'] = "Captcha incorrecto. La respuesta es 8 (5 + 3 = 8)";
+            if (!recaptcha_is_configured()) {
+                // Si no está configurado, denegar por seguridad
+                $_SESSION['error'] = "Captcha no configurado. Contacte al administrador.";
+                header("Location: login.php");
+                exit();
+            }
+
+            if (empty($recaptchaResponse)) {
+                $_SESSION['error'] = "Por favor complete el captcha de Google.";
+                header("Location: login.php");
+                exit();
+            }
+
+            // Verificar con la API de Google
+            $secret = $recaptcha_secret_key;
+            $remoteIp = $_SERVER['REMOTE_ADDR'] ?? '';
+
+            // Usar cURL si está disponible, si no usar file_get_contents
+            $verifyResponse = null;
+            $params = http_build_query([
+                'secret' => $secret,
+                'response' => $recaptchaResponse,
+                'remoteip' => $remoteIp
+            ]);
+
+            if (function_exists('curl_version')) {
+                $ch = curl_init('https://www.google.com/recaptcha/api/siteverify');
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+                $verifyResponse = curl_exec($ch);
+                curl_close($ch);
+            } else {
+                $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?' . $params);
+            }
+
+            $responseData = json_decode($verifyResponse, true);
+            if (!isset($responseData['success']) || $responseData['success'] !== true) {
+                $_SESSION['error'] = "Captcha inválido. Intente nuevamente.";
                 header("Location: login.php");
                 exit();
             }

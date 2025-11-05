@@ -1,11 +1,6 @@
 <?php
 require_once __DIR__ . '/../../config/session.php';
-
-// Captcha fijo y simple
-$_SESSION['captcha_num1'] = 5;
-$_SESSION['captcha_num2'] = 3;
-$_SESSION['captcha_operator'] = '+';
-$_SESSION['captcha_result'] = 8;
+require_once __DIR__ . '/../../config/recaptcha.php';
 ?>
 
 <!DOCTYPE html>
@@ -100,14 +95,12 @@ $_SESSION['captcha_result'] = 8;
                         </div>
 
                         <div class="form-group">
-                            <label for="captcha">IMAGEN:</label>
-                            <div class="captcha-container">
-                                <div class="captcha-image">
-                                    5 + 3 = ?
-                                </div>
-                            </div>
-                            <input type="number" class="form-control" id="captcha" name="captcha" placeholder="Resultado (respuesta: 8)" required>
-                            <small>Ingrese el número 8 para completar el acceso.</small>
+                            <label>Captcha:</label>
+                            <?php if (recaptcha_is_configured()): ?>
+                                <div class="g-recaptcha" data-sitekey="<?= htmlspecialchars($recaptcha_site_key) ?>"></div>
+                            <?php else: ?>
+                                <div class="alert alert-warning">El captcha de Google no está configurado. Contacte al administrador.</div>
+                            <?php endif; ?>
                         </div>
 
                         <button type="submit" class="btn">Enviar</button>
@@ -116,7 +109,7 @@ $_SESSION['captcha_result'] = 8;
                     <div style="margin-top: 20px; font-size: 12px; color: #666;">
                         <strong>Usuario demo:</strong> demo<br>
                         <strong>Contraseña:</strong> demo123<br>
-                        <strong>Captcha:</strong> 8
+                        <strong>Captcha:</strong> Google reCAPTCHA (si está configurado)
                     </div>
                 </div>
             </div>
@@ -124,6 +117,7 @@ $_SESSION['captcha_result'] = 8;
     </div>
 
     <script src="js/script.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     
     <!-- CHATBOX WIDGET - Se conecta a MongoDB Atlas vía API Gateway -->
     <link rel="stylesheet" href="css/chatbox.css">
