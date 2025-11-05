@@ -86,7 +86,7 @@ import { IChatSessionRepository } from './domain/repositories/chat-session.repos
 
     // Database
     MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/upt_chat_system', {
-      dbName: 'BASEDEDATOS2' // Nombre correcto de la base de datos en Atlas
+      dbName: 'upt_chat_system' // Cambio: usar base donde están los datos FAQs
     }),
     MongooseModule.forFeature([
       { name: 'User', schema: UserSchema },
