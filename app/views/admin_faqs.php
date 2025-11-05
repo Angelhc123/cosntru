@@ -260,18 +260,31 @@
 
         async function loadFaqs() {
             try {
+                console.log('🔍 Cargando FAQs desde:', `${API_URL}/faqs`);
                 const response = await fetch(`${API_URL}/faqs`);
                 const data = await response.json();
+                
+                console.log('📊 Respuesta completa del API:', data);
+                console.log('📋 Datos de FAQs:', data.data);
+                console.log('📈 Cantidad de FAQs:', data.data ? data.data.length : 'undefined');
 
                 if (data.status === 'success') {
-                    renderFaqs(data.data);
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('faqs-table').style.display = 'block';
+                    if (data.data && data.data.length > 0) {
+                        renderFaqs(data.data);
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('faqs-table').style.display = 'block';
+                        console.log('✅ FAQs renderizadas exitosamente');
+                    } else {
+                        console.log('⚠️ No hay FAQs en la respuesta');
+                        document.getElementById('loading').innerHTML = '<p>📭 No hay FAQs configuradas</p>';
+                        document.getElementById('faqs-table').style.display = 'none';
+                    }
                 } else {
-                    showError('Error al cargar FAQs');
+                    console.error('❌ Error en respuesta del API:', data.message);
+                    showError('Error al cargar FAQs: ' + (data.message || 'Error desconocido'));
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('💥 Error de conexión:', error);
                 showError('Error de conexión con el servidor');
             }
         }
@@ -414,6 +427,16 @@
             container.innerHTML = `<div class="error-message">❌ ${message}</div>`;
             setTimeout(() => container.innerHTML = '', 5000);
         }
+    </script>
+
+    <!-- CHATBOX WIDGET -->
+    <link rel="stylesheet" href="css/chatbox.css">
+    <script src="js/chatbox.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatbox = new ChatboxWidget();
+            chatbox.init();
+        });
     </script>
 </body>
 </html>
