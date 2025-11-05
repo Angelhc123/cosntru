@@ -1,7 +1,7 @@
 import { Controller, Get, Query, Logger } from '@nestjs/common';
 import { DialogflowService } from '../../application/services/dialogflow.service';
 
-@Controller('api/v1/dialogflow')
+@Controller('dialogflow')
 export class DialogflowController {
   private readonly logger = new Logger(DialogflowController.name);
 
