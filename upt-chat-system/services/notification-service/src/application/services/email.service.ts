@@ -21,20 +21,34 @@ export class EmailService {
    * Inicializa el transporter de nodemailer con Gmail SMTP
    */
   private initializeTransporter() {
-    this.transporter = nodemailer.createTransport({
-      service: 'gmail',
+    this.transporter = nodemailer.createTransporter({
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false, // true for 465, false for other ports
       auth: {
         user: this.configService.get<string>('GMAIL_USER'),
         pass: this.configService.get<string>('GMAIL_APP_PASSWORD'),
       },
+      tls: {
+        rejectUnauthorized: false
+      },
+      connectionTimeout: 60000, // 60 seconds
+      greetingTimeout: 30000, // 30 seconds
+      socketTimeout: 60000 // 60 seconds
     });
 
-    // Verificar conexión
+    // Verificar conexión con más detalles
+    this.logger.log(`🔧 Configurando email con usuario: ${this.configService.get<string>('GMAIL_USER')}`);
+    this.logger.log(`🔧 Configurando SMTP: smtp.gmail.com:587`);
+    
     this.transporter.verify((error, success) => {
       if (error) {
         this.logger.error('❌ Error configurando email:', error);
+        this.logger.error('❌ Tipo de error:', (error as any).code);
+        this.logger.error('❌ Mensaje completo:', error.message);
       } else {
         this.logger.log('✅ Email service configurado correctamente');
+        this.logger.log('✅ Conexión SMTP establecida exitosamente');
       }
     });
   }
