@@ -3,15 +3,6 @@ require_once __DIR__ . '/../../config/session.php';
 require_once __DIR__ . '/../../config/recaptcha.php';
 // Debug temporal: muestra en el código fuente qué valores está leyendo PHP
 echo '<!-- RECAPTCHA DEBUG site: ' . htmlspecialchars($recaptcha_site_key) . ' secret: ' . (empty($recaptcha_secret_key) ? 'EMPTY' : 'SET') . ' -->';
-// BLOQUE DE DEBUG VISIBLE (temporal): muestra site key pública y estado de configuración
-?>
-<style>
-    .recaptcha-debug { background:#fff3cd; border:1px solid #ffeeba; padding:8px; margin:10px 0; font-size:13px; color:#856404; }
-</style>
-<?php
-echo '<div class="recaptcha-debug">';
-echo '<strong>reCAPTCHA (debug):</strong> site_key=' . htmlspecialchars($recaptcha_site_key) . ' — configured=' . (recaptcha_is_configured() ? 'YES' : 'NO');
-echo '</div>';
 ?>
 
 <!DOCTYPE html>
