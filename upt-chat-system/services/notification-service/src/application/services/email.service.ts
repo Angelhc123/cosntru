@@ -21,7 +21,7 @@ export class EmailService {
    * Inicializa el transporter de nodemailer con Gmail SMTP
    */
   private initializeTransporter() {
-    this.transporter = nodemailer.createTransporter({
+    this.transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 587,
       secure: false, // true for 465, false for other ports
