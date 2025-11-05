@@ -3,6 +3,9 @@ require_once __DIR__ . '/../../config/session.php';
 require_once __DIR__ . '/../../config/recaptcha.php';
 // Debug temporal: muestra en el código fuente qué valores está leyendo PHP
 echo '<!-- RECAPTCHA DEBUG site: ' . htmlspecialchars($recaptcha_site_key) . ' secret: ' . (empty($recaptcha_secret_key) ? 'EMPTY' : 'SET') . ' -->';
+echo '<div class="recaptcha-debug">';
+echo '<strong>reCAPTCHA (debug):</strong> site_key=' . htmlspecialchars($recaptcha_site_key) . ' — secret=' . (empty($recaptcha_secret_key) ? 'EMPTY' : 'SET') . ' — configured=' . (recaptcha_is_configured() ? 'YES' : 'NO');
+echo '</div>';
 ?>
 
 <!DOCTYPE html>
@@ -98,10 +101,13 @@ echo '<!-- RECAPTCHA DEBUG site: ' . htmlspecialchars($recaptcha_site_key) . ' s
 
                         <div class="form-group">
                             <label>Captcha:</label>
-                            <?php if (recaptcha_is_configured()): ?>
-                                <div class="g-recaptcha" data-sitekey="<?= htmlspecialchars($recaptcha_site_key) ?>"></div>
-                            <?php else: ?>
-                                <div class="alert alert-warning">El captcha de Google no está configurado. Contacte al administrador.</div>
+                            <?php
+                            // Para depuración siempre incluimos el DIV del widget con la site key.
+                            // En producción, esto debe condicionarse a recaptcha_is_configured().
+                            ?>
+                            <div class="g-recaptcha" data-sitekey="<?= htmlspecialchars($recaptcha_site_key) ?>"></div>
+                            <?php if (!recaptcha_is_configured()): ?>
+                                <div class="alert alert-warning">Nota: la secret de reCAPTCHA no está disponible en el servidor (solo modo debug). Contacte al administrador.</div>
                             <?php endif; ?>
                         </div>
 
