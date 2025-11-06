@@ -36,6 +36,7 @@ async function bootstrap() {
   logger.log(`🚀 Notification Service corriendo en puerto ${port}`);
   logger.log(`📧 Brevo SMTP configurado: dragonfaita@gmail.com`);
   logger.log(`🔗 API Gateway: ${process.env.API_GATEWAY_URL}`);
+  logger.log(`✅ Sistema de emails listo con Brevo`);
 }
 
 bootstrap();
