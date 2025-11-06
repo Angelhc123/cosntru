@@ -36,7 +36,7 @@ export class EmailService {
 
     // Verificar conexión con más detalles
     this.logger.log(`🔧 Configurando email con usuario: ${this.configService.get<string>('GMAIL_USER')}`);
-    this.logger.log(`🔧 Configurando SMTP: smtp.gmail.com:587`);
+    this.logger.log(`🔧 Configurando SMTP: smtp.gmail.com:465`);
     
     this.transporter.verify((error, success) => {
       if (error) {
