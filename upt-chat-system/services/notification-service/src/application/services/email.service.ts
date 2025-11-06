@@ -59,19 +59,33 @@ export class EmailService {
     confirmationUrl: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const mailOptions = {
-        from: `"Sistema UPT" <dragonfaita@gmail.com>`,
-        to,
-        subject: 'Confirmación de Recuperación de Contraseña - UPT',
-        html: this.getPasswordResetConfirmationTemplate(userName, confirmationUrl),
-      };
+      // Usar Brevo API REST en lugar de SMTP (Railway bloquea puertos SMTP)
+      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'api-key': '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',
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          sender: { name: "Sistema UPT", email: "dragonfaita@gmail.com" },
+          to: [{ email: to, name: userName }],
+          subject: 'Confirmación de Recuperación de Contraseña - UPT',
+          htmlContent: this.getPasswordResetConfirmationTemplate(userName, confirmationUrl)
+        })
+      });
 
-      const info = await this.transporter.sendMail(mailOptions);
-      this.logger.log(`✅ Email de confirmación enviado a ${to}: ${info.messageId}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Brevo API error: ${JSON.stringify(errorData)}`);
+      }
+
+      const result = await response.json();
+      this.logger.log(`✅ Email de confirmación enviado a ${to} via Brevo API: ${result.messageId}`);
       
       return {
         success: true,
-        messageId: info.messageId,
+        messageId: result.messageId,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando email de confirmación a ${to}:`, error);
