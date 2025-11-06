@@ -3,7 +3,7 @@
  * Conecta con Analytics Service en puerto 3006
  */
 
-const ANALYTICS_API_URL = 'http://localhost:3006/api/v1/analytics';
+const ANALYTICS_API_URL = 'https://analytics-service-production-effe.up.railway.app/api/v1/analytics';
 
 let chartsInstances = {};
 let currentDates = {
