@@ -21,13 +21,15 @@ export class EmailService {
    * Inicializa el transporter de nodemailer con SMTP configurado
    */
   private initializeTransporter() {
+    const brevoApiKey = this.configService.get<string>('BREVO_API_KEY');
+    
     this.transporter = nodemailer.createTransport({
       host: 'smtp-relay.brevo.com',
       port: 2525,
       secure: false,
       auth: {
         user: 'dragonfaita@gmail.com',
-        pass: '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',
+        pass: brevoApiKey,
       },
       tls: {
         rejectUnauthorized: false
@@ -59,12 +61,14 @@ export class EmailService {
     confirmationUrl: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
+      const brevoApiKey = this.configService.get<string>('BREVO_API_KEY');
+      
       // Usar Brevo API REST en lugar de SMTP (Railway bloquea puertos SMTP)
       const response = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
         headers: {
           'accept': 'application/json',
-          'api-key': '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',
+          'api-key': brevoApiKey,
           'content-type': 'application/json'
         },
         body: JSON.stringify({
