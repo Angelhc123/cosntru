@@ -18,16 +18,20 @@ export class EmailService {
   }
 
   /**
-   * Inicializa el transporter de nodemailer con Gmail SMTP
+   * Inicializa el transporter de nodemailer con SMTP configurado
    */
   private initializeTransporter() {
+    const smtpHost = this.configService.get<string>('SMTP_HOST') || 'smtp.gmail.com';
+    const smtpPort = parseInt(this.configService.get<string>('SMTP_PORT') || '587');
+    const smtpSecure = smtpPort === 465; // true para 465 (SSL), false para 587 (TLS)
+    
     this.transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true, // true for 465 (SSL), false for other ports
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpSecure,
       auth: {
-        user: this.configService.get<string>('GMAIL_USER'),
-        pass: this.configService.get<string>('GMAIL_APP_PASSWORD'),
+        user: this.configService.get<string>('SMTP_USER') || this.configService.get<string>('GMAIL_USER'),
+        pass: this.configService.get<string>('SMTP_PASSWORD') || this.configService.get<string>('GMAIL_APP_PASSWORD'),
       },
       tls: {
         rejectUnauthorized: false
@@ -35,8 +39,8 @@ export class EmailService {
     });
 
     // Verificar conexión con más detalles
-    this.logger.log(`🔧 Configurando email con usuario: ${this.configService.get<string>('GMAIL_USER')}`);
-    this.logger.log(`🔧 Configurando SMTP: smtp.gmail.com:465`);
+    this.logger.log(`🔧 Configurando email con usuario: ${this.configService.get<string>('SMTP_USER') || this.configService.get<string>('GMAIL_USER')}`);
+    this.logger.log(`🔧 Configurando SMTP: ${smtpHost}:${smtpPort}`);
     
     this.transporter.verify((error, success) => {
       if (error) {
