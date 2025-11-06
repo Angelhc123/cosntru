@@ -83,19 +83,35 @@ export class EmailService {
     newPassword: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const mailOptions = {
-        from: `"Sistema UPT" <xxdescixx@gmail.com>`,
-        to,
-        subject: 'Tu Nueva Contraseña - UPT',
-        html: this.getNewPasswordTemplate(userName, newPassword),
-      };
+      const brevoApiKey = this.configService.get<string>('BREVO_API_KEY');
+      
+      // Usar Brevo API REST
+      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'api-key': brevoApiKey,
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          sender: { name: "Sistema UPT", email: "xxdescixx@gmail.com" },
+          to: [{ email: to, name: userName }],
+          subject: 'Tu Nueva Contraseña - UPT',
+          htmlContent: this.getNewPasswordTemplate(userName, newPassword)
+        })
+      });
 
-      const info = await this.transporter.sendMail(mailOptions);
-      this.logger.log(`✅ Email con nueva contraseña enviado a ${to}: ${info.messageId}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Brevo API error: ${JSON.stringify(errorData)}`);
+      }
+
+      const result = await response.json();
+      this.logger.log(`✅ Email con nueva contraseña enviado a ${to} via Brevo API: ${result.messageId}`);
       
       return {
         success: true,
-        messageId: info.messageId,
+        messageId: result.messageId,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando nueva contraseña a ${to}:`, error);
@@ -235,19 +251,34 @@ export class EmailService {
     htmlContent: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const mailOptions = {
-        from: `"Sistema UPT" <xxdescixx@gmail.com>`,
-        to,
-        subject,
-        html: htmlContent,
-      };
+      const brevoApiKey = this.configService.get<string>('BREVO_API_KEY');
+      
+      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'api-key': brevoApiKey,
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          sender: { name: "Sistema UPT", email: "xxdescixx@gmail.com" },
+          to: [{ email: to }],
+          subject: subject,
+          htmlContent: htmlContent
+        })
+      });
 
-      const info = await this.transporter.sendMail(mailOptions);
-      this.logger.log(`✅ Email enviado a ${to}: ${info.messageId}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Brevo API error: ${JSON.stringify(errorData)}`);
+      }
+
+      const result = await response.json();
+      this.logger.log(`✅ Email enviado a ${to} via Brevo API: ${result.messageId}`);
       
       return {
         success: true,
-        messageId: info.messageId,
+        messageId: result.messageId,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando email a ${to}:`, error);
@@ -269,19 +300,34 @@ export class EmailService {
     sessionId?: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const mailOptions = {
-        from: `"Sistema UPT" <xxdescixx@gmail.com>`,
-        to,
-        subject: 'Transcripción de tu Conversación con el Asistente Virtual UPT',
-        html: this.getChatTranscriptionTemplate(userName, messages, sessionEndTime, sessionId),
-      };
+      const brevoApiKey = this.configService.get<string>('BREVO_API_KEY');
+      
+      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'api-key': brevoApiKey,
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          sender: { name: "Sistema UPT", email: "xxdescixx@gmail.com" },
+          to: [{ email: to, name: userName }],
+          subject: 'Transcripción de tu Conversación con el Asistente Virtual UPT',
+          htmlContent: this.getChatTranscriptionTemplate(userName, messages, sessionEndTime, sessionId)
+        })
+      });
 
-      const info = await this.transporter.sendMail(mailOptions);
-      this.logger.log(`✅ Transcripción enviada a ${to}: ${info.messageId}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Brevo API error: ${JSON.stringify(errorData)}`);
+      }
+
+      const result = await response.json();
+      this.logger.log(`✅ Transcripción enviada a ${to} via Brevo API: ${result.messageId}`);
       
       return {
         success: true,
-        messageId: info.messageId,
+        messageId: result.messageId,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando transcripción a ${to}:`, error);
