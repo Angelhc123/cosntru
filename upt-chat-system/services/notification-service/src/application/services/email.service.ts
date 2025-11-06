@@ -18,38 +18,12 @@ export class EmailService {
   }
 
   /**
-   * Inicializa el transporter de nodemailer con SMTP configurado
+   * Inicializa el transporter de nodemailer (DEPRECADO - Usar Brevo API REST)
+   * Se mantiene para compatibilidad pero ya no se usa
    */
   private initializeTransporter() {
-    const brevoApiKey = this.configService.get<string>('BREVO_API_KEY');
-    
-    this.transporter = nodemailer.createTransport({
-      host: 'smtp-relay.brevo.com',
-      port: 2525,
-      secure: false,
-      auth: {
-        user: 'dragonfaita@gmail.com',
-        pass: brevoApiKey,
-      },
-      tls: {
-        rejectUnauthorized: false
-      }
-    });
-
-    // Verificar conexión con más detalles
-    this.logger.log(`🔧 Configurando email con usuario: dragonfaita@gmail.com`);
-    this.logger.log(`🔧 Configurando SMTP: smtp-relay.brevo.com:2525`);
-    
-    this.transporter.verify((error, success) => {
-      if (error) {
-        this.logger.error('❌ Error configurando email:', error);
-        this.logger.error('❌ Tipo de error:', (error as any).code);
-        this.logger.error('❌ Mensaje completo:', error.message);
-      } else {
-        this.logger.log('✅ Email service configurado correctamente');
-        this.logger.log('✅ Conexión SMTP establecida exitosamente');
-      }
-    });
+    this.logger.log(`📧 Usando Brevo API REST para envío de emails`);
+    this.logger.log(`✅ Email service listo con Brevo API`);
   }
 
   /**
@@ -72,7 +46,7 @@ export class EmailService {
           'content-type': 'application/json'
         },
         body: JSON.stringify({
-          sender: { name: "Sistema UPT", email: "dragonfaita@gmail.com" },
+          sender: { name: "Sistema UPT", email: "xxdescixx@gmail.com" },
           to: [{ email: to, name: userName }],
           subject: 'Confirmación de Recuperación de Contraseña - UPT',
           htmlContent: this.getPasswordResetConfirmationTemplate(userName, confirmationUrl)
@@ -110,7 +84,7 @@ export class EmailService {
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
       const mailOptions = {
-        from: `"Sistema UPT" <dragonfaita@gmail.com>`,
+        from: `"Sistema UPT" <xxdescixx@gmail.com>`,
         to,
         subject: 'Tu Nueva Contraseña - UPT',
         html: this.getNewPasswordTemplate(userName, newPassword),
@@ -262,7 +236,7 @@ export class EmailService {
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
       const mailOptions = {
-        from: `"Sistema UPT" <dragonfaita@gmail.com>`,
+        from: `"Sistema UPT" <xxdescixx@gmail.com>`,
         to,
         subject,
         html: htmlContent,
@@ -296,7 +270,7 @@ export class EmailService {
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
       const mailOptions = {
-        from: `"Sistema UPT" <dragonfaita@gmail.com>`,
+        from: `"Sistema UPT" <xxdescixx@gmail.com>`,
         to,
         subject: 'Transcripción de tu Conversación con el Asistente Virtual UPT',
         html: this.getChatTranscriptionTemplate(userName, messages, sessionEndTime, sessionId),
