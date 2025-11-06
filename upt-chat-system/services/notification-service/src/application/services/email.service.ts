@@ -23,7 +23,7 @@ export class EmailService {
   private initializeTransporter() {
     this.transporter = nodemailer.createTransport({
       host: 'smtp-relay.brevo.com',
-      port: 587,
+      port: 2525,
       secure: false,
       auth: {
         user: 'dragonfaita@gmail.com',
@@ -36,7 +36,7 @@ export class EmailService {
 
     // Verificar conexión con más detalles
     this.logger.log(`🔧 Configurando email con usuario: dragonfaita@gmail.com`);
-    this.logger.log(`🔧 Configurando SMTP: smtp-relay.brevo.com:587`);
+    this.logger.log(`🔧 Configurando SMTP: smtp-relay.brevo.com:2525`);
     
     this.transporter.verify((error, success) => {
       if (error) {

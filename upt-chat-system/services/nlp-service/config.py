@@ -41,8 +41,8 @@ class Settings(BaseSettings):
     # NLP Local (fallback)
     spacy_model: str = "es_core_news_sm"
     
-    # DialogFlow Configuration (desactivado por defecto para Railway)
-    use_dialogflow: bool = False  # Cambiar a True si tienes credenciales
+    # DialogFlow Configuration
+    use_dialogflow: bool = True
     google_project_id: str = "upt-chat-fhps"
     google_credentials_path: str = "credentials/dialogflow-credentials.json"
     dialogflow_session_path: str = ""
