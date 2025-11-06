@@ -34,7 +34,7 @@ async function bootstrap() {
   await app.listen(port);
 
   logger.log(`🚀 Notification Service corriendo en puerto ${port}`);
-  logger.log(`📧 Gmail configurado: ${process.env.GMAIL_USER}`);
+  logger.log(`📧 Brevo SMTP configurado: dragonfaita@gmail.com`);
   logger.log(`🔗 API Gateway: ${process.env.API_GATEWAY_URL}`);
 }
 

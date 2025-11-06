@@ -21,17 +21,13 @@ export class EmailService {
    * Inicializa el transporter de nodemailer con SMTP configurado
    */
   private initializeTransporter() {
-    const smtpHost = this.configService.get<string>('SMTP_HOST') || 'smtp.gmail.com';
-    const smtpPort = parseInt(this.configService.get<string>('SMTP_PORT') || '587');
-    const smtpSecure = smtpPort === 465; // true para 465 (SSL), false para 587 (TLS)
-    
     this.transporter = nodemailer.createTransport({
-      host: smtpHost,
-      port: smtpPort,
-      secure: smtpSecure,
+      host: 'smtp-relay.brevo.com',
+      port: 587,
+      secure: false,
       auth: {
-        user: this.configService.get<string>('SMTP_USER') || this.configService.get<string>('GMAIL_USER'),
-        pass: this.configService.get<string>('SMTP_PASSWORD') || this.configService.get<string>('GMAIL_APP_PASSWORD'),
+        user: 'dragonfaita@gmail.com',
+        pass: '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',
       },
       tls: {
         rejectUnauthorized: false
@@ -39,8 +35,8 @@ export class EmailService {
     });
 
     // Verificar conexión con más detalles
-    this.logger.log(`🔧 Configurando email con usuario: ${this.configService.get<string>('SMTP_USER') || this.configService.get<string>('GMAIL_USER')}`);
-    this.logger.log(`🔧 Configurando SMTP: ${smtpHost}:${smtpPort}`);
+    this.logger.log(`🔧 Configurando email con usuario: dragonfaita@gmail.com`);
+    this.logger.log(`🔧 Configurando SMTP: smtp-relay.brevo.com:587`);
     
     this.transporter.verify((error, success) => {
       if (error) {
@@ -64,7 +60,7 @@ export class EmailService {
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
       const mailOptions = {
-        from: `"${this.configService.get<string>('FROM_NAME')}" <${this.configService.get<string>('FROM_EMAIL')}>`,
+        from: `"Sistema UPT" <dragonfaita@gmail.com>`,
         to,
         subject: 'Confirmación de Recuperación de Contraseña - UPT',
         html: this.getPasswordResetConfirmationTemplate(userName, confirmationUrl),
@@ -96,7 +92,7 @@ export class EmailService {
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
       const mailOptions = {
-        from: `"${this.configService.get<string>('FROM_NAME')}" <${this.configService.get<string>('FROM_EMAIL')}>`,
+        from: `"Sistema UPT" <dragonfaita@gmail.com>`,
         to,
         subject: 'Tu Nueva Contraseña - UPT',
         html: this.getNewPasswordTemplate(userName, newPassword),
@@ -248,7 +244,7 @@ export class EmailService {
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
       const mailOptions = {
-        from: `"${this.configService.get<string>('FROM_NAME')}" <${this.configService.get<string>('FROM_EMAIL')}>`,
+        from: `"Sistema UPT" <dragonfaita@gmail.com>`,
         to,
         subject,
         html: htmlContent,
@@ -282,7 +278,7 @@ export class EmailService {
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
       const mailOptions = {
-        from: `"${this.configService.get<string>('FROM_NAME')}" <${this.configService.get<string>('FROM_EMAIL')}>`,
+        from: `"Sistema UPT" <dragonfaita@gmail.com>`,
         to,
         subject: 'Transcripción de tu Conversación con el Asistente Virtual UPT',
         html: this.getChatTranscriptionTemplate(userName, messages, sessionEndTime, sessionId),
