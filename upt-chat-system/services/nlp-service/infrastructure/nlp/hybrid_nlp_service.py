@@ -85,7 +85,7 @@ class HybridNLPService:
                 confidence = result.get('confidence', 0.0)
                 logger.info(f"🤖 DIALOGFLOW RESPONSE: intent='{result.get('intent_name')}', confidence={confidence:.3f}")
                 
-                if confidence >= 0.5:  # Umbral mínimo para DialogFlow
+                if confidence >= 0.3:  # Umbral mínimo para DialogFlow (bajado para aceptar más intents)
                     result['method_used'] = method_used
                     result['hybrid_confidence'] = confidence
                     logger.info(f"✅ DIALOGFLOW SUCCESS: Using {result['intent_name']} with confidence {confidence:.2f}")
