@@ -167,8 +167,17 @@ class DialogFlowService:
         logger.info(f"🔍 DEBUGGING DIALOGFLOW RESPONSE:")
         logger.info(f"   - fulfillment_text: '{query_result.fulfillment_text}'")
         logger.info(f"   - fulfillment_messages count: {len(query_result.fulfillment_messages)}")
-        logger.info(f"   - webhook_status: {query_result.webhook_status}")
-        logger.info(f"   - webhook_payload: {dict(query_result.webhook_payload) if query_result.webhook_payload else 'None'}")
+        
+        # Intentar acceder a campos de webhook de manera segura
+        webhook_status = getattr(query_result, 'webhook_status', 'No webhook_status field')
+        webhook_payload = getattr(query_result, 'webhook_payload', None)
+        
+        logger.info(f"   - webhook_status: {webhook_status}")
+        logger.info(f"   - webhook_payload: {dict(webhook_payload) if webhook_payload else 'None'}")
+        logger.info(f"   - query_result fields: {[field.name for field in query_result.__class__.DESCRIPTOR.fields]}")
+        
+        # Revisar TODOS los campos disponibles en query_result
+        logger.info(f"   - All query_result attributes: {[attr for attr in dir(query_result) if not attr.startswith('_')]}")
         
         webhook_response_text = query_result.fulfillment_text
         
