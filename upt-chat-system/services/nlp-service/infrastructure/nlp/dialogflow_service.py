@@ -178,7 +178,7 @@ class DialogFlowService:
                 "escalate": False
             },
             "Contraseña Institucional": {
-                "response": "Los problemas de acceso institucional requieren soporte especializado. He generado automáticamente un ticket de soporte para ti. Un especialista revisará tu caso y te contactará pronto.\n\n🎫 **Ticket generado automáticamente**\n📧 Recibirás una notificación por correo\n⏱️ Tiempo estimado de respuesta: 24-48 horas",
+                "response": "Los problemas de acceso institucional requieren soporte especializado. Nuestro sistema detectó que necesitas ayuda personalizada.",
                 "escalate": True,
                 "category": "Contraseña Institucional"
             },
@@ -191,7 +191,7 @@ class DialogFlowService:
                 "escalate": False
             },
             "Problemas Técnicos": {
-                "response": "He detectado que tienes un problema técnico. He generado automáticamente un ticket de soporte para ti.\n\n🎫 **Ticket generado automáticamente**\n🔧 **Categoría:** Soporte Técnico\n📧 Recibirás una notificación por correo\n⏱️ Un técnico especializado revisará tu caso\n\n**Tiempo estimado de respuesta:** 2-4 horas hábiles",
+                "response": "He detectado que tienes un problema técnico. Nuestro sistema te conectará automáticamente con soporte especializado.",
                 "escalate": True,
                 "category": "Problemas Técnicos"
             }
@@ -201,44 +201,9 @@ class DialogFlowService:
             config = intent_config[intent_name]
             webhook_response_text = config["response"]
             
-            # Si el intent requiere escalación, crear ticket automáticamente
+            # Marcar si el intent requiere escalación (el API Gateway se encarga de crear el ticket)
             if config.get("escalate", False):
-                logger.info(f"🎫 ESCALATION REQUIRED: Intent {intent_name} needs ticket creation")
-                try:
-                    # Extraer session_id del response.session (que es el path completo)
-                    session_id = "unknown_session"
-                    try:
-                        # response.session es el path completo, extraemos el último segmento
-                        session_path = getattr(response, 'session', '')
-                        if session_path:
-                            session_id = session_path.split("/")[-1]
-                        else:
-                            # Fallback: usar un timestamp como session_id
-                            session_id = f"auto_{int(datetime.now().timestamp())}"
-                    except Exception as session_error:
-                        logger.warning(f"⚠️ Could not extract session_id: {session_error}")
-                        session_id = f"auto_{int(datetime.now().timestamp())}"
-                    
-                    ticket_info = await self._create_automatic_ticket(
-                        session_id=session_id,
-                        intent_name=intent_name,
-                        category=config.get("category", intent_name),
-                        query_text=query_result.query_text
-                    )
-                    
-                    if ticket_info:
-                        # Actualizar la respuesta con información del ticket
-                        webhook_response_text = config["response"].replace(
-                            "🎫 **Ticket generado automáticamente**",
-                            f"🎫 **Ticket #{ticket_info['ticket_id']} generado automáticamente**"
-                        )
-                        logger.info(f"✅ Ticket creado automáticamente: {ticket_info['ticket_id']}")
-                    else:
-                        logger.error("❌ Error creando ticket automático")
-                        
-                except Exception as e:
-                    logger.error(f"❌ Error en escalación automática: {str(e)}")
-                    # Mantener la respuesta original aunque falle la creación del ticket
+                logger.info(f"🎫 INTENT REQUIRES ESCALATION: {intent_name} - API Gateway will handle ticket creation")
             
             logger.info(f"🔧 TEMPORAL FIX: Using configured response for {intent_name} intent")
         
@@ -397,82 +362,3 @@ class DialogFlowService:
         except:
             return False
     
-    async def _create_automatic_ticket(
-        self,
-        session_id: str,
-        intent_name: str,
-        category: str,
-        query_text: str
-    ) -> Optional[Dict[str, Any]]:
-        """
-        Crea un ticket automáticamente cuando se detecta un intent que requiere escalación
-        
-        Args:
-            session_id: ID de la sesión de DialogFlow
-            intent_name: Nombre del intent detectado
-            category: Categoría del problema
-            query_text: Texto original del usuario
-            
-        Returns:
-            Información del ticket creado o None si hay error
-        """
-        try:
-            # URL del API Gateway (desde variable de entorno o default)
-            api_gateway_url = os.environ.get("API_GATEWAY_URL", "https://api-gateway-production-f25f.up.railway.app")
-            
-            # Datos del ticket según el formato que espera el support.controller.ts
-            ticket_data = {
-                "sessionId": session_id,
-                "userId": "chatbot_user",  # Usuario genérico para escalaciones automáticas
-                "userName": "Usuario del Chat",
-                "userEmail": "2022081567@upt.edu.pe",  # Email genérico
-                "originalQuery": query_text,
-                "botResponse": f"Intent detectado: {intent_name}. Se requiere escalación automática.",
-                "confidence": 0.95  # Confidence alta porque el intent fue detectado correctamente
-            }
-            
-            logger.info(f"🎫 Creating automatic ticket for intent: {intent_name}")
-            logger.info(f"🔗 API Gateway URL: {api_gateway_url}/api/v1/support/tickets")
-            
-            # Llamar al API Gateway para crear el ticket usando el endpoint correcto
-            async with httpx.AsyncClient(timeout=15.0) as client:
-                response = await client.post(
-                    f"{api_gateway_url}/api/v1/support/tickets",
-                    json=ticket_data,
-                    headers={
-                        "Content-Type": "application/json"
-                    }
-                )
-                
-                logger.info(f"📝 Response status: {response.status_code}")
-                logger.info(f"📝 Response headers: {dict(response.headers)}")
-                
-                if response.status_code in [200, 201]:
-                    result = response.json()
-                    logger.info(f"✅ Ticket API response: {result}")
-                    
-                    # Extraer ticket ID del response
-                    ticket_id = None
-                    if result.get('data') and result['data'].get('ticketId'):
-                        ticket_id = result['data']['ticketId']
-                    elif result.get('ticketId'):
-                        ticket_id = result['ticketId']
-                    else:
-                        ticket_id = "AUTO-TKT"
-                    
-                    logger.info(f"✅ Ticket created successfully: {ticket_id}")
-                    return {
-                        "ticket_id": ticket_id,
-                        "success": True
-                    }
-                else:
-                    error_text = response.text
-                    logger.error(f"❌ Failed to create ticket: {response.status_code}")
-                    logger.error(f"❌ Response text: {error_text}")
-                    return None
-                    
-        except Exception as e:
-            logger.error(f"❌ Error creating automatic ticket: {str(e)}")
-            import traceback
-            logger.error(f"❌ Traceback: {traceback.format_exc()}")
-            return None

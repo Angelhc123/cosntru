@@ -3,13 +3,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import axios from 'axios';
 import { MessageDocument } from '../../infrastructure/database/schemas/message.schema';
+import { SupportService } from './support.service';
 
 @Injectable()
 export class NlpService {
     private readonly nlpServiceUrl: string;
 
     constructor(
-        @InjectModel('Message') private readonly messageModel: Model<MessageDocument>
+        @InjectModel('Message') private readonly messageModel: Model<MessageDocument>,
+        private readonly supportService: SupportService
     ) {
         this.nlpServiceUrl = process.env.NLP_SERVICE_URL || 'http://127.0.0.1:8001';
         console.log('🔧 NLP Service URL configurada:', this.nlpServiceUrl);
@@ -58,7 +60,16 @@ export class NlpService {
 
             // 3. Detectar si requiere escalamiento a soporte humano
             // REGLA: Solo escalar si confidence < 0.5 (muy bajo) o 2+ mensajes consecutivos < 0.7
+            // TAMBIÉN: Intents específicos que siempre escalan sin importar la confianza
             const confidence = response.data?.confidence || response.data?.data?.confidence || 1.0;
+            const intentName = response.data?.intent?.name || response.data?.intent?.id || '';
+            
+            // Intents que siempre requieren escalación automática
+            const AUTO_ESCALATION_INTENTS = [
+                'Contraseña Institucional',
+                'Problemas Técnicos',
+                'Soporte Técnico'
+            ];
             
             // Contar mensajes con baja confianza en esta sesión
             let lowConfidenceCount = 0;
@@ -70,24 +81,56 @@ export class NlpService {
                 });
             }
             
-            // Escalar solo si:
+            // Escalar si:
+            // - Intent específico que siempre requiere escalación
             // - Confidence < 0.5 (muy bajo, escalar inmediatamente)
             // - O 2+ respuestas consecutivas con confidence < 0.7
-            const requiresEscalation = confidence < 0.5 || (confidence < 0.7 && lowConfidenceCount >= 1);
+            const isAutoEscalationIntent = AUTO_ESCALATION_INTENTS.includes(intentName);
+            const requiresEscalation = isAutoEscalationIntent || confidence < 0.5 || (confidence < 0.7 && lowConfidenceCount >= 1);
             
             if (requiresEscalation) {
-                console.log('⚠️ ESCALAMIENTO DETECTADO - Confidence:', confidence, 'Count:', lowConfidenceCount);
+                if (isAutoEscalationIntent) {
+                    console.log('⚠️ ESCALAMIENTO AUTOMÁTICO - Intent:', intentName, 'requiere soporte especializado');
+                } else {
+                    console.log('⚠️ ESCALAMIENTO DETECTADO - Confidence:', confidence, 'Count:', lowConfidenceCount);
+                }
             }
 
             // 4. Guardar respuesta del BOT en MongoDB y obtener messageId
             // Si requiere escalación, guardar mensaje especial con opciones
             const botResponse = response.data?.response || response.data?.data?.response;
+            
+            // Crear ticket automáticamente si es un intent que siempre escala
+            let autoTicketId: string | null = null;
+            if (requiresEscalation && isAutoEscalationIntent) {
+                try {
+                    const autoTicket = await this.supportService.createTicket({
+                        sessionId: sessionId || 'unknown',
+                        userId: userId || 'anonymous',
+                        userName: 'Usuario del Chat',
+                        userEmail: '2022081567@upt.edu.pe', // Email genérico para escalaciones automáticas
+                        originalQuery: text,
+                        botResponse: botResponse || 'Intent detectado automáticamente',
+                        confidence: confidence
+                    });
+                    
+                    autoTicketId = autoTicket.ticketId;
+                    console.log('✅ TICKET CREADO AUTOMÁTICAMENTE:', autoTicketId);
+                } catch (ticketError) {
+                    console.error('❌ Error creando ticket automático:', ticketError.message);
+                }
+            }
             let botMessageId = null;
             let finalResponse = botResponse;
             
             // Si requiere escalación, modificar la respuesta para incluir prompt
             if (requiresEscalation) {
-                finalResponse = botResponse; // Mantener respuesta original
+                if (autoTicketId) {
+                    // Si se creó un ticket automático, actualizar la respuesta
+                    finalResponse = `${botResponse}\n\n🎫 **Ticket #${autoTicketId} creado automáticamente**\n📧 Recibirás una notificación por correo\n⏱️ Un especialista revisará tu caso pronto`;
+                } else {
+                    finalResponse = botResponse; // Mantener respuesta original
+                }
             }
             
             if (sessionId && finalResponse) {
@@ -121,8 +164,10 @@ export class NlpService {
                 response: finalResponse,
                 messageId: botMessageId,
                 requires_escalation: requiresEscalation,
-                show_escalation_prompt: requiresEscalation, // Nuevo campo para frontend
-                escalation_reason: requiresEscalation ? `Confianza baja (${(confidence * 100).toFixed(1)}%)` : null
+                show_escalation_prompt: requiresEscalation && !autoTicketId, // Solo mostrar prompt si no se creó ticket automático
+                escalation_reason: requiresEscalation ? (isAutoEscalationIntent ? `Soporte especializado requerido: ${intentName}` : `Confianza baja (${(confidence * 100).toFixed(1)}%)`) : null,
+                auto_ticket_created: !!autoTicketId,
+                auto_ticket_id: autoTicketId
             };
 
         } catch (error) {
