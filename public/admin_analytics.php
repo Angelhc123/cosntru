@@ -208,7 +208,7 @@
                     <input type="date" id="end-date" style="display:none;">
                 </div>
                 <button class="btn" onclick="updateDashboard()">🔄 Actualizar</button>
-                <button class="btn back-button" onclick="window.location.href='../app/views/admin_dashboard.php'">← Volver</button>
+                <button class="btn back-button" onclick="window.location.href='admin_dashboard.php'">← Volver</button>
             </div>
         </header>
 
