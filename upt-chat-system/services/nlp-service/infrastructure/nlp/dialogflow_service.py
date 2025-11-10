@@ -432,12 +432,12 @@ class DialogFlowService:
             }
             
             logger.info(f"🎫 Creating automatic ticket for intent: {intent_name}")
-            logger.info(f"🔗 API Gateway URL: {api_gateway_url}/support/tickets")
+            logger.info(f"🔗 API Gateway URL: {api_gateway_url}/api/v1/support/tickets")
             
             # Llamar al API Gateway para crear el ticket usando el endpoint correcto
             async with httpx.AsyncClient(timeout=15.0) as client:
                 response = await client.post(
-                    f"{api_gateway_url}/support/tickets",
+                    f"{api_gateway_url}/api/v1/support/tickets",
                     json=ticket_data,
                     headers={
                         "Content-Type": "application/json"
