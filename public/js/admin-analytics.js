@@ -266,7 +266,13 @@ async function loadIntentsChart() {
     chartsInstances['intents'] = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: intents.map(i => i.name || 'Sin intent'),
+            labels: intents.map(i => {
+                // Si name es un objeto, extraer el id o name
+                if (typeof i.name === 'object' && i.name !== null) {
+                    return i.name.id || i.name.name || 'Sin intent';
+                }
+                return i.name || 'Sin intent';
+            }),
             datasets: [{
                 label: 'Usos',
                 data: intents.map(i => i.count),
