@@ -163,17 +163,46 @@ class DialogFlowService:
             })
         
         # IMPORTANTE: Extraer la respuesta correcta del webhook
-        # Cuando hay webhook habilitado, la respuesta real viene en fulfillment_messages
-        # o directamente desde el webhook response
+        # Debugging exhaustivo para encontrar dónde está la respuesta del webhook
+        logger.info(f"🔍 DEBUGGING DIALOGFLOW RESPONSE:")
+        logger.info(f"   - fulfillment_text: '{query_result.fulfillment_text}'")
+        logger.info(f"   - fulfillment_messages count: {len(query_result.fulfillment_messages)}")
+        logger.info(f"   - webhook_status: {query_result.webhook_status}")
+        logger.info(f"   - webhook_payload: {dict(query_result.webhook_payload) if query_result.webhook_payload else 'None'}")
+        
         webhook_response_text = query_result.fulfillment_text
         
         # Si hay fulfillment messages, usar el primero (respuesta del webhook)
         if query_result.fulfillment_messages:
-            for message in query_result.fulfillment_messages:
+            logger.info(f"📋 Processing {len(query_result.fulfillment_messages)} fulfillment messages...")
+            for i, message in enumerate(query_result.fulfillment_messages):
+                logger.info(f"   Message {i}: type={type(message)}, has_text={hasattr(message, 'text')}")
                 if hasattr(message, 'text') and message.text:
+                    logger.info(f"   Message {i} text: {message.text.text}")
                     webhook_response_text = message.text.text[0] if message.text.text else webhook_response_text
                     logger.info(f"✅ Webhook response extracted from fulfillment_messages: '{webhook_response_text[:100]}...'")
                     break
+        else:
+            logger.warning("⚠️ No fulfillment_messages found - checking webhook_payload...")
+            
+        # Si webhook_payload tiene datos, intentar extraer de ahí
+        if query_result.webhook_payload and not webhook_response_text.strip():
+            payload_dict = dict(query_result.webhook_payload)
+            if 'fulfillmentText' in payload_dict:
+                webhook_response_text = payload_dict['fulfillmentText']
+                logger.info(f"✅ Webhook response extracted from webhook_payload: '{webhook_response_text[:100]}...'")
+            elif 'fulfillment_text' in payload_dict:
+                webhook_response_text = payload_dict['fulfillment_text']
+                logger.info(f"✅ Webhook response extracted from webhook_payload (snake_case): '{webhook_response_text[:100]}...'")
+        
+        logger.info(f"🎯 FINAL webhook_response_text: '{webhook_response_text[:100]}...'")
+        
+        # Si aún no tenemos respuesta del webhook, usar el fulfillment_text original
+        if not webhook_response_text or webhook_response_text.strip() == '':
+            webhook_response_text = query_result.fulfillment_text or "Respuesta de Dialogflow no disponible"
+            logger.warning(f"⚠️ Using fallback fulfillment_text: '{webhook_response_text}'")
+        else:
+            logger.info(f"✅ Using webhook response: '{webhook_response_text[:100]}...'")
         
         # Log de debugging
         logger.info(f"📋 DIALOGFLOW RESULT:")
