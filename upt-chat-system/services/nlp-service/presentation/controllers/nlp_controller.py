@@ -61,7 +61,8 @@ async def process_message(request: ProcessMessageRequestDTO):
     4. Mantiene el contexto de conversación
     """
     try:
-        logger.info(f"Processing message from session {request.session_id}")
+        logger.info(f"🔍 PROCESSING MESSAGE from session {request.session_id}")
+        logger.info(f"🔍 MESSAGE TEXT: '{request.message}'")
         
         if not _process_message_use_case:
             raise HTTPException(
@@ -71,11 +72,11 @@ async def process_message(request: ProcessMessageRequestDTO):
         
         response = await _process_message_use_case.execute(request)
         
-        logger.info(
-            f"Message processed successfully. "
-            f"Intent: {response.intent.id if response.intent else 'None'}, "
-            f"Confidence: {response.confidence}"
-        )
+        logger.info(f"✅ MESSAGE PROCESSED:")
+        logger.info(f"   - Intent: {response.intent.id if response.intent else 'None'}")
+        logger.info(f"   - Confidence: {response.confidence}")
+        logger.info(f"   - Response: '{response.answer[:100]}...'")
+        logger.info(f"   - Source: DialogFlow or Local NLP")
         
         return response
         

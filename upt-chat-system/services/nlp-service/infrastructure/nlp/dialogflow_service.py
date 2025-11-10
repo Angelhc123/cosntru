@@ -49,19 +49,34 @@ class DialogFlowService:
         Inicializa el cliente DialogFlow con credenciales
         """
         try:
+            logger.info(f"🔍 INITIALIZING DIALOGFLOW CLIENT:")
+            logger.info(f"   - Project ID: {self.project_id}")
+            logger.info(f"   - Credentials path: {self.credentials_path}")
+            logger.info(f"   - Language code: {self.language_code}")
+            
             if not os.path.exists(self.credentials_path):
+                logger.error(f"❌ Credentials file not found: {self.credentials_path}")
                 raise FileNotFoundError(f"Credentials file not found: {self.credentials_path}")
             
+            # Verificar tamaño del archivo
+            file_size = os.path.getsize(self.credentials_path)
+            logger.info(f"🔍 Credentials file size: {file_size} bytes")
+            
             # Cargar credenciales del service account
+            logger.info(f"🔄 Loading service account credentials...")
             self.credentials = service_account.Credentials.from_service_account_file(
                 self.credentials_path,
                 scopes=['https://www.googleapis.com/auth/cloud-platform']
             )
             
-            logger.info(f"✅ DialogFlow credentials loaded from {self.credentials_path}")
+            logger.info(f"✅ DialogFlow credentials loaded successfully from {self.credentials_path}")
+            logger.info(f"✅ Service account email: {self.credentials.service_account_email}")
             
         except Exception as e:
-            logger.error(f"❌ Failed to initialize DialogFlow client: {str(e)}")
+            logger.error(f"❌ DIALOGFLOW CLIENT INITIALIZATION FAILED: {str(e)}")
+            logger.error(f"❌ Exception type: {type(e).__name__}")
+            import traceback
+            logger.error(f"❌ Full traceback: {traceback.format_exc()}")
             raise
     
     async def detect_intent(
@@ -82,6 +97,12 @@ class DialogFlowService:
         try:
             # Crear session path
             session_path = self.session_path_template.format(session_id)
+            logger.info(f"🔍 DIALOGFLOW REQUEST:")
+            logger.info(f"   - Session ID: {session_id}")
+            logger.info(f"   - Session Path: {session_path}")
+            logger.info(f"   - Text: '{message.normalized_text}'")
+            logger.info(f"   - Language: {self.language_code}")
+            logger.info(f"   - Project ID: {self.project_id}")
             
             # Crear text input
             text_input = dialogflow.TextInput(
@@ -93,23 +114,31 @@ class DialogFlowService:
             query_input = dialogflow.QueryInput(text=text_input)
             
             # Hacer la petición a DialogFlow
+            logger.info(f"🔄 Making request to DialogFlow...")
             response = self.session_client.detect_intent(
                 request={
                     "session": session_path,
                     "query_input": query_input
                 }
             )
+            logger.info(f"✅ DialogFlow request successful")
             
             # Procesar respuesta
             result = self._process_dialogflow_response(response)
             
-            logger.info(f"DialogFlow intent detected: {result.get('intent_name')} "
-                       f"(confidence: {result.get('confidence')})")
+            logger.info(f"📋 DIALOGFLOW RESULT:")
+            logger.info(f"   - Intent: {result.get('intent_name')}")
+            logger.info(f"   - Confidence: {result.get('confidence'):.3f}")
+            logger.info(f"   - Fulfillment: '{result.get('fulfillment_text', '')[:100]}...'")
+            logger.info(f"   - Action: {result.get('action')}")
             
             return result
             
         except Exception as e:
-            logger.error(f"❌ DialogFlow intent detection failed: {str(e)}")
+            logger.error(f"❌ DIALOGFLOW ERROR: {str(e)}")
+            logger.error(f"❌ Exception type: {type(e).__name__}")
+            import traceback
+            logger.error(f"❌ Full traceback: {traceback.format_exc()}")
             raise
     
     def _process_dialogflow_response(self, response) -> Dict[str, Any]:

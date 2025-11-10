@@ -69,42 +69,57 @@ class HybridNLPService:
         method_used = "unknown"
         
         # Estrategia 1: Intentar DialogFlow primero (si está habilitado y disponible)
+        logger.info(f"🔍 HYBRID SERVICE ANALYSIS:")
+        logger.info(f"   - use_dialogflow: {self.use_dialogflow}")
+        logger.info(f"   - dialogflow_available: {self.dialogflow_available}")
+        logger.info(f"   - local_nlp_available: {self.local_nlp_available}")
+        logger.info(f"   - dialogflow_service exists: {self.dialogflow_service is not None}")
+        
         if self.use_dialogflow and self.dialogflow_available:
             try:
-                logger.debug(f"🤖 Trying DialogFlow for: {message.normalized_text[:50]}...")
+                logger.info(f"🤖 TRYING DIALOGFLOW for: '{message.normalized_text[:50]}...'")
                 result = await self.dialogflow_service.detect_intent(session_id, message)
                 method_used = "dialogflow"
                 
                 # Verificar confianza
                 confidence = result.get('confidence', 0.0)
+                logger.info(f"🤖 DIALOGFLOW RESPONSE: intent='{result.get('intent_name')}', confidence={confidence:.3f}")
+                
                 if confidence >= 0.5:  # Umbral mínimo para DialogFlow
                     result['method_used'] = method_used
                     result['hybrid_confidence'] = confidence
-                    logger.info(f"✅ DialogFlow success: {result['intent_name']} ({confidence:.2f})")
+                    logger.info(f"✅ DIALOGFLOW SUCCESS: Using {result['intent_name']} with confidence {confidence:.2f}")
                     return result
                 else:
-                    logger.warning(f"⚠️ DialogFlow low confidence ({confidence:.2f}), trying local NLP...")
+                    logger.warning(f"⚠️ DIALOGFLOW LOW CONFIDENCE ({confidence:.2f}), switching to local NLP...")
                     result = None  # Resetear para intentar local
                     
             except Exception as e:
-                logger.warning(f"⚠️ DialogFlow failed: {str(e)}, trying local NLP...")
+                logger.error(f"❌ DIALOGFLOW FAILED: {str(e)}")
+                logger.error(f"❌ Exception type: {type(e).__name__}")
+                logger.warning(f"⚠️ Falling back to local NLP...")
                 result = None
+        else:
+            logger.info(f"🔄 SKIPPING DIALOGFLOW - use_dialogflow: {self.use_dialogflow}, available: {self.dialogflow_available}")
         
         # Estrategia 2: Usar NLP local (como fallback o primario)
         if result is None and self.local_nlp_available:
             try:
-                logger.debug(f"🧠 Trying Local NLP for: {message.normalized_text[:50]}...")
+                logger.info(f"🧠 TRYING LOCAL NLP for: '{message.normalized_text[:50]}...'")
                 result = await self._detect_intent_local(session_id, message)
                 method_used = "local_nlp"
                 
                 result['method_used'] = method_used
-                logger.info(f"✅ Local NLP success: {result['intent_name']} ({result['confidence']:.2f})")
+                logger.info(f"✅ LOCAL NLP SUCCESS: {result['intent_name']} ({result['confidence']:.2f})")
                 return result
                 
             except Exception as e:
-                logger.error(f"❌ Local NLP also failed: {str(e)}")
+                logger.error(f"❌ LOCAL NLP ALSO FAILED: {str(e)}")
+        elif result is None:
+            logger.error(f"❌ NO NLP METHODS AVAILABLE - DialogFlow: {self.dialogflow_available}, Local: {self.local_nlp_available}")
         
         # Si todo falla, devolver respuesta por defecto
+        logger.warning(f"🔄 USING FALLBACK RESPONSE")
         return self._get_fallback_response(message, session_id)
     
     async def _detect_intent_local(
