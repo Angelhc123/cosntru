@@ -81,51 +81,49 @@ async def lifespan(app: FastAPI):
         logger.info("✅ NLP engine initialized")
         
         # 3. Inicializar DialogFlow (si está habilitado)
-        logger.info(f"🔍 DIALOGFLOW DEBUG - use_dialogflow: {settings.use_dialogflow}")
-        logger.info(f"🔍 DIALOGFLOW DEBUG - project_id: {settings.google_project_id}")
-        logger.info(f"🔍 DIALOGFLOW DEBUG - credentials_path: {settings.google_credentials_path}")
-        logger.info(f"🔍 DIALOGFLOW DEBUG - has base64 attr: {hasattr(settings, 'google_credentials_base64')}")
-        
-        if hasattr(settings, 'google_credentials_base64'):
-            base64_len = len(settings.google_credentials_base64) if settings.google_credentials_base64 else 0
-            logger.info(f"🔍 DIALOGFLOW DEBUG - base64 length: {base64_len}")
+        logger.info(f"🔍 DIALOGFLOW CONFIG:")
+        logger.info(f"   - use_dialogflow: {settings.use_dialogflow}")
+        logger.info(f"   - project_id: {settings.google_project_id}")
+        logger.info(f"   - credentials_path: {settings.google_credentials_path}")
+        logger.info(f"   - has_env_vars: {bool(settings.google_client_email)}")
         
         if settings.use_dialogflow:
             try:
                 logger.info("🚀 Initializing DialogFlow service...")
                 
-                # Intentar crear credenciales desde base64 si existe
-                credentials_path = settings.google_credentials_path
-                if hasattr(settings, 'google_credentials_base64') and settings.google_credentials_base64:
-                    logger.info("📋 Using base64 credentials from environment")
-                    import base64
+                # Método 1: Usar variables de entorno individuales (para Railway)
+                if settings.google_client_email and settings.google_private_key:
+                    logger.info("� Using environment variables to create credentials")
                     import json
                     import os
                     
-                    # Decodificar base64 y crear archivo temporal
-                    try:
-                        credentials_json = base64.b64decode(settings.google_credentials_base64).decode('utf-8')
-                        logger.info("✅ Base64 decoded successfully")
-                        
-                        # Crear directorio de credenciales si no existe
-                        os.makedirs('credentials', exist_ok=True)
-                        credentials_path = 'credentials/dialogflow-credentials-temp.json'
-                        
-                        with open(credentials_path, 'w') as f:
-                            f.write(credentials_json)
-                        
-                        logger.info(f"✅ Credentials written to {credentials_path}")
-                        
-                        # Verificar que el archivo se creó correctamente
-                        if os.path.exists(credentials_path):
-                            logger.info(f"✅ Credentials file exists, size: {os.path.getsize(credentials_path)} bytes")
-                        else:
-                            logger.error("❌ Credentials file was not created")
-                            
-                    except Exception as decode_error:
-                        logger.error(f"❌ Base64 decode error: {str(decode_error)}")
-                        raise
+                    # Crear JSON de credenciales dinámicamente
+                    credentials_data = {
+                        "type": "service_account",
+                        "project_id": settings.google_project_id,
+                        "private_key_id": settings.google_private_key_id,
+                        "private_key": settings.google_private_key.replace('\\n', '\n'),  # Convertir saltos de línea
+                        "client_email": settings.google_client_email,
+                        "client_id": settings.google_client_id,
+                        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                        "token_uri": "https://oauth2.googleapis.com/token",
+                        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                        "client_x509_cert_url": f"https://www.googleapis.com/robot/v1/metadata/x509/{settings.google_client_email.replace('@', '%40')}",
+                        "universe_domain": "googleapis.com"
+                    }
+                    
+                    # Crear directorio y archivo temporal
+                    os.makedirs('credentials', exist_ok=True)
+                    credentials_path = 'credentials/dialogflow-credentials-env.json'
+                    
+                    with open(credentials_path, 'w') as f:
+                        json.dump(credentials_data, f, indent=2)
+                    
+                    logger.info(f"✅ Credentials created from env vars: {credentials_path}")
+                
+                # Método 2: Usar archivo local (para desarrollo)
                 else:
+                    credentials_path = settings.google_credentials_path
                     logger.info(f"📁 Using file credentials: {credentials_path}")
                 
                 container.dialogflow_service = DialogFlowService(
@@ -133,7 +131,8 @@ async def lifespan(app: FastAPI):
                     credentials_path=credentials_path,
                     language_code=settings.dialogflow_language_code
                 )
-                logger.info("✅ DialogFlow service ready and initialized!")
+                logger.info("✅ DialogFlow service ready!")
+                
             except Exception as e:
                 logger.error(f"❌ DialogFlow initialization failed: {str(e)}")
                 logger.error(f"❌ Exception type: {type(e).__name__}")
