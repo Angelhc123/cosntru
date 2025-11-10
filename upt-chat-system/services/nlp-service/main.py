@@ -84,9 +84,31 @@ async def lifespan(app: FastAPI):
         if settings.use_dialogflow:
             try:
                 logger.info("Initializing DialogFlow service...")
+                
+                # Intentar crear credenciales desde base64 si existe
+                credentials_path = settings.google_credentials_path
+                if hasattr(settings, 'google_credentials_base64') and settings.google_credentials_base64:
+                    logger.info("Using base64 credentials from environment")
+                    import base64
+                    import json
+                    import tempfile
+                    import os
+                    
+                    # Decodificar base64 y crear archivo temporal
+                    credentials_json = base64.b64decode(settings.google_credentials_base64).decode('utf-8')
+                    
+                    # Crear directorio de credenciales si no existe
+                    os.makedirs('credentials', exist_ok=True)
+                    credentials_path = 'credentials/dialogflow-credentials-temp.json'
+                    
+                    with open(credentials_path, 'w') as f:
+                        f.write(credentials_json)
+                    
+                    logger.info(f"✅ Credentials written to {credentials_path}")
+                
                 container.dialogflow_service = DialogFlowService(
                     project_id=settings.google_project_id,
-                    credentials_path=settings.google_credentials_path,
+                    credentials_path=credentials_path,
                     language_code=settings.dialogflow_language_code
                 )
                 logger.info("✅ DialogFlow service ready")

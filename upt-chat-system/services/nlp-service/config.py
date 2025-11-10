@@ -45,6 +45,7 @@ class Settings(BaseSettings):
     use_dialogflow: bool = True
     google_project_id: str = "upt-chat-fhps"
     google_credentials_path: str = "credentials/dialogflow-credentials.json"
+    google_credentials_base64: str = ""  # Para Railway: credenciales en base64
     dialogflow_session_path: str = ""
     dialogflow_language_code: str = "es"
     
