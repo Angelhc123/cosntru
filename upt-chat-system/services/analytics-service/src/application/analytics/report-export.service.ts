@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { AnalyticsService } from './analytics.service';
 import * as ExcelJS from 'exceljs';
-import * as PDFDocument from 'pdfkit';
+const PDFDocument = require('pdfkit');
 
 /**
  * Application Service - Report Export
@@ -131,11 +131,17 @@ export class ReportExportService {
 
     return new Promise(async (resolve, reject) => {
       try {
+        this.logger.log(`🔍 Creando documento PDF...`);
+        this.logger.log(`📦 PDFDocument type: ${typeof PDFDocument}`);
+        
         const doc = new PDFDocument({ margin: 50 });
         const chunks: Buffer[] = [];
 
         doc.on('data', (chunk) => chunks.push(chunk));
-        doc.on('end', () => resolve(Buffer.concat(chunks)));
+        doc.on('end', () => {
+          this.logger.log(`✅ PDF generado exitosamente, tamaño: ${Buffer.concat(chunks).length} bytes`);
+          resolve(Buffer.concat(chunks));
+        });
 
         // Obtener datos
         const stats = await this.analyticsService.getDashboardStats(startDate, endDate);
@@ -235,6 +241,7 @@ export class ReportExportService {
 
         doc.end();
       } catch (error) {
+        this.logger.error(`❌ Error generando PDF: ${error.message}`, error.stack);
         reject(error);
       }
     });
