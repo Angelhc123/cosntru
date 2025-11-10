@@ -191,7 +191,7 @@ class DialogFlowService:
                 "escalate": False
             },
             "Problemas Técnicos": {
-                "response": "He detectado que tienes un problema técnico. Nuestro sistema te conectará automáticamente con soporte especializado.",
+                "response": "Lamento que tengas problemas técnicos. Ahora te atenderá un especialista.",
                 "escalate": True,
                 "category": "Problemas Técnicos"
             }
