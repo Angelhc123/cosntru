@@ -7,6 +7,9 @@ from typing import Optional, Dict, Any, List
 from google.cloud import dialogflow
 from google.oauth2 import service_account
 import json
+import httpx
+import asyncio
+from datetime import datetime
 
 from domain.entities.intent import Intent
 from domain.value_objects.confidence import Confidence
@@ -124,7 +127,7 @@ class DialogFlowService:
             logger.info(f"✅ DialogFlow request successful")
             
             # Procesar respuesta
-            result = self._process_dialogflow_response(response)
+            result = await self._process_dialogflow_response(response)
             
             logger.info(f"📋 DIALOGFLOW RESULT:")
             logger.info(f"   - Intent: {result.get('intent_name')}")
@@ -141,7 +144,7 @@ class DialogFlowService:
             logger.error(f"❌ Full traceback: {traceback.format_exc()}")
             raise
     
-    def _process_dialogflow_response(self, response) -> Dict[str, Any]:
+    async def _process_dialogflow_response(self, response) -> Dict[str, Any]:
         """
         Procesa la respuesta de DialogFlow
         
@@ -168,22 +171,66 @@ class DialogFlowService:
         # TEMPORAL FIX: Respuestas hardcoded para todos los intents
         intent_name = query_result.intent.display_name if query_result.intent.display_name else "Default Fallback Intent"
         
-        # Diccionario de respuestas por intent
-        hardcoded_responses = {
-            "Saludos": "¡Hola! Soy el Asistente Virtual de la UPT. ¿En qué puedo ayudarte hoy? Puedo asistirte con:\n\n• Recuperación de contraseña\n• Información sobre horarios\n• Consultas generales\n\n¿Qué necesitas?",
-            
-            "Contraseña Institucional": "Los problemas de acceso institucional requieren soporte especializado. Para ayudarte mejor, necesito que proporciones tu correo institucional para verificar tu identidad y generar un ticket de soporte.",
-            
-            "Horarios de Atención": "Los horarios de atención de la Universidad Privada de Tacna son:\n\n📅 **Lunes a Viernes:** 8:00 AM - 8:00 PM\n📅 **Sábados:** 9:00 AM - 1:00 PM\n📅 **Domingos:** Cerrado\n\n¿Necesitas información sobre alguna oficina específica?",
-            
-            "Información de Matrícula": "Para información sobre matrícula, te puedo ayudar con:\n\n📚 **Fechas de matrícula**\n📚 **Requisitos necesarios**\n📚 **Proceso de inscripción**\n📚 **Costos y pagos**\n\n¿Qué información específica necesitas sobre la matrícula?",
-            
-            "Problemas Técnicos": "Entiendo que tienes un problema técnico. Para poder ayudarte mejor, necesito que me describas:\n\n🔧 **¿Qué sistema o plataforma estás usando?**\n🔧 **¿Qué error específico recibes?**\n🔧 **¿Cuándo comenzó el problema?**\n\nUn representante revisará tu caso y te contactará pronto."
+        # Diccionario de respuestas por intent con información de escalación
+        intent_config = {
+            "Saludos": {
+                "response": "¡Hola! Soy el Asistente Virtual de la UPT. ¿En qué puedo ayudarte hoy? Puedo asistirte con:\n\n• Recuperación de contraseña\n• Información sobre horarios\n• Consultas generales\n\n¿Qué necesitas?",
+                "escalate": False
+            },
+            "Contraseña Institucional": {
+                "response": "Los problemas de acceso institucional requieren soporte especializado. He generado automáticamente un ticket de soporte para ti. Un especialista revisará tu caso y te contactará pronto.\n\n🎫 **Ticket generado automáticamente**\n📧 Recibirás una notificación por correo\n⏱️ Tiempo estimado de respuesta: 24-48 horas",
+                "escalate": True,
+                "category": "Contraseña Institucional"
+            },
+            "Horarios de Atención": {
+                "response": "Los horarios de atención de la Universidad Privada de Tacna son:\n\n📅 **Lunes a Viernes:** 8:00 AM - 8:00 PM\n📅 **Sábados:** 9:00 AM - 1:00 PM\n📅 **Domingos:** Cerrado\n\n¿Necesitas información sobre alguna oficina específica?",
+                "escalate": False
+            },
+            "Información de Matrícula": {
+                "response": "Para información sobre matrícula, te puedo ayudar con:\n\n📚 **Fechas de matrícula**\n📚 **Requisitos necesarios**\n📚 **Proceso de inscripción**\n📚 **Costos y pagos**\n\n¿Qué información específica necesitas sobre la matrícula?",
+                "escalate": False
+            },
+            "Problemas Técnicos": {
+                "response": "He detectado que tienes un problema técnico. He generado automáticamente un ticket de soporte para ti.\n\n🎫 **Ticket generado automáticamente**\n🔧 **Categoría:** Soporte Técnico\n📧 Recibirás una notificación por correo\n⏱️ Un técnico especializado revisará tu caso\n\n**Tiempo estimado de respuesta:** 2-4 horas hábiles",
+                "escalate": True,
+                "category": "Problemas Técnicos"
+            }
         }
         
-        if intent_name in hardcoded_responses and (not webhook_response_text or webhook_response_text.strip() == ''):
-            webhook_response_text = hardcoded_responses[intent_name]
-            logger.info(f"🔧 TEMPORAL FIX: Using hardcoded response for {intent_name} intent")
+        if intent_name in intent_config and (not webhook_response_text or webhook_response_text.strip() == ''):
+            config = intent_config[intent_name]
+            webhook_response_text = config["response"]
+            
+            # Si el intent requiere escalación, crear ticket automáticamente
+            if config.get("escalate", False):
+                logger.info(f"🎫 ESCALATION REQUIRED: Intent {intent_name} needs ticket creation")
+                try:
+                    # Crear ticket automáticamente
+                    # Construir session_path para el ticket
+                    session_path_for_ticket = f"projects/{self.project_id}/agent/sessions/{response.session}"
+                    
+                    ticket_info = await self._create_automatic_ticket(
+                        session_path=session_path_for_ticket,
+                        intent_name=intent_name,
+                        category=config.get("category", intent_name),
+                        query_text=query_result.query_text
+                    )
+                    
+                    if ticket_info:
+                        # Actualizar la respuesta con información del ticket
+                        webhook_response_text = config["response"].replace(
+                            "🎫 **Ticket generado automáticamente**",
+                            f"🎫 **Ticket #{ticket_info['ticket_id']} generado automáticamente**"
+                        )
+                        logger.info(f"✅ Ticket creado automáticamente: {ticket_info['ticket_id']}")
+                    else:
+                        logger.error("❌ Error creando ticket automático")
+                        
+                except Exception as e:
+                    logger.error(f"❌ Error en escalación automática: {str(e)}")
+                    # Mantener la respuesta original aunque falle la creación del ticket
+            
+            logger.info(f"🔧 TEMPORAL FIX: Using configured response for {intent_name} intent")
         
         # Si hay fulfillment messages, usar el primero (respuesta del webhook)
         elif query_result.fulfillment_messages:
@@ -339,3 +386,69 @@ class DialogFlowService:
             )
         except:
             return False
+    
+    async def _create_automatic_ticket(
+        self,
+        session_path: str,
+        intent_name: str,
+        category: str,
+        query_text: str
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Crea un ticket automáticamente cuando se detecta un intent que requiere escalación
+        
+        Args:
+            session_path: Ruta de la sesión de DialogFlow
+            intent_name: Nombre del intent detectado
+            category: Categoría del problema
+            query_text: Texto original del usuario
+            
+        Returns:
+            Información del ticket creado o None si hay error
+        """
+        try:
+            # Extraer session_id de la ruta
+            session_id = session_path.split("/")[-1] if session_path else "unknown"
+            
+            # URL del API Gateway (desde variable de entorno o default)
+            api_gateway_url = os.environ.get("API_GATEWAY_URL", "http://api-gateway-production-f25f.up.railway.app")
+            
+            # Datos del ticket
+            ticket_data = {
+                "subject": f"Escalación Automática: {category}",
+                "description": f"Ticket generado automáticamente por el chatbot.\n\nIntent detectado: {intent_name}\nConsulta del usuario: {query_text}\nFecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\nSesión: {session_id}",
+                "priority": "medium",
+                "category": category.lower().replace(" ", "_"),
+                "source": "chatbot_auto_escalation",
+                "sessionId": session_id,
+                "userName": "Usuario del Chat",
+                "userEmail": "chatbot@upt.edu.pe",  # Email placeholder
+                "status": "open"
+            }
+            
+            logger.info(f"🎫 Creating automatic ticket for intent: {intent_name}")
+            
+            # Llamar al API Gateway para crear el ticket
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                response = await client.post(
+                    f"{api_gateway_url}/api/v1/support/tickets",
+                    json=ticket_data,
+                    headers={
+                        "Content-Type": "application/json"
+                    }
+                )
+                
+                if response.status_code in [200, 201]:
+                    result = response.json()
+                    logger.info(f"✅ Ticket created successfully: {result.get('ticketId', 'Unknown ID')}")
+                    return {
+                        "ticket_id": result.get("ticketId", "TKT-AUTO"),
+                        "success": True
+                    }
+                else:
+                    logger.error(f"❌ Failed to create ticket: {response.status_code} - {response.text}")
+                    return None
+                    
+        except Exception as e:
+            logger.error(f"❌ Error creating automatic ticket: {str(e)}")
+            return None
