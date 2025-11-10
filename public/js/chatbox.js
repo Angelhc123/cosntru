@@ -169,6 +169,9 @@ class ChatboxWidget {
             
             this.addSystemMessage('Conversación iniciada. ¿En qué puedo ayudarte?');
             
+            // Desbloquear controles por si estaban bloqueados
+            this.unlockChatControls();
+            
             // Registrar mensaje de inicio en la BD (después de verificar que sessionId existe)
             if (this.sessionId && this.sessionToken) {
                 await this.registerSystemMessage('Conversación iniciada', 'inicio');
@@ -316,6 +319,47 @@ class ChatboxWidget {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
+    unlockChatControls() {
+        // DESBLOQUEAR EL INPUT Y BOTONES DEL CHAT
+        const chatInput = document.getElementById('chat-input');
+        const sendButton = document.getElementById('send-message'); // Corrección: es 'send-message' no 'send-button'
+        const endButton = document.getElementById('end-conversation');
+        const quickFaqs = document.getElementById('quick-faqs');
+        
+        console.log('🔓 Desbloqueando controles del chat...');
+        
+        if (chatInput) {
+            chatInput.disabled = false;
+            chatInput.placeholder = 'Escribe tu mensaje...';
+            chatInput.style.background = '';
+            chatInput.style.cursor = '';
+        }
+        if (sendButton) {
+            sendButton.disabled = false;
+            sendButton.style.opacity = '';
+            sendButton.style.cursor = '';
+        }
+        if (endButton) {
+            endButton.disabled = false;
+            endButton.style.opacity = '';
+            endButton.style.cursor = '';
+        }
+        
+        // DESBLOQUEAR PREGUNTAS FRECUENTES
+        if (quickFaqs) {
+            const faqButtons = quickFaqs.querySelectorAll('.faq-button');
+            faqButtons.forEach(button => {
+                button.disabled = false;
+                button.style.opacity = '';
+                button.style.cursor = '';
+                button.style.pointerEvents = '';
+            });
+            console.log(`✅ ${faqButtons.length} botones de FAQs desbloqueados`);
+        }
+        
+        console.log('✅ Todos los controles desbloqueados correctamente');
+    }
+
     async submitSessionFeedback(rating) {
         try {
             // Mapear rating a score numérico
@@ -411,10 +455,12 @@ class ChatboxWidget {
                 const messagesContainer = document.getElementById('chat-messages');
                 messagesContainer.innerHTML = `
                     <div class="welcome-message">
-                        ¡Hola! 👋 Soy el asistente virtual de la UPT.<br>
-                        ¿En qué puedo ayudarte hoy?
+                        👋 Nueva conversación iniciada. ¿En qué puedo ayudarte?
                     </div>
                 `;
+                
+                // ✅ DESBLOQUEAR TODAS LAS FAQs Y CONTROLES
+                this.unlockChatControls();
                 
             }, 2000);
             
