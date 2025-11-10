@@ -127,7 +127,43 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
                 }
         
         # ===================================================================
-        # CASO 3: Detectar email sin contexto explícito
+        # CASO 3: Intent de Saludos
+        # ===================================================================
+        if intent_name in ["Saludos", "saludos", "greeting"]:
+            logger.info("👋 Intent de Saludos detectado")
+            return {
+                "fulfillmentText": "¡Hola! Soy el Asistente Virtual de la UPT. ¿En qué puedo ayudarte hoy? Puedo asistirte con:\n\n• Recuperación de contraseña\n• Información sobre horarios\n• Consultas generales\n\n¿Qué necesitas?",
+            }
+        
+        # ===================================================================
+        # CASO 4: Intent de Información de Matrícula
+        # ===================================================================
+        if intent_name in ["Informacion de Matricula", "matricula"]:
+            logger.info("📚 Intent de Matrícula detectado")
+            return {
+                "fulfillmentText": "Para información sobre matrícula, te puedo ayudar con:\n\n• Fechas de matrícula\n• Requisitos\n• Proceso de inscripción\n\n¿Qué información específica necesitas?",
+            }
+        
+        # ===================================================================
+        # CASO 5: Intent de Horarios de Atención
+        # ===================================================================
+        if intent_name in ["Horarios de Atencion", "horarios"]:
+            logger.info("🕐 Intent de Horarios detectado")
+            return {
+                "fulfillmentText": "Los horarios de atención de la Universidad Privada de Tacna son:\n\n📅 Lunes a Viernes: 8:00 AM - 8:00 PM\n📅 Sábados: 9:00 AM - 1:00 PM\n📅 Domingos: Cerrado\n\n¿Necesitas información sobre alguna oficina específica?",
+            }
+        
+        # ===================================================================
+        # CASO 6: Intent de Problemas Técnicos
+        # ===================================================================
+        if intent_name in ["Problemas Técnicos", "problemas_tecnicos", "technical_issues"]:
+            logger.info("🔧 Intent de Problemas Técnicos detectado")
+            return {
+                "fulfillmentText": "Entiendo que tienes un problema técnico. Para poder ayudarte mejor, necesito que me describas:\n\n• ¿Qué sistema o plataforma estás usando?\n• ¿Qué error específico recibes?\n• ¿Cuándo comenzó el problema?\n\nUn representante revisará tu caso y te contactará pronto.",
+            }
+        
+        # ===================================================================
+        # CASO 7: Detectar email sin contexto explícito
         # Si el mensaje contiene un email válido, procesarlo
         # ===================================================================
         email = extract_email_from_text(query_text, parameters)
@@ -137,11 +173,11 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             return await handle_password_recovery_with_email(email, session)
         
         # ===================================================================
-        # CASO 4: Intent por defecto - Cualquier otro mensaje
+        # CASO 8: Intent por defecto - Cualquier otro mensaje
         # ===================================================================
         logger.warning(f"⚠️ Intent '{intent_name}' no tiene handler específico")
         return {
-            "fulfillmentText": "Procesando tu solicitud...",
+            "fulfillmentText": "Entiendo que necesitas ayuda. ¿Podrías ser más específico sobre lo que buscas? Puedo ayudarte con recuperación de contraseña, información de matrícula, horarios y más.",
         }
         
     except Exception as e:
