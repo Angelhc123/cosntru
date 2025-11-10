@@ -162,15 +162,28 @@ class DialogFlowService:
                 "parameters": dict(context.parameters)
             })
         
-        # IMPORTANT: Para "Saludos" intent, usar respuesta hardcoded hasta que se arregle el webhook
+        # IMPORTANT: Respuestas hardcoded para todos los intents hasta que se arregle el webhook
         webhook_response_text = query_result.fulfillment_text
         
-        # TEMPORAL FIX: Si es el intent "Saludos", usar respuesta hardcoded
+        # TEMPORAL FIX: Respuestas hardcoded para todos los intents
         intent_name = query_result.intent.display_name if query_result.intent.display_name else "Default Fallback Intent"
         
-        if intent_name == "Saludos" and (not webhook_response_text or webhook_response_text.strip() == ''):
-            webhook_response_text = "¡Hola! Soy el Asistente Virtual de la UPT. ¿En qué puedo ayudarte hoy? Puedo asistirte con:\n\n• Recuperación de contraseña\n• Información sobre horarios\n• Consultas generales\n\n¿Qué necesitas?"
-            logger.info(f"🔧 TEMPORAL FIX: Using hardcoded response for Saludos intent")
+        # Diccionario de respuestas por intent
+        hardcoded_responses = {
+            "Saludos": "¡Hola! Soy el Asistente Virtual de la UPT. ¿En qué puedo ayudarte hoy? Puedo asistirte con:\n\n• Recuperación de contraseña\n• Información sobre horarios\n• Consultas generales\n\n¿Qué necesitas?",
+            
+            "Contraseña Institucional": "Los problemas de acceso institucional requieren soporte especializado. Para ayudarte mejor, necesito que proporciones tu correo institucional para verificar tu identidad y generar un ticket de soporte.",
+            
+            "Horarios de Atención": "Los horarios de atención de la Universidad Privada de Tacna son:\n\n📅 **Lunes a Viernes:** 8:00 AM - 8:00 PM\n📅 **Sábados:** 9:00 AM - 1:00 PM\n📅 **Domingos:** Cerrado\n\n¿Necesitas información sobre alguna oficina específica?",
+            
+            "Información de Matrícula": "Para información sobre matrícula, te puedo ayudar con:\n\n📚 **Fechas de matrícula**\n📚 **Requisitos necesarios**\n📚 **Proceso de inscripción**\n📚 **Costos y pagos**\n\n¿Qué información específica necesitas sobre la matrícula?",
+            
+            "Problemas Técnicos": "Entiendo que tienes un problema técnico. Para poder ayudarte mejor, necesito que me describas:\n\n🔧 **¿Qué sistema o plataforma estás usando?**\n🔧 **¿Qué error específico recibes?**\n🔧 **¿Cuándo comenzó el problema?**\n\nUn representante revisará tu caso y te contactará pronto."
+        }
+        
+        if intent_name in hardcoded_responses and (not webhook_response_text or webhook_response_text.strip() == ''):
+            webhook_response_text = hardcoded_responses[intent_name]
+            logger.info(f"🔧 TEMPORAL FIX: Using hardcoded response for {intent_name} intent")
         
         # Si hay fulfillment messages, usar el primero (respuesta del webhook)
         elif query_result.fulfillment_messages:
