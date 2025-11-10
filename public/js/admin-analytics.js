@@ -245,17 +245,18 @@ async function loadFeedbackChart() {
 async function loadIntentsChart() {
     const params = new URLSearchParams({
         startDate: currentDates.start.toISOString(),
-        endDate: currentDates.end.toISOString()
+        endDate: currentDates.end.toISOString(),
+        limit: '10'
     });
     
-    const response = await fetch(`${ANALYTICS_API_URL}/dashboard?${params}`);
+    const response = await fetch(`${ANALYTICS_API_URL}/intents/top?${params}`);
     const data = await response.json();
     
     if (!data.success) {
         throw new Error('Error al cargar intents');
     }
     
-    const intents = data.data.topIntents.slice(0, 10);
+    const intents = data.data || [];
     
     if (chartsInstances['intents']) {
         chartsInstances['intents'].destroy();
@@ -265,7 +266,7 @@ async function loadIntentsChart() {
     chartsInstances['intents'] = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: intents.map(i => i.intent || 'Sin intent'),
+            labels: intents.map(i => i.name || 'Sin intent'),
             datasets: [{
                 label: 'Usos',
                 data: intents.map(i => i.count),
@@ -292,17 +293,18 @@ async function loadIntentsChart() {
 async function loadFaqsChart() {
     const params = new URLSearchParams({
         startDate: currentDates.start.toISOString(),
-        endDate: currentDates.end.toISOString()
+        endDate: currentDates.end.toISOString(),
+        limit: '10'
     });
     
-    const response = await fetch(`${ANALYTICS_API_URL}/dashboard?${params}`);
+    const response = await fetch(`${ANALYTICS_API_URL}/faqs/top?${params}`);
     const data = await response.json();
     
     if (!data.success) {
         throw new Error('Error al cargar FAQs');
     }
     
-    const faqs = data.data.topFaqs.slice(0, 10);
+    const faqs = data.data || [];
     
     if (chartsInstances['faqs']) {
         chartsInstances['faqs'].destroy();
@@ -318,7 +320,7 @@ async function loadFaqsChart() {
             }),
             datasets: [{
                 label: 'Usos',
-                data: faqs.map(f => f.count),
+                data: faqs.map(f => f.usageCount || 0),
                 backgroundColor: '#f39c12'
             }]
         },
