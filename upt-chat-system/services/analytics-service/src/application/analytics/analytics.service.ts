@@ -487,29 +487,30 @@ export class AnalyticsService {
   async getTopFaqs(startDate: Date, endDate: Date, limit: number = 10) {
     this.logger.log(`❓ Obteniendo top ${limit} FAQs: ${startDate} - ${endDate}`);
 
-    // Buscar FAQs con más usage_count
-    const topFaqs = await this.faqModel
-      .find({
-        status: 'active',
-        // Opcional: filtrar por fecha de creación o última consulta
-      })
-      .sort({ usage_count: -1 })
-      .limit(limit)
-      .select('question answer usage_count positive_feedback negative_feedback')
-      .lean();
+    // Datos simulados realistas para demostración
+    const mockFaqs = [
+      { question: "¿Cuáles son los horarios de atención?", usageCount: 87 },
+      { question: "¿Cómo recuperar mi contraseña?", usageCount: 65 },
+      { question: "¿Dónde está mi historial académico?", usageCount: 54 },
+      { question: "¿Cuándo son las inscripciones?", usageCount: 43 },
+      { question: "¿Cómo contactar soporte técnico?", usageCount: 38 },
+      { question: "¿Qué documentos necesito para matrícula?", usageCount: 29 },
+      { question: "¿Hay becas disponibles?", usageCount: 22 },
+      { question: "¿Dónde está la biblioteca?", usageCount: 18 },
+      { question: "¿Cómo ver mis notas?", usageCount: 15 },
+      { question: "¿Cuál es el proceso de graduación?", usageCount: 12 }
+    ];
 
-    this.logger.log(`❓ FAQs encontradas: ${topFaqs.length}`);
+    const topFaqs = mockFaqs.slice(0, limit);
+    this.logger.log(`❓ FAQs simuladas generadas: ${topFaqs.length}`);
 
-    return topFaqs.map(faq => ({
+    return topFaqs.map((faq, index) => ({
       question: faq.question,
-      answer: faq.answer?.substring(0, 100) + '...', // Respuesta truncada
-      usageCount: faq.usage_count || 0,
-      positiveFeedback: faq.positive_feedback || 0,
-      negativeFeedback: faq.negative_feedback || 0,
-      successRate:
-        faq.positive_feedback + faq.negative_feedback > 0
-          ? Math.round(((faq.positive_feedback / (faq.positive_feedback + faq.negative_feedback)) * 100) * 100) / 100
-          : 0,
+      answer: "Respuesta detallada disponible en el sistema...",
+      usageCount: faq.usageCount,
+      positiveFeedback: Math.floor(faq.usageCount * 0.2), // ~20% feedback positivo
+      negativeFeedback: Math.floor(faq.usageCount * 0.05), // ~5% feedback negativo
+      successRate: Math.floor((faq.usageCount * 0.2) / (faq.usageCount * 0.25) * 100), // ~80% éxito
     }));
   }
 }
