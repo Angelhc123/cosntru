@@ -75,7 +75,7 @@ async def process_message(request: ProcessMessageRequestDTO):
         logger.info(f"✅ MESSAGE PROCESSED:")
         logger.info(f"   - Intent: {response.intent.id if response.intent else 'None'}")
         logger.info(f"   - Confidence: {response.confidence}")
-        logger.info(f"   - Response: '{response.answer[:100]}...'")
+        logger.info(f"   - Response: '{response.response[:100]}...'")
         logger.info(f"   - Source: DialogFlow or Local NLP")
         
         return response
