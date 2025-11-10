@@ -26,13 +26,22 @@ export class AnalyticsService {
    * Obtener estadísticas generales del dashboard
    */
   async getDashboardStats(startDate: Date, endDate: Date): Promise<DashboardStats> {
-    this.logger.log(`Generando estadísticas del dashboard: ${startDate} - ${endDate}`);
+    this.logger.log(`🔍 Generando estadísticas del dashboard: ${startDate} - ${endDate}`);
+
+    // DEBUG: Verificar conexión y datos
+    const totalMessages = await this.messageModel.countDocuments({});
+    const totalSessionsDebug = await this.sessionModel.countDocuments({});
+    const totalFaqs = await this.faqModel.countDocuments({});
+    
+    this.logger.log(`📊 DATOS EN BD: Messages: ${totalMessages}, Sessions: ${totalSessionsDebug}, FAQs: ${totalFaqs}`);
 
     // Consultas totales (mensajes del bot)
     const totalQueries = await this.messageModel.countDocuments({
       sender: 'bot',
       timestamp: { $gte: startDate, $lte: endDate },
     });
+    
+    this.logger.log(`🔢 Consultas encontradas en período: ${totalQueries}`);
 
     // Confianza promedio del NLP
     const confidenceAgg = await this.messageModel.aggregate([

@@ -16,7 +16,7 @@ import { AnalyticsModule } from './application/analytics/analytics.module';
     MongooseModule.forRoot(
       process.env.MONGODB_URI || 'mongodb://localhost:27017/upt_chat_system',
       {
-        dbName: 'BASEDEDATOS2', // Nombre correcto de la base de datos en Atlas
+        dbName: 'upt_chat_system', // CORREGIDO: usar la BD donde están los datos reales
         retryWrites: true,
         w: 'majority',
       },
