@@ -454,7 +454,7 @@ export class AnalyticsService {
         $match: {
           sender: 'bot',
           timestamp: { $gte: startDate, $lte: endDate },
-          'nlp.intent': { 
+          'metadata.intent': { 
             $exists: true, 
             $ne: null, 
             $nin: ['unknown', '', undefined] 
@@ -463,9 +463,9 @@ export class AnalyticsService {
       },
       {
         $group: {
-          _id: '$nlp.intent',
+          _id: '$metadata.intent',
           count: { $sum: 1 },
-          avgConfidence: { $avg: '$nlp.confidence' },
+          avgConfidence: { $avg: '$metadata.confidence' },
         },
       },
       { $sort: { count: -1 } },
