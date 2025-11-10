@@ -162,13 +162,35 @@ class DialogFlowService:
                 "parameters": dict(context.parameters)
             })
         
+        # IMPORTANTE: Extraer la respuesta correcta del webhook
+        # Cuando hay webhook habilitado, la respuesta real viene en fulfillment_messages
+        # o directamente desde el webhook response
+        webhook_response_text = query_result.fulfillment_text
+        
+        # Si hay fulfillment messages, usar el primero (respuesta del webhook)
+        if query_result.fulfillment_messages:
+            for message in query_result.fulfillment_messages:
+                if hasattr(message, 'text') and message.text:
+                    webhook_response_text = message.text.text[0] if message.text.text else webhook_response_text
+                    logger.info(f"✅ Webhook response extracted from fulfillment_messages: '{webhook_response_text[:100]}...'")
+                    break
+        
+        # Log de debugging
+        logger.info(f"📋 DIALOGFLOW RESULT:")
+        logger.info(f"   - Intent: {query_result.intent.display_name if query_result.intent.display_name else 'Default Fallback Intent'}")
+        logger.info(f"   - Confidence: {query_result.intent_detection_confidence:.3f}")
+        logger.info(f"   - Fulfillment: '{webhook_response_text[:100]}...'")
+        logger.info(f"   - Action: {query_result.action}")
+        logger.info(f"📋 Parámetros: {dict(query_result.parameters)}")
+        logger.info(f"🔄 Contexts: {[c.name.split('/')[-1] for c in query_result.output_contexts]}")
+
         return {
             "query_text": query_result.query_text,
             "intent_name": query_result.intent.display_name if query_result.intent.display_name else "Default Fallback Intent",
             "intent_id": query_result.intent.name,
             "confidence": query_result.intent_detection_confidence,
-            "fulfillment_text": query_result.fulfillment_text,  # DialogFlow convierte camelCase a snake_case
-            "fulfillmentText": query_result.fulfillment_text,    # También en formato original
+            "fulfillment_text": webhook_response_text,  # Respuesta correcta del webhook
+            "fulfillmentText": webhook_response_text,    # También en formato camelCase
             "parameters": dict(query_result.parameters),
             "action": query_result.action,
             "contexts": output_contexts,  # Formato antiguo (mantener compatibilidad)
