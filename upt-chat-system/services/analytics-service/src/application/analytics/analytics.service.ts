@@ -442,4 +442,74 @@ export class AnalyticsService {
 
     return { activeSessionsCount: activeSessions };
   }
+
+  /**
+   * Obtener top intents más utilizados
+   */
+  async getTopIntents(startDate: Date, endDate: Date, limit: number = 10) {
+    this.logger.log(`📊 Obteniendo top ${limit} intents: ${startDate} - ${endDate}`);
+
+    const intentsAgg = await this.messageModel.aggregate([
+      {
+        $match: {
+          sender: 'bot',
+          timestamp: { $gte: startDate, $lte: endDate },
+          'nlp.intent': { 
+            $exists: true, 
+            $ne: null, 
+            $nin: ['unknown', '', undefined] 
+          },
+        },
+      },
+      {
+        $group: {
+          _id: '$nlp.intent',
+          count: { $sum: 1 },
+          avgConfidence: { $avg: '$nlp.confidence' },
+        },
+      },
+      { $sort: { count: -1 } },
+      { $limit: limit },
+    ]);
+
+    this.logger.log(`🎯 Intents encontrados: ${intentsAgg.length}`);
+
+    return intentsAgg.map(intent => ({
+      name: intent._id || 'unknown',
+      count: intent.count,
+      confidence: Math.round(intent.avgConfidence * 100) / 100,
+    }));
+  }
+
+  /**
+   * Obtener top FAQs más consultadas
+   */
+  async getTopFaqs(startDate: Date, endDate: Date, limit: number = 10) {
+    this.logger.log(`❓ Obteniendo top ${limit} FAQs: ${startDate} - ${endDate}`);
+
+    // Buscar FAQs con más usage_count
+    const topFaqs = await this.faqModel
+      .find({
+        status: 'active',
+        // Opcional: filtrar por fecha de creación o última consulta
+      })
+      .sort({ usage_count: -1 })
+      .limit(limit)
+      .select('question answer usage_count positive_feedback negative_feedback')
+      .lean();
+
+    this.logger.log(`❓ FAQs encontradas: ${topFaqs.length}`);
+
+    return topFaqs.map(faq => ({
+      question: faq.question,
+      answer: faq.answer?.substring(0, 100) + '...', // Respuesta truncada
+      usageCount: faq.usage_count || 0,
+      positiveFeedback: faq.positive_feedback || 0,
+      negativeFeedback: faq.negative_feedback || 0,
+      successRate:
+        faq.positive_feedback + faq.negative_feedback > 0
+          ? Math.round(((faq.positive_feedback / (faq.positive_feedback + faq.negative_feedback)) * 100) * 100) / 100
+          : 0,
+    }));
+  }
 }

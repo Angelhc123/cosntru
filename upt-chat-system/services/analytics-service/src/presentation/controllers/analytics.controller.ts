@@ -315,6 +315,54 @@ export class AnalyticsController {
   }
 
   /**
+   * GET /analytics/intents/top
+   * Obtener top 10 intents más utilizados
+   */
+  @Get('intents/top')
+  async getTopIntents(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const start = startDate ? new Date(startDate) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const end = endDate ? new Date(endDate) : new Date();
+    const lim = limit ? parseInt(limit) : 10;
+
+    this.logger.log(`GET /analytics/intents/top - Período: ${start} - ${end}, Límite: ${lim}`);
+
+    const intents = await this.analyticsService.getTopIntents(start, end, lim);
+
+    return {
+      success: true,
+      data: intents,
+    };
+  }
+
+  /**
+   * GET /analytics/faqs/top
+   * Obtener top 10 FAQs más consultadas
+   */
+  @Get('faqs/top')
+  async getTopFaqs(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const start = startDate ? new Date(startDate) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const end = endDate ? new Date(endDate) : new Date();
+    const lim = limit ? parseInt(limit) : 10;
+
+    this.logger.log(`GET /analytics/faqs/top - Período: ${start} - ${end}, Límite: ${lim}`);
+
+    const faqs = await this.analyticsService.getTopFaqs(start, end, lim);
+
+    return {
+      success: true,
+      data: faqs,
+    };
+  }
+
+  /**
    * GET /analytics/debug/count
    * Contar mensajes sin filtros (DEBUG)
    */
