@@ -1,6 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { AnalyticsService } from './analytics.service';
 import * as ExcelJS from 'exceljs';
+
+// Para PDFKit sin tipos en producción
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const PDFDocument = require('pdfkit');
 
 /**
