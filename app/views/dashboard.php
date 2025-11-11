@@ -32,7 +32,6 @@
             background:var(--navy-dark);
             color:#fff;
             display:flex;
-            justify-content:space-between;
             align-items:center;
             padding:10px 28px;
             font-size:12px;
@@ -45,7 +44,6 @@
         .top-strip__left{
             display:flex;
             align-items:center;
-            gap:8px;
             font-weight:700;
         }
 
@@ -53,53 +51,36 @@
             font-size:18px;
         }
 
-        .top-strip__left .indicator{
-            width:12px;
-            height:12px;
-            border:2px solid #fff;
-            background:#0a2470;
-            display:inline-block;
-        }
-
         .top-strip__center{
             display:flex;
+            justify-content:center;
             align-items:center;
-            gap:14px;
+            flex:1;
             flex-wrap:wrap;
-            margin-left:auto;
         }
 
         .top-strip__center .user{
-            font-weight:600;
+            font-weight:700;
             text-transform:uppercase;
         }
 
-        .top-strip__center a{
+        .top-strip__right{
+            display:flex;
+            align-items:center;
+            gap:16px;
+            font-weight:600;
+            font-size:12px;
+            flex-wrap:wrap;
+            justify-content:flex-end;
+        }
+
+        .top-strip__right a{
             color:#fff;
             text-decoration:none;
             font-weight:600;
             display:inline-flex;
             align-items:center;
             gap:4px;
-            font-size:12px;
-        }
-
-        .top-strip__center a .icon{
-            width:16px;
-            height:16px;
-            border:1px solid #fff;
-            border-radius:50%;
-            display:inline-flex;
-            align-items:center;
-            justify-content:center;
-            font-size:11px;
-        }
-
-        .top-strip__right{
-            display:flex;
-            align-items:center;
-            gap:6px;
-            font-weight:600;
             font-size:12px;
         }
 
@@ -111,7 +92,13 @@
             display:inline-flex;
             align-items:center;
             justify-content:center;
-            font-size:12px;
+            font-size:11px;
+        }
+
+        .top-strip__clock{
+            display:flex;
+            align-items:center;
+            gap:6px;
         }
 
         .page{
@@ -576,17 +563,18 @@
     <header class="top-strip">
         <div class="top-strip__left">
             <span class="brand">Net.UPT.edu.pe</span>
-            <span class="indicator" aria-hidden="true"></span>
         </div>
         <div class="top-strip__center">
             <span class="user">Usuario: <strong><?php echo $nombreCompleto; ?></strong></span>
-            <a href="#"><span class="icon">?</span>Ayuda</a>
-            <a href="logout.php"><span class="icon">⏻</span>Finalizar</a>
         </div>
         <div class="top-strip__right">
-            <span class="icon">🕒</span>
-            <span>Hora del sistema:</span>
-            <span id="sys-time">--:--:--</span>
+            <a href="#"><span class="icon" aria-hidden="true">?</span>Ayuda</a>
+            <a href="logout.php"><span class="icon" aria-hidden="true">⏻</span>Finalizar</a>
+            <div class="top-strip__clock">
+                <span class="icon" aria-hidden="true">🕒</span>
+                <span>Hora del sistema:</span>
+                <span id="sys-time">--:--:--</span>
+            </div>
         </div>
     </header>
 
