@@ -32,6 +32,67 @@
             background:#ffffff;
         }
 
+        .top-header{
+            padding:14px 32px 10px;
+            border-bottom:3px double var(--navy-dark);
+            border-top:4px solid transparent;
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            gap:24px;
+        }
+
+        .top-title{
+            margin:0;
+            font-size:28px;
+            font-weight:700;
+            letter-spacing:-0.4px;
+        }
+
+        .top-title .accent{
+            color:var(--accent);
+        }
+
+        .top-title .brand{
+            color:var(--navy-dark);
+        }
+
+        .top-meta{
+            display:flex;
+            align-items:flex-end;
+            gap:8px;
+            font-size:11px;
+            color:var(--navy-dark);
+            font-weight:700;
+        }
+
+        .top-meta .badge{
+            width:16px;
+            height:16px;
+            background:var(--navy-dark);
+            border:2px solid #fff;
+            box-shadow:0 0 0 1px var(--navy-dark);
+            display:inline-block;
+        }
+
+        .user-bar{
+            display:flex;
+            align-items:center;
+            gap:14px;
+            margin-top:4px;
+        }
+
+        .user-bar .username{
+            font-weight:700;
+            color:var(--navy-dark);
+        }
+
+        .user-bar a{
+            color:var(--navy-dark);
+            font-weight:700;
+            text-decoration:underline;
+        }
+
         /* Sidebar */
         .sidebar{
             width:215px;
@@ -109,48 +170,39 @@
             padding:26px 32px 40px;
         }
 
-        .hero{
+        .section-lead{
             display:flex;
             justify-content:space-between;
             align-items:flex-start;
             gap:20px;
+            margin-top:18px;
         }
 
-        .hero-title{
+        .section-lead .title{
             margin:0;
-            font-size:30px;
+            font-size:26px;
             font-weight:700;
-            letter-spacing:-0.4px;
+            letter-spacing:-0.3px;
         }
 
-        .hero-title .accent{
-            color:var(--accent);
-        }
-
-        .hero-title .brand{
-            color:var(--navy-dark);
-        }
-
-        .hero-sub{
+        .section-lead .subtitle{
             margin:2px 0 0;
             color:#4a4a4a;
             font-style:italic;
             font-size:12px;
         }
 
-        .hero-action{
+        .section-lead a{
             color:var(--navy-dark);
             font-weight:700;
             text-decoration:underline;
-            cursor:pointer;
-            display:inline-block;
             margin-top:4px;
         }
 
         .divider{
-            height:4px;
+            height:3px;
             background:var(--navy-dark);
-            margin:12px 0 24px;
+            margin:12px 0 20px;
         }
 
         .content-grid{
@@ -185,78 +237,88 @@
         }
 
         .welcome-card{
-            padding:18px 20px 20px;
+            padding:20px 22px 24px;
         }
 
-        .welcome-card .note{
-            margin:0;
+        .section-heading{
+            font-size:14px;
+            font-weight:700;
+            color:#6f6f6f;
+            text-transform:uppercase;
+            border-bottom:1px solid #dcdcdc;
+            padding-bottom:6px;
+            margin:0 0 14px 0;
+        }
+
+        .info-text{
+            margin:0 0 12px 0;
             line-height:1.6;
         }
 
-        .welcome-card .highlight{
-            margin:18px 0 0;
-            background:#fff3d1;
-            border:1px solid #e7cf83;
-            padding:12px;
-            font-weight:600;
-            color:#6a4d00;
-            max-width:240px;
-        }
-
-        .info-row{
-            display:flex;
-            gap:16px;
-            flex-wrap:wrap;
-            align-items:stretch;
-            margin-top:18px;
-        }
-
-        .highlight{
-            flex:0 0 220px;
-        }
-
-        .btn-email{
-            background:var(--accent);
+        .info-text strong{
             color:#1d1d1d;
-            font-weight:700;
-            border:none;
-            padding:10px 18px;
-            cursor:pointer;
-            min-width:140px;
         }
 
-        .email-block{
-            display:flex;
-            flex-direction:column;
-            gap:8px;
-            justify-content:center;
-            min-width:220px;
-        }
-
-        .mail-meta{
-            font-weight:600;
-            color:#2c2c2c;
-            font-size:12px;
-            line-height:1.4;
-        }
-
-        .btn-password{
+        .banner{
+            margin:16px 0 18px;
             background:var(--navy-dark);
             color:#fff;
-            border:none;
+            padding:12px 18px;
             font-weight:700;
-            padding:12px 24px;
-            cursor:pointer;
-            flex:1;
-            display:flex;
-            align-items:center;
-            justify-content:center;
+            text-transform:uppercase;
+            font-size:13px;
         }
 
-        .btn-password span{
+        .banner a{
+            color:#fff;
+            text-decoration:underline;
+            margin-left:6px;
+        }
+
+        .email-row{
+            display:flex;
+            align-items:center;
+            gap:12px;
+            flex-wrap:wrap;
+        }
+
+        .email-row label{
+            font-weight:700;
+            color:#1f1f1f;
+            font-size:13px;
+        }
+
+        .email-row input{
+            padding:8px 10px;
+            border:1px solid #9ca3af;
+            min-width:220px;
+            font-size:13px;
+            background:#f7f7f7;
+        }
+
+        .btn-primary{
+            background:var(--navy-dark);
+            color:#fff;
+            font-weight:700;
+            border:none;
+            padding:9px 18px;
+            cursor:pointer;
             display:inline-flex;
             align-items:center;
-            gap:8px;
+            gap:6px;
+        }
+
+        .password-row{
+            margin-top:16px;
+            display:flex;
+            align-items:center;
+            flex-wrap:wrap;
+            gap:12px;
+        }
+
+        .password-row .note{
+            font-weight:600;
+            color:#1f1f1f;
         }
 
         .list{
@@ -266,28 +328,35 @@
         }
 
         .calendar-card{
-            background:#f1f2f4;
+            background:#f7f7f7;
+            border:1px solid #bfc3c8;
         }
 
         .calendar-card strong{
             display:block;
             margin-bottom:10px;
-            color:#152b4a;
+            color:#6b6b6b;
+            font-weight:700;
         }
 
         .calendar-buttons{
             display:flex;
             flex-direction:column;
-            gap:8px;
         }
 
-        .calendar-buttons button{
-            border:1px solid #c5c8cc;
-            background:#e9eaec;
+        .calendar-button{
+            border-bottom:1px solid #cfd2d6;
+            padding:10px 12px;
+            background:#e4e5e7;
             font-weight:700;
-            padding:8px 12px;
-            text-align:left;
-            cursor:pointer;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            color:#1f1f1f;
+        }
+
+        .calendar-button:last-child{
+            border-bottom:none;
         }
 
         .record-card .small-muted{
@@ -301,56 +370,54 @@
         .benefits-area h4{
             margin:0;
             text-transform:uppercase;
-            color:#666666;
+            color:#6b6b6b;
+            letter-spacing:0.5px;
         }
 
         .benefits-divider{
             height:1px;
             background:#d6d6d6;
-            margin:10px 0 18px;
+            margin:10px 0 22px;
         }
 
         .benefits-list{
             display:flex;
-            gap:22px;
+            gap:40px;
+            align-items:stretch;
         }
 
         .benefit-card{
             flex:1;
-            border:1px solid var(--border-grey);
-            padding:18px;
             display:flex;
             align-items:center;
-            gap:16px;
-            background:#ffffff;
+            gap:18px;
         }
 
         .benefit-card .icon{
-            font-size:40px;
+            width:90px;
+            text-align:center;
+            font-size:60px;
             color:var(--navy-dark);
         }
 
         .benefit-card .info h5{
-            margin:0 0 6px 0;
+            margin:0 0 4px 0;
             color:var(--navy-dark);
-            font-size:14px;
+            font-size:15px;
+            text-transform:uppercase;
         }
 
-        .btn-download{
+        .benefit-card .download{
             margin-left:auto;
-            background:var(--navy-dark);
-            color:#fff;
-            border:none;
-            font-weight:700;
-            padding:8px 18px;
-            cursor:pointer;
         }
 
-        .record-card .btn-download{
-            margin-left:0;
+        .download .btn-primary{
+            padding:10px 20px;
+        }
+
+        .record-card .btn-primary{
             width:100%;
-            display:block;
-            text-align:center;
+            justify-content:center;
         }
 
         .tickets-card{
@@ -388,21 +455,38 @@
                 flex-direction:column;
             }
 
-            .info-row .highlight{
-                flex:1 1 100%;
+            .email-row{
+                flex-direction:column;
+                align-items:flex-start;
             }
 
-            .email-block{
-                min-width:unset;
+            .email-row input{
+                width:100%;
             }
 
-            .btn-password{
-                flex:1 1 100%;
+            .password-row{
+                flex-direction:column;
+                align-items:flex-start;
             }
         }
     </style>
 </head>
 <body>
+    <?php $usuario = isset($_SESSION['usuario']) ? htmlspecialchars($_SESSION['usuario']) : 'Invitado'; ?>
+    <header class="top-header">
+        <div>
+            <h1 class="top-title"><span class="accent">Bienvenido a</span> <span class="brand">Net.UPT.edu.pe</span></h1>
+            <div class="top-meta">
+                <span>versión 1.5 by Of. Tecnologías de la Información</span>
+                <span class="badge"></span>
+            </div>
+        </div>
+        <div class="user-bar">
+            <span class="username">Usuario: <?php echo $usuario; ?></span>
+            <a href="logout.php">Cerrar sesión</a>
+        </div>
+    </header>
+
     <div class="page">
         <aside class="sidebar">
             <div class="block-title">INICIO</div>
@@ -462,31 +546,38 @@
         </aside>
 
         <main class="content">
-            <header class="hero">
+            <div class="section-lead">
                 <div>
-                    <h1 class="hero-title"><span class="accent">Bienvenido a</span> <span class="brand">Net.UPT.edu.pe</span></h1>
-                    <p class="hero-sub">Información importante</p>
+                    <h2 class="title">Bienvenido al Sistema Académico</h2>
+                    <p class="subtitle">Información importante</p>
                 </div>
-                <a class="hero-action" href="#">Ver Directorio</a>
-            </header>
+                <a href="#">Ver Directorio</a>
+            </div>
 
             <div class="divider"></div>
 
             <div class="content-grid">
                 <section class="column-left">
                     <div class="card welcome-card">
-                        <h2>Bienvenido al Sistema Académico</h2>
-                        <p class="note"><strong>INFORMACIÓN</strong><br>¿Tienes problemas con la Intranet? entonces escríbenos a intranet@upt.pe enviando tu código universitario y datos personales.</p>
+                        <div class="section-heading">INFORMACIÓN</div>
+                        <p class="info-text"><strong>¿Tienes problemas con la Intranet?</strong> entonces escríbenos a intranet@upt.pe enviando tu código universitario y datos personales.</p>
+                        <p class="info-text"><strong>¿Tienes problemas con tu cuenta de Correo Institucional Live@Edu?</strong> entonces escríbenos a soporte365@upt.pe enviando tu código universitario y datos personales.</p>
+                        <p class="info-text"><strong>¿Tienes problemas con tu cuenta de Google?</strong> entonces escríbenos a soportegsuite@virtual.upt.pe enviando tu código universitario y datos personales.</p>
 
-                        <div class="info-row">
-                            <div class="highlight">ACTIVA TU CORREO INSTITUCIONAL UPT.PE hasta el 20/09/2025 (Solo ingresantes)</div>
+                        <div class="banner">
+                            ACTIVA TU CORREO INSTITUCIONAL UPT.PE hasta el 20/09/2025
+                            <a href="#">Ingrese aquí (Solo para estudiantes ingresantes)</a>
+                        </div>
 
-                            <div class="email-block">
-                                <button class="btn-email">🔒 Cambiar Email</button>
-                                <div class="mail-meta"><strong>Su cuenta de correo personal es:</strong><br><?php echo isset($_SESSION['usuario'])?htmlspecialchars($_SESSION['usuario']):''; ?>@gmail.com</div>
-                            </div>
+                        <div class="email-row">
+                            <label for="personal-email">Su cuenta de correo personal es:</label>
+                            <input id="personal-email" type="text" value="<?php echo isset($_SESSION['correo_personal'])?htmlspecialchars($_SESSION['correo_personal']):$usuario; ?>" readonly>
+                            <button class="btn-primary" type="button">🔒 Cambiar Email</button>
+                        </div>
 
-                            <button class="btn-password" onclick="alert('Función de cambiar contraseña (demo)')"><span>📧 Cambiar Contraseña</span></button>
+                        <div class="password-row">
+                            <div class="note">Seleccione el botón si desea cambiar su contraseña de la Intranet:</div>
+                            <button class="btn-primary" type="button" onclick="alert('Función de cambiar contraseña (demo)')">� Cambiar Contraseña</button>
                         </div>
                     </div>
 
@@ -502,8 +593,24 @@
 
                     <div class="card economics-card">
                         <h3>INFORMACIÓN ECONÓMICA</h3>
-                        <p>No tiene deuda hasta la fecha</p>
-                        <p style="margin-top:6px;"><strong>Deuda Libro:</strong> No tiene deuda de libro hasta la fecha</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nro</th>
+                                    <th>Descripción</th>
+                                    <th>Monto</th>
+                                    <th>Vence</th>
+                                    <th>Dependencia</th>
+                                    <th>Semestre</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="6">No tiene deuda hasta la fecha</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p style="margin-top:12px;"><strong>Deuda Libro:</strong> No tiene deuda de libro hasta la fecha</p>
                     </div>
                 </section>
 
@@ -511,17 +618,18 @@
                     <div class="card calendar-card">
                         <strong>CALENDARIOS ACADÉMICOS</strong>
                         <div class="calendar-buttons">
-                            <button>2025 - REC</button>
-                            <button>2025 - INT</button>
-                            <button>2025 - I</button>
-                            <button>2025 - II</button>
+                            <div class="calendar-button">2025 - II <span>&lsaquo;</span></div>
+                            <div class="calendar-button">2025 - INT <span>&lsaquo;</span></div>
+                            <div class="calendar-button">2026 - REC <span>&lsaquo;</span></div>
+                            <div class="calendar-button">2026 - I <span>&lsaquo;</span></div>
+                            <div class="calendar-button">2026 - II <span>&lsaquo;</span></div>
                         </div>
                     </div>
 
                     <div class="card calendar-card record-card">
                         <strong>FICHA DE MATRÍCULA</strong>
                         <p class="small-muted">Esta opción estará habilitada hasta la rectificación de matrícula (demo)</p>
-                        <button class="btn-download">Descargar</button>
+                        <button class="btn-primary" type="button">Descargar</button>
                     </div>
                 </aside>
             </div>
@@ -533,19 +641,19 @@
                     <article class="benefit-card">
                         <div class="icon">📶</div>
                         <div class="info">
-                            <h5>Generar Clave WIFI:</h5>
+                            <h5>GENERAR CLAVE WIFI:</h5>
                             <div class="small-muted">Procedimiento para acceder a UPT_WIFI</div>
                         </div>
-                        <button class="btn-download">Descargar</button>
+                        <div class="download"><button class="btn-primary" type="button">⬇ Descargar</button></div>
                     </article>
 
                     <article class="benefit-card">
                         <div class="icon" style="color:var(--accent);">🧾</div>
                         <div class="info">
-                            <h5>Ficha de Matrícula</h5>
+                            <h5>FICHA DE MATRÍCULA</h5>
                             <div class="small-muted">Esta opción estará habilitada hasta la rectificación de matrícula (demo)</div>
                         </div>
-                        <button class="btn-download">Descargar</button>
+                        <div class="download"><button class="btn-primary" type="button">⬇ Descargar</button></div>
                     </article>
                 </div>
             </section>
