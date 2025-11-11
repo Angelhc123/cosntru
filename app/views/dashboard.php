@@ -111,19 +111,20 @@
         /* Sidebar */
         .sidebar{
             width:215px;
-            background:var(--navy-light);
-            color:#fff;
-            border-right:4px solid var(--navy-dark);
+            background:#ffffff;
+            color:var(--navy-dark);
+            border-right:1px solid #d0d4d9;
         }
 
         .sidebar .block-title{
-            padding:10px 16px;
+            padding:8px 14px;
             font-weight:700;
             font-size:12px;
             text-transform:uppercase;
             background:var(--navy-dark);
-            border-top:1px solid rgba(255,255,255,0.25);
-            border-bottom:1px solid rgba(0,0,0,0.45);
+            color:#fff;
+            border-top:1px solid rgba(255,255,255,0.35);
+            border-bottom:1px solid rgba(0,0,0,0.35);
             letter-spacing:0.4px;
         }
 
@@ -134,7 +135,8 @@
         }
 
         .sidebar li{
-            border-bottom:1px solid rgba(255,255,255,0.08);
+            border-bottom:1px dotted #d4b45a;
+            background:#ffffff;
         }
 
         .sidebar li:last-child{
@@ -143,20 +145,23 @@
 
         .sidebar a{
             display:block;
-            padding:8px 18px 8px 32px;
-            color:#fff;
+            padding:7px 18px 7px 32px;
+            color:var(--navy-dark);
             font-weight:600;
             text-decoration:none;
             position:relative;
+            transition:color 0.2s ease;
         }
 
         .sidebar a::before{
-            content:'\203A';
+            content:'\003E';
             position:absolute;
-            left:16px;
+            left:14px;
             top:50%;
             transform:translateY(-50%);
-            font-size:16px;
+            font-size:14px;
+            color:#6f6f6f;
+            font-weight:700;
         }
 
         .sidebar a[data-star]::after{
@@ -170,13 +175,18 @@
         }
 
         .sidebar a:hover{
-            background:rgba(255,255,255,0.12);
+            color:#f6b541;
+        }
+
+        .sidebar a:hover::before{
+            color:#f6b541;
         }
 
         .sidebar .separator{
             height:1px;
-            background:rgba(255,255,255,0.18);
-            margin:8px 0;
+            background:transparent;
+            border-top:1px dotted #d4b45a;
+            margin:10px 0;
         }
 
         /* Contenido principal */
