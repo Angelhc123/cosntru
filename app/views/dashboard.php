@@ -29,15 +29,17 @@
     .sidebar a:hover{background:rgba(255,255,255,0.06)}
     .sidebar .sep{height:0; border-bottom:1px solid #fef3db; margin:8px 0}
 
-        /* Main: separado del sidebar. Usamos un contenedor interior para centrar contenido similar a la imagen */
-    .main{margin-left:206px; padding:14px 20px; min-height:calc(100vh - 44px)}
-        .main .content-inner{max-width:980px; margin:0 auto}
+    /* Main: más cercano al sidebar, alineado a la izquierda */
+    .main{margin-left:190px; padding:12px 16px; min-height:calc(100vh - 44px)}
+    .main .content-inner{max-width:none; margin:0}
 
         /* Welcome header estilo similar a la imagen */
-        .banner{background:transparent; padding:6px 0; margin-bottom:6px}
-        .banner .text{font-weight:700; color:var(--accent); font-size:22px}
+    .banner{background:transparent; padding:6px 0; margin-bottom:0; display:flex; align-items:center; justify-content:space-between; gap:12px}
+    .banner .welcome{margin:0; font-size:28px; font-weight:700}
+    .banner .welcome .accent{color:var(--accent)}
+    .banner .welcome .brand-name{color:var(--blue)}
         .page-sub{display:block; margin-top:6px; color:#222; font-size:12px}
-        .thin-divider{height:4px; background:var(--navy); margin:8px 0 18px 0}
+    .thin-divider{height:4px; background:var(--navy); margin:8px 0 14px 0}
 
         /* Tarjetas compactas */
         .card{background:#fff; border-radius:2px; padding:12px; box-shadow:none; border-top:1px solid #e6e6e6; margin-bottom:14px}
@@ -53,7 +55,7 @@
         .small-muted{color:var(--muted); font-size:12px}
 
     /* Grid principal: contenido + bloque derecho (calendarios) */
-        .grid-2{display:grid; grid-template-columns:1fr 300px; gap:18px}
+    .grid-2{display:grid; grid-template-columns:minmax(0,1fr) 320px; gap:20px}
         .calendar-box{border:2px solid #bdbdbd; padding:8px; border-radius:2px; background:#f7f7f7}
         .calendar-box .btn{display:block; margin-bottom:8px; text-align:left}
 
@@ -132,10 +134,11 @@
         </aside>
 
         <main class="main">
-            <div class="card banner">
-                <div class="text">¡Bienvenido a Net.UPT.edu.pe — Información importante</div>
+            <div class="banner">
+                <h1 class="welcome"><span class="accent">Bienvenido a</span> <span class="brand-name">Net.UPT.edu.pe</span> <small class="small-muted">— Información importante</small></h1>
                 <a class="btn" href="#">Ver Directorio</a>
             </div>
+            <div class="thin-divider"></div>
 
             <div class="grid-2">
                 <div>
