@@ -18,9 +18,18 @@ src/application/
 ├── use-cases/          # Casos de uso del sistema
 │   ├── user.use-cases.ts
 │   └── chat-session.use-cases.ts
+├── services/          # Servicios de aplicación
+│   ├── analytics.service.ts
+│   ├── dialogflow.service.ts
+│   ├── nlp.service.ts
+│   ├── password-reset.service.ts
+│   ├── support.service.ts
+│   └── tickets.service.ts    # ✨ REUBICADO desde tickets/
 └── dtos/              # Objetos de transferencia de datos
     ├── user.dto.ts
-    └── chat-session.dto.ts
+    ├── chat-session.dto.ts
+    ├── faq.dto.ts
+    └── password-reset.dto.ts
 ```
 
 #### **🎯 Propósito de los Use Cases:**
@@ -238,9 +247,19 @@ La capa de presentación maneja la **comunicación con el exterior** (HTTP, WebS
 #### **📁 Estructura:**
 ```
 src/presentation/
-└── controllers/
-    ├── users.controller.ts
-    └── chat-sessions.controller.ts
+├── controllers/          # Controladores HTTP
+│   ├── users.controller.ts
+│   ├── chat-sessions.controller.ts
+│   ├── analytics.controller.ts
+│   ├── dialogflow.controller.ts
+│   ├── faqs.controller.ts
+│   ├── health.controller.ts
+│   ├── nlp.controller.ts
+│   ├── password-reset.controller.ts
+│   ├── support.controller.ts
+│   └── tickets.controller.ts    # ✨ REUBICADO desde application/tickets/
+└── modules/             # Módulos de NestJS
+    └── tickets.module.ts       # ✨ REUBICADO desde application/tickets/
 ```
 
 #### **🎮 CONTROLLERS:**
@@ -357,7 +376,52 @@ Esta arquitectura permite fácilmente:
 
 ---
 
-## 📚 **CONCLUSIÓN**
+## � **REFACTORING RECIENTE: MÓDULO TICKETS**
+
+### **Problema Identificado:**
+El módulo `tickets` estaba ubicado incorrectamente en `src/application/tickets/` como una carpeta independiente, violando los principios de Clean Architecture + DDD de 4 capas.
+
+### **Solución Implementada:**
+
+#### **✨ Archivos Movidos:**
+
+**Controller (Capa de Presentación):**
+```
+ANTES: src/application/tickets/tickets.controller.ts
+DESPUÉS: src/presentation/controllers/tickets.controller.ts
+```
+
+**Service (Capa de Aplicación):**
+```
+ANTES: src/application/tickets/tickets.service.ts
+DESPUÉS: src/application/services/tickets.service.ts
+```
+
+**Module (Organización en Presentación):**
+```
+ANTES: src/application/tickets/tickets.module.ts
+DESPUÉS: src/presentation/modules/tickets.module.ts
+```
+
+#### **🔧 Cambios de Imports:**
+
+- **TicketsController**: Actualizado para importar `TicketsService` desde `../../application/services/tickets.service`
+- **TicketsModule**: Reconfigurado para usar el controlador desde `../controllers/tickets.controller`
+- **AppModule**: Actualizado para importar desde `./presentation/modules/tickets.module`
+
+#### **📋 Archivos Legacy:**
+Los archivos antiguos en `src/application/tickets/` fueron reemplazados por stubs de depreciación para evitar conflictos durante la migración.
+
+### **✅ Resultado:**
+Ahora el módulo `tickets` respeta correctamente la arquitectura de 4 capas:
+- **Presentation**: `tickets.controller.ts`, `tickets.module.ts`
+- **Application**: `tickets.service.ts`
+- **Domain**: (usando schemas existentes)
+- **Infrastructure**: (usando schemas y repositorios MongoDB existentes)
+
+---
+
+## �📚 **CONCLUSIÓN**
 
 El **UPT Chat System** utiliza una arquitectura robusta que:
 

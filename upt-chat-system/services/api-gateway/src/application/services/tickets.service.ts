@@ -399,14 +399,4 @@ export class TicketsService {
       </html>
     `;
   }
-
-  /**
-   * Obtener tickets asignados a un admin
-   */
-  async getAdminTickets(adminId: string): Promise<TicketDocument[]> {
-    return this.ticketModel
-      .find({ adminId })
-      .sort({ createdAt: -1 })
-      .exec();
-  }
 }

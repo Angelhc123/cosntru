@@ -70,7 +70,7 @@ import { AnalyticsService } from './application/services/analytics.service';
 import { DialogflowService } from './application/services/dialogflow.service';
 
 // Tickets Module
-import { TicketsModule } from './application/tickets/tickets.module';
+import { TicketsModule } from './presentation/modules/tickets.module';
 
 // Repository Interfaces
 import { IUserRepository } from './domain/repositories/user.repository.interface';
