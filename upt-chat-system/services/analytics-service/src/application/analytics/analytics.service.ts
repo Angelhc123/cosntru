@@ -157,7 +157,7 @@ export class AnalyticsService {
       positiveRate,
       escalationRate,
       topIntents,
-      topFaqs: topFaqsMapped,
+      topFaqs: [],
       period: { start: startDate, end: endDate },
     });
   }
