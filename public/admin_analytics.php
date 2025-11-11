@@ -257,6 +257,14 @@
                     </div>
                 </div>
 
+                <!-- Gráfico de Top FAQs -->
+                <div class="chart-card">
+                    <h3>❓ Top 10 Preguntas Frecuentes</h3>
+                    <div class="chart-container">
+                        <canvas id="faqs-chart"></canvas>
+                    </div>
+                </div>
+
                 <!-- Gráfico de Tickets por Estado -->
                 <div class="chart-card">
                     <h3>🎫 Tickets por Estado</h3>
