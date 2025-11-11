@@ -35,30 +35,58 @@
             display:flex;
             justify-content:space-between;
             align-items:center;
-            padding:6px 28px;
+            padding:10px 28px;
             font-size:12px;
             flex-wrap:wrap;
-            gap:12px;
+            gap:14px;
             width:100%;
+            box-shadow:0 2px 4px rgba(0,0,0,0.25);
+            border-bottom:4px solid var(--navy);
         }
 
         .system-bar__left{
-            font-size:20px;
+            font-size:18px;
             font-weight:700;
-            letter-spacing:-0.3px;
+            letter-spacing:-0.2px;
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+
+        .system-bar__left span{
+            display:inline-block;
+            width:16px;
+            height:16px;
+            background:#fff;
+            border:2px solid var(--navy);
         }
 
         .system-bar__right{
             display:flex;
             align-items:center;
-            gap:16px;
+            gap:18px;
             flex-wrap:wrap;
         }
 
         .system-bar__right a{
             color:#fff;
             text-decoration:underline;
-            font-weight:600;
+            font-weight:700;
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+        }
+
+        .system-bar__right a::before{
+            font-size:14px;
+        }
+
+        .system-bar__right a[data-icon="help"]::before{
+            content:'\2753'; /* signo de pregunta */
+        }
+
+        .system-bar__right a[data-icon="logout"]::before{
+            content:'\23FB'; /* símbolo de apagado */
         }
 
         .system-bar__user strong{
@@ -66,7 +94,7 @@
         }
 
         .system-bar__time{
-            font-weight:600;
+            font-weight:700;
         }
 
         .page{
@@ -529,11 +557,11 @@
         $emailPersonal = isset($_SESSION['email_personal']) && $_SESSION['email_personal'] !== '' ? htmlspecialchars($_SESSION['email_personal']) : '';
     ?>
     <header class="system-bar">
-        <div class="system-bar__left">Net.UPT.edu.pe</div>
+        <div class="system-bar__left">Net.UPT.edu.pe <span aria-hidden="true"></span></div>
         <div class="system-bar__right">
             <span class="system-bar__user">Usuario: <strong><?php echo $nombreCompleto; ?></strong></span>
-            <a href="#">Ayuda</a>
-            <a href="logout.php">Finalizar</a>
+            <a href="#" data-icon="help">Ayuda</a>
+            <a href="logout.php" data-icon="logout">Finalizar</a>
             <span class="system-bar__time">Hora del sistema: <span id="sys-time">--:--:--</span></span>
         </div>
     </header>
