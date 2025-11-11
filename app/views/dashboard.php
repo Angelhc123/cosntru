@@ -27,7 +27,6 @@
             display:block;
             min-height:100vh;
         }
-        }
 
         .top-strip{
             background:var(--navy-dark);
@@ -35,7 +34,7 @@
             display:flex;
             justify-content:space-between;
             align-items:center;
-            padding:8px 26px;
+            padding:10px 28px;
             font-size:12px;
             flex-wrap:wrap;
             gap:18px;
@@ -55,10 +54,10 @@
         }
 
         .top-strip__left .indicator{
-            width:14px;
-            height:14px;
+            width:12px;
+            height:12px;
             border:2px solid #fff;
-            background:transparent;
+            background:#0a2470;
             display:inline-block;
         }
 
@@ -67,10 +66,12 @@
             align-items:center;
             gap:14px;
             flex-wrap:wrap;
+            margin-left:auto;
         }
 
         .top-strip__center .user{
             font-weight:600;
+            text-transform:uppercase;
         }
 
         .top-strip__center a{
@@ -80,10 +81,18 @@
             display:inline-flex;
             align-items:center;
             gap:4px;
+            font-size:12px;
         }
 
         .top-strip__center a .icon{
-            font-size:14px;
+            width:16px;
+            height:16px;
+            border:1px solid #fff;
+            border-radius:50%;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            font-size:11px;
         }
 
         .top-strip__right{
@@ -91,10 +100,18 @@
             align-items:center;
             gap:6px;
             font-weight:600;
+            font-size:12px;
         }
 
         .top-strip__right .icon{
-            font-size:14px;
+            width:16px;
+            height:16px;
+            border:1px solid #fff;
+            border-radius:50%;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            font-size:12px;
         }
 
         .page{
