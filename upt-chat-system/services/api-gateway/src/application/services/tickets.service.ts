@@ -133,6 +133,16 @@ export class TicketsService {
   }
 
   /**
+   * Obtener tickets asignados a un admin específico
+   */
+  async getAdminTickets(adminId: string): Promise<TicketDocument[]> {
+    return this.ticketModel
+      .find({ adminId })
+      .sort({ createdAt: -1 })
+      .exec();
+  }
+
+  /**
    * Obtener un ticket por ID
    */
   async getTicketById(ticketId: string): Promise<TicketDocument> {
