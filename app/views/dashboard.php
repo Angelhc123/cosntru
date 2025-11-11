@@ -24,6 +24,9 @@
             font-size:13px;
             background:#ffffff;
             color:var(--text);
+            display:block;
+            min-height:100vh;
+        }
         }
 
         .system-bar{
@@ -36,6 +39,7 @@
             font-size:12px;
             flex-wrap:wrap;
             gap:12px;
+            width:100%;
         }
 
         .system-bar__left{
@@ -69,6 +73,7 @@
             display:flex;
             min-height:100vh;
             background:#ffffff;
+            width:100%;
         }
 
         /* Sidebar */
