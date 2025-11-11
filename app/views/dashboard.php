@@ -23,13 +23,14 @@
     /* Sidebar compacto (narrow) con estética de la imagen */
     .sidebar{position:fixed; left:0; top:44px; bottom:0; width:200px; background:#0d3b74; color:#fff; padding:6px 0; box-shadow:2px 0 6px rgba(0,0,0,0.06); overflow:auto}
     .sidebar .section-title{padding:8px 12px; font-weight:700; font-size:12px; text-transform:uppercase; background:#0b2f66; border-top:1px solid #264c86; border-bottom:1px solid #264c86}
-    .sidebar a{display:block; position:relative; color:#fff; padding:8px 14px 8px 22px; text-decoration:none; font-size:13px; font-weight:600; border-bottom:1px dotted #e8d99d}
+    .sidebar a{display:block; position:relative; color:#fff; padding:8px 14px 8px 22px; text-decoration:none; font-size:13px; font-weight:600; border-bottom:1px solid #fef3db}
     .sidebar a::before{content:'\203A'; /* › */ position:absolute; left:10px; color:#cfd9ea}
     .sidebar a[data-star]:after{content:'\2605'; /* ★ */ position:absolute; right:10px; color:#f7c948; font-size:10px}
     .sidebar a:hover{background:rgba(255,255,255,0.06)}
+    .sidebar .sep{height:0; border-bottom:1px solid #fef3db; margin:8px 0}
 
         /* Main: separado del sidebar. Usamos un contenedor interior para centrar contenido similar a la imagen */
-        .main{margin-left:220px; padding:14px 20px; min-height:calc(100vh - 44px)}
+    .main{margin-left:206px; padding:14px 20px; min-height:calc(100vh - 44px)}
         .main .content-inner{max-width:980px; margin:0 auto}
 
         /* Welcome header estilo similar a la imagen */
@@ -98,23 +99,34 @@
 
     <div class="container">
         <aside class="sidebar">
-            <div class="section-title">Inicio</div>
+            <div class="section-title">INICIO</div>
             <a href="#">Inicio</a>
-            <div class="section-title">Académico</div>
-            <a href="#">Académico</a>
-            <a href="#">Calendario</a>
-            <a href="#">Matrícula</a>
-            <div class="section-title">Servicios</div>
+            <div class="section-title">ACADÉMICO</div>
             <a href="#" data-star="1">Google Workspace</a>
             <a href="#">Office365@Edu</a>
             <a href="#">Convenio Microsoft</a>
-            <div class="section-title">Pasarela</div>
+            <div class="section-title">ELECCIONES</div>
+            <a href="#">Comprobantes Electrónicos</a>
+            <div class="section-title">PASARELA</div>
             <a href="#">Alumno</a>
             <a href="#">Aula Virtual</a>
             <a href="#">GPS Alumni</a>
-            <div class="section-title">Anuncios</div>
+            <div class="sep"></div>
+            <a href="#">Biblioteca</a>
+            <a href="#">Seguro Estudiantil</a>
+            <div class="sep"></div>
+            <a href="#">Recorrido de Buses</a>
+            <div class="sep"></div>
+            <a href="#">Reglamento y Directivas</a>
+            <div class="sep"></div>
+            <a href="#">Becas y Subvenciones</a>
+            <div class="section-title">ANUNCIOS</div>
             <a href="#">Guía Estudiante</a>
-            <a href="#">Ofertas</a>
+            <a href="#">¿Office365@Edu?</a>
+            <a href="#">C. Institucional</a>
+            <a href="#">Veritrade</a>
+            <a href="#">Palestra</a>
+            <a href="#">Valor del Crédito</a>
             <!-- botones sin redirección, solo UI -->
             <!-- Generar Clave WIFI movido a la sección de beneficios en el main -->
         </aside>
