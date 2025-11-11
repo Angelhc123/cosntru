@@ -136,21 +136,6 @@ export class AnalyticsService {
       },
     ]);
 
-    // Top FAQs - Usando preguntas frecuentes realistas basadas en nuestro sistema
-    // Generamos datos realistas que coinciden con nuestros intents de Dialogflow
-    const topFaqsMapped = [
-      { question: '¿Cuáles son los horarios de atención?', count: 85 },
-      { question: '¿Cómo recuperar mi contraseña?', count: 72 },
-      { question: '¿Dónde está mi historial académico?', count: 58 },
-      { question: '¿Cuándo son las inscripciones?', count: 45 },
-      { question: '¿Cómo contactar soporte técnico?', count: 38 },
-      { question: '¿Qué documentos necesito para matrícula?', count: 32 },
-      { question: '¿Hay becas disponibles?', count: 28 },
-      { question: '¿Dónde está la biblioteca?', count: 24 },
-      { question: '¿Cómo ver mis notas?', count: 20 },
-      { question: '¿Cuál es el proceso de graduación?', count: 16 }
-    ];
-
     return DashboardStats.create({
       totalQueries,
       averageConfidence,
