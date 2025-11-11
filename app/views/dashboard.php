@@ -7,143 +7,253 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/chatbox-with-history.css">
     <style>
-        /* Estilos refinados para asemejarse a la imagen: compact, lineal y con contraste */
-        :root{ --blue:#103a78; --navy:#0a2a66; --accent:#efb02f; --muted:#6c757d }
+        /* Estilos según diseño de referencia */
+        :root{ --navy:#0b2f66; --navy-dark:#061f4d; --navy-light:#0f3875; --accent:#f2a900; --border-gold:#fef3db; --grey-border:#dadada; --muted:#6c6c6c; --text:#1f1f1f }
         html,body{height:100%;}
-        body{font-family: Arial, Helvetica, sans-serif; margin:0; background:#fff; color:#222; font-size:13px}
+        body{font-family: Arial, Helvetica, sans-serif; margin:0; background:#ffffff; color:var(--text); font-size:13px}
 
-        /* Topbar (más compacta) */
-        .topbar{background:var(--navy); color:#fff; padding:6px 18px; display:flex; align-items:center; justify-content:space-between; position:fixed; top:0; left:0; right:0; height:44px; z-index:1000}
-        .topbar .brand{font-size:16px; font-weight:700}
-        .topbar .user{font-size:12px; display:flex; gap:14px; align-items:center}
+        /* Barra superior fija */
+        .topbar{background:var(--navy-dark); color:#fff; padding:6px 22px; display:flex; align-items:center; justify-content:space-between; position:fixed; top:0; left:0; right:0; height:48px; z-index:1000; box-shadow:0 2px 4px rgba(0,0,0,0.2)}
+        .topbar .brand{font-size:20px; font-weight:700}
+        .topbar .user{font-size:12px; display:flex; gap:16px; align-items:center}
+        .topbar .user a{color:#fff; font-weight:700; text-decoration:none}
 
-        /* Contenedor principal: dejar espacio para header */
-        .container{display:block; padding-top:44px; min-height:calc(100vh - 44px); background:#fff}
+        /* Layout principal */
+        .container{display:flex; min-height:100vh; padding-top:48px; background:#fff}
 
-    /* Sidebar compacto (narrow) con estética de la imagen */
-    .sidebar{position:fixed; left:0; top:44px; bottom:0; width:200px; background:#0d3b74; color:#fff; padding:6px 0; box-shadow:2px 0 6px rgba(0,0,0,0.06); overflow:auto}
-    .sidebar .section-title{padding:8px 12px; font-weight:700; font-size:12px; text-transform:uppercase; background:#0b2f66; border-top:1px solid #264c86; border-bottom:1px solid #264c86}
-    .sidebar a{display:block; position:relative; color:#fff; padding:8px 14px 8px 22px; text-decoration:none; font-size:13px; font-weight:600; border-bottom:1px solid #fef3db}
-    .sidebar a::before{content:'\203A'; /* › */ position:absolute; left:10px; color:#cfd9ea}
-    .sidebar a[data-star]:after{content:'\2605'; /* ★ */ position:absolute; right:10px; color:#f7c948; font-size:10px}
-    .sidebar a:hover{background:rgba(255,255,255,0.06)}
-    .sidebar .sep{height:0; border-bottom:1px solid #fef3db; margin:8px 0}
+        /* Sidebar con bloques y separadores dorados */
+        .sidebar{width:196px; background:var(--navy-light); color:#fff; border-right:4px solid var(--navy-dark); padding-bottom:20px}
+        .sidebar .block-title{padding:9px 14px; font-weight:700; font-size:12px; text-transform:uppercase; background:var(--navy-dark); border-top:1px solid rgba(255,255,255,0.2); border-bottom:1px solid rgba(0,0,0,0.4)}
+        .sidebar ul{list-style:none; margin:0; padding:0}
+        .sidebar li{border-bottom:1px solid var(--border-gold)}
+        .sidebar li:last-child{border-bottom:none}
+        .sidebar a{display:block; padding:8px 12px 8px 26px; color:#fff; text-decoration:none; font-weight:600; position:relative}
+        .sidebar a::before{content:'\203A'; position:absolute; left:10px}
+        .sidebar a[data-star]::after{content:'\2605'; position:absolute; right:12px; color:#ffd54f; font-size:11px}
+        .sidebar a:hover{background:rgba(255,255,255,0.08)}
+        .sidebar .separator{height:1px; background:var(--border-gold); margin:8px 0}
 
-    /* Main: más cercano al sidebar, alineado a la izquierda */
-    .main{margin-left:190px; padding:12px 16px; min-height:calc(100vh - 44px)}
-    .main .content-inner{max-width:none; margin:0}
+        /* Contenido principal pegado al sidebar */
+        .main{flex:1; padding:18px 30px 40px 18px}
+        .main-inner{max-width:1000px; margin:0}
 
-        /* Welcome header estilo similar a la imagen */
-    .banner{background:transparent; padding:6px 0; margin-bottom:0; display:flex; align-items:center; justify-content:space-between; gap:12px}
-    .banner .welcome{margin:0; font-size:28px; font-weight:700}
-    .banner .welcome .accent{color:var(--accent)}
-    .banner .welcome .brand-name{color:var(--blue)}
-        .page-sub{display:block; margin-top:6px; color:#222; font-size:12px}
-    .thin-divider{height:4px; background:var(--navy); margin:8px 0 14px 0}
+        /* Encabezado principal */
+        .heading{display:flex; align-items:center; justify-content:space-between}
+        .heading-title{margin:0; font-size:30px; font-weight:700}
+        .heading-title .accent{color:var(--accent)}
+        .heading-title .brand{color:var(--navy-dark)}
+        .heading-sub{margin:0; color:#494949; font-size:12px}
+        .divider{height:4px; background:var(--navy-dark); margin:8px 0 18px 0}
 
-        /* Tarjetas compactas */
-        .card{background:#fff; border-radius:2px; padding:12px; box-shadow:none; border-top:1px solid #e6e6e6; margin-bottom:14px}
-        .card h3, .card h4{margin-top:0}
+        /* Columnas principales */
+        .layout{display:flex; gap:24px}
+        .layout-left{flex:1}
+        .layout-right{width:300px}
 
-        /* Botones pequeños (estilo intranet clásico) */
-        .btn{background:var(--blue); color:#fff; padding:6px 10px; border-radius:2px; text-decoration:none; display:inline-block; font-size:12px}
-        .btn.secondary{background:#e9ecef; color:#212529; border:1px solid #cfcfcf}
-    .logout-btn{background:#e74c3c;color:#fff;padding:6px 10px;border-radius:2px;text-decoration:none}
-    /* Topbar link style (used for Cerrar Sesión) */
-    .top-link{color:#fff; text-decoration:none; font-weight:600}
+        /* Tarjetas */
+        .info-card{border:1px solid var(--grey-border); background:#fff; padding:16px}
+        .info-card h3{margin:0 0 12px 0; color:var(--navy-dark)}
+        .info-alert{background:#fff5db; border:1px solid #f1d48c; padding:10px; width:240px; font-size:12px}
+        .info-actions{display:flex; align-items:center; gap:12px}
+        .btn-main{background:#d99616; color:#1a1a1a; font-weight:700; padding:10px 16px; border:none; cursor:pointer; text-transform:uppercase}
+        .btn-blue{background:var(--navy-dark); color:#fff; border:none; padding:8px 16px; font-weight:700; cursor:pointer}
+        .btn-blue.small{padding:6px 12px; font-size:12px}
 
+        .card{border:1px solid var(--grey-border); padding:12px 16px; margin-top:18px; background:#fff}
+        .card h4{margin:0 0 8px 0; color:var(--navy-dark)}
+        .card p{margin:0}
+        .list{margin:0; padding-left:18px}
+        .list li{margin-bottom:4px}
+        table{width:100%; border-collapse:collapse; font-size:13px; margin-top:8px}
+        th,td{border:1px solid var(--grey-border); padding:6px 8px}
+
+        /* Panel derecho */
+        .calendar-card{border:1px solid #b5b5b5; background:#f2f2f2; padding:12px 14px}
+        .calendar-card button{width:100%; text-align:left; padding:8px 10px; border:1px solid #c7c7c7; background:#ececec; font-weight:700; margin-bottom:6px}
+
+        /* Beneficios */
+        .benefits-section{margin-top:26px}
+        .benefits-title{font-weight:700; text-transform:uppercase; color:#777; margin:0 0 8px 0}
+        .benefits-divider{height:1px; background:#dddddd; margin-bottom:14px}
+        .benefits{display:flex; gap:24px}
+        .benefit-box{flex:1; border:1px solid var(--grey-border); padding:16px; display:flex; align-items:center; gap:14px; background:#fff}
+        .benefit-icon{font-size:48px; color:var(--navy-dark)}
+        .benefit-action{margin-left:auto}
+        .btn-download{background:var(--navy-dark); color:#fff; border:none; padding:8px 18px; font-weight:700; cursor:pointer}
         .small-muted{color:var(--muted); font-size:12px}
 
-    /* Grid principal: contenido + bloque derecho (calendarios) */
-    .grid-2{display:grid; grid-template-columns:minmax(0,1fr) 320px; gap:20px}
-        .calendar-box{border:2px solid #bdbdbd; padding:8px; border-radius:2px; background:#f7f7f7}
-        .calendar-box .btn{display:block; margin-bottom:8px; text-align:left}
-
-    /* Encabezado secciones grises (BENEFICIOS, etc.) */
-    .section-legend{font-weight:700; color:#6b6b6b; margin:16px 0 8px; text-transform:uppercase}
-    .muted-divider{height:1px; background:#e6e6e6; margin:6px 0 14px}
-
-    /* Beneficios en dos columnas */
-    .benefits{display:flex; align-items:flex-start; gap:48px; margin:10px 0 24px}
-    .benefit{display:flex; align-items:center; gap:18px; flex:1}
-    .benefit .icon{font-size:58px; line-height:1}
-    .benefit.wifi .icon{color:var(--blue)}
-    .benefit.ficha .icon{color:#efb02f}
-    .btn-download{background:#0a2a66; color:#fff; padding:10px 22px; border-radius:2px; font-weight:700; text-decoration:none}
-
-        /* Estética de tabla y listas para que se vea compacto */
-        ul{margin:0; padding-left:18px}
-        table{width:100%; border-collapse:collapse; font-size:13px}
-        table td, table th{padding:6px; border:1px solid #eee}
-
-        /* Responsive: colapsar sidebar y recolocar contenido */
-        @media(max-width:1000px){
-            .sidebar{position:static; width:100%; height:auto}
-            .main{margin-left:0; padding:12px}
-            .main .content-inner{max-width:100%}
-            .grid-2{grid-template-columns:1fr}
+        /* Responsivo básico */
+        @media(max-width:1100px){
+            .container{flex-direction:column}
+            .sidebar{width:100%; border-right:none}
+            .main{padding:16px}
+            .main-inner{max-width:100%; margin:0}
+            .layout{flex-direction:column}
+            .layout-right{width:100%}
+            .benefits{flex-direction:column}
         }
     </style>
-</head>
-<body>
-    <div class="topbar">
-    <div class="brand">Net.UPT.edu.pe</div>
-        <div class="user">
-            <div>Usuario: <?php echo htmlspecialchars(
-                isset($_SESSION['nombre_completo'])?$_SESSION['nombre_completo']:''
-            ); ?></div>
-            <div class="small-muted">Ayuda</div>
-            <!-- Reemplazamos "Finalizar" por un enlace de Cerrar Sesión para evitar duplicados -->
-            <div class="small-muted"><a href="logout.php" class="top-link">Cerrar Sesión</a></div>
-            <div class="small-muted">⏰ Hora del sistema: <span id="sys-time"><?php echo date('H:i:s'); ?></span></div>
-        </div>
-    </div>
 
     <div class="container">
         <aside class="sidebar">
-            <div class="section-title">INICIO</div>
-            <a href="#">Inicio</a>
-            <div class="section-title">ACADÉMICO</div>
-            <a href="#" data-star="1">Google Workspace</a>
-            <a href="#">Office365@Edu</a>
-            <a href="#">Convenio Microsoft</a>
-            <div class="section-title">ELECCIONES</div>
-            <a href="#">Comprobantes Electrónicos</a>
-            <div class="section-title">PASARELA</div>
-            <a href="#">Alumno</a>
-            <a href="#">Aula Virtual</a>
-            <a href="#">GPS Alumni</a>
-            <div class="sep"></div>
-            <a href="#">Biblioteca</a>
-            <a href="#">Seguro Estudiantil</a>
-            <div class="sep"></div>
-            <a href="#">Recorrido de Buses</a>
-            <div class="sep"></div>
-            <a href="#">Reglamento y Directivas</a>
-            <div class="sep"></div>
-            <a href="#">Becas y Subvenciones</a>
-            <div class="section-title">ANUNCIOS</div>
-            <a href="#">Guía Estudiante</a>
-            <a href="#">¿Office365@Edu?</a>
-            <a href="#">C. Institucional</a>
-            <a href="#">Veritrade</a>
-            <a href="#">Palestra</a>
-            <a href="#">Valor del Crédito</a>
-            <!-- botones sin redirección, solo UI -->
-            <!-- Generar Clave WIFI movido a la sección de beneficios en el main -->
+            <div class="block-title">INICIO</div>
+            <ul class="menu">
+                <li><a href="#">Inicio</a></li>
+            </ul>
+
+            <div class="block-title">ACADÉMICO</div>
+            <ul class="menu">
+                <li><a href="#" data-star="1">Google Workspace</a></li>
+                <li><a href="#">Office365@Edu</a></li>
+                <li><a href="#">Convenio Microsoft</a></li>
+            </ul>
+
+            <div class="block-title">ELECCIONES</div>
+            <ul class="menu">
+                <li><a href="#">Comprobantes Electrónicos</a></li>
+            </ul>
+
+            <div class="block-title">PASARELA</div>
+            <ul class="menu">
+                <li><a href="#">Alumno</a></li>
+                <li><a href="#">Aula Virtual</a></li>
+                <li><a href="#">GPS Alumni</a></li>
+            </ul>
+
+            <div class="separator"></div>
+            <ul class="menu">
+                <li><a href="#">Biblioteca</a></li>
+                <li><a href="#">Seguro Estudiantil</a></li>
+            </ul>
+
+            <div class="separator"></div>
+            <ul class="menu">
+                <li><a href="#">Recorrido de Buses</a></li>
+            </ul>
+
+            <div class="separator"></div>
+            <ul class="menu">
+                <li><a href="#">Reglamento y Directivas</a></li>
+            </ul>
+
+            <div class="separator"></div>
+            <ul class="menu">
+                <li><a href="#">Becas y Subvenciones</a></li>
+            </ul>
+
+            <div class="block-title">ANUNCIOS</div>
+            <ul class="menu">
+                <li><a href="#">Guía Estudiante</a></li>
+                <li><a href="#">¿Office365@Edu?</a></li>
+                <li><a href="#">C. Institucional</a></li>
+                <li><a href="#">Veritrade</a></li>
+                <li><a href="#">Palestra</a></li>
+                <li><a href="#">Valor del Crédito</a></li>
+            </ul>
         </aside>
 
         <main class="main">
-            <div class="banner">
-                <h1 class="welcome"><span class="accent">Bienvenido a</span> <span class="brand-name">Net.UPT.edu.pe</span> <small class="small-muted">— Información importante</small></h1>
-                <a class="btn" href="#">Ver Directorio</a>
-            </div>
-            <div class="thin-divider"></div>
+            <div class="main-inner">
+                <div class="heading">
+                    <div>
+                        <h1 class="heading-title"><span class="accent">Bienvenido a</span> <span class="brand">Net.UPT.edu.pe</span></h1>
+                        <p class="heading-sub">Información importante</p>
+                    </div>
+                    <button class="btn-blue">Ver Directorio</button>
+                </div>
+                <div class="divider"></div>
 
-            <div class="grid-2">
-                <div>
-                    <div class="card">
-                        <h3 style="color:var(--blue); margin-top:0">Bienvenido al Sistema Académico</h3>
+                <div class="layout">
+                    <div class="layout-left">
+                        <div class="info-card">
+                            <h3>Bienvenido al Sistema Académico</h3>
+                            <p><strong>INFORMACIÓN</strong><br> ¿Tienes problemas con la Intranet? entonces escríbenos a intranet@upt.pe enviando tu código universitario y datos personales.</p>
+
+                            <div class="info-alert" style="margin:14px 0">ACTIVA TU CORREO INSTITUCIONAL UPT.PE hasta el 20/09/2025 (Solo ingresantes)</div>
+
+                            <div class="info-actions">
+                                <button class="btn-main">Cambiar Email</button>
+                                <span><strong>Su cuenta de correo personal es:</strong> <?php echo isset($_SESSION['usuario'])?htmlspecialchars($_SESSION['usuario']):''; ?>@gmail.com</span>
+                            </div>
+
+                            <div style="margin-top:12px">
+                                <button class="btn-blue small" onclick="alert('Función de cambiar contraseña (demo)')">Cambiar Contraseña</button>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h4>ÚLTIMOS ACCESOS</h4>
+                            <ul class="list">
+                                <li>Jueves 2 Octubre del 2025 4:56PM -</li>
+                                <li>Jueves 2 Octubre del 2025 2:46PM -</li>
+                                <li>Lunes 29 Septiembre del 2025 5:09PM -</li>
+                                <li>Jueves 18 Septiembre del 2025 1:58PM -</li>
+                            </ul>
+                        </div>
+
+                        <div class="card">
+                            <h4>INFORMACIÓN ECONÓMICA</h4>
+                            <p>No tiene deuda hasta la fecha</p>
+                            <p style="margin-top:8px"><strong>Deuda Libro:</strong> No tiene deuda de libro hasta la fecha</p>
+                        </div>
+                    </div>
+
+                    <div class="layout-right">
+                        <div class="calendar-card">
+                            <strong>CALENDARIOS ACADÉMICOS</strong>
+                            <div style="margin-top:10px">
+                                <button>2025 - II</button>
+                                <button>2025 - INT</button>
+                                <button>2026 - REC</button>
+                                <button>2026 - I</button>
+                                <button>2026 - II</button>
+                            </div>
+                        </div>
+
+                        <div class="calendar-card" style="margin-top:16px">
+                            <strong>FICHA DE MATRÍCULA</strong>
+                            <p style="margin:8px 0 12px 0">Esta opción estará habilitada hasta la rectificación de matrícula (demo)</p>
+                            <button class="btn-blue" style="width:100%">Descargar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="benefits-section">
+                    <div class="benefits-title">Beneficios</div>
+                    <div class="benefits-divider"></div>
+                    <div class="benefits">
+                        <div class="benefit-box">
+                            <div class="benefit-icon">📶</div>
+                            <div>
+                                <h4 style="margin:0 0 6px 0">Generar Clave WIFI:</h4>
+                                <div class="small-muted">Procedimiento para acceder a UPT_WIFI</div>
+                            </div>
+                            <div class="benefit-action">
+                                <button class="btn-download">Descargar</button>
+                            </div>
+                        </div>
+                        <div class="benefit-box">
+                            <div class="benefit-icon" style="color:#f2a900">🧾</div>
+                            <div>
+                                <h4 style="margin:0 0 6px 0">Ficha de Matrícula</h4>
+                                <div class="small-muted">Esta opción estará habilitada hasta la rectificación de matrícula (demo)</div>
+                            </div>
+                            <div class="benefit-action">
+                                <button class="btn-download">Descargar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tickets" class="card" style="display:none; margin-top:18px">
+                    <h3>🎫 Mis Tickets de Soporte</h3>
+                    <div id="tickets-container" style="min-height:200px">Cargando tus tickets...</div>
+                </div>
+            </div>
+
+            <div id="user-id-data" data-user-id="<?php echo isset($_SESSION['user_id'])?htmlspecialchars($_SESSION['user_id']):''; ?>" style="display:none"></div>
+        </main>
+    </div>
                         <div style="margin-bottom:12px;">
                             <strong>INFORMACIÓN</strong><br>
                             <div class="small-muted">¿Tienes problemas con la Intranet? entonces escríbanos a intranet@upt.pe enviando tu código universitario y datos personales.</div>
