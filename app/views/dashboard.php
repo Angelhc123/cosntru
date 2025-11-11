@@ -20,12 +20,13 @@
         /* Contenedor principal: dejar espacio para header */
         .container{display:block; padding-top:44px; min-height:calc(100vh - 44px); background:#fff}
 
-        /* Sidebar compacto (narrow) */
-        .sidebar{position:fixed; left:0; top:44px; bottom:0; width:200px; background:#0d3b74; color:#fff; padding:6px 0; box-shadow:2px 0 6px rgba(0,0,0,0.06); overflow:auto}
-        .sidebar a{display:block; color:#fff; padding:8px 14px; text-decoration:none; border-bottom:1px solid rgba(255,255,255,0.04); font-size:13px}
-        .sidebar a:hover{background:rgba(255,255,255,0.03)}
-        .sidebar .section-title{padding:10px 14px; font-weight:700; font-size:12px; opacity:0.95}
-        .sidebar .btn{display:block; margin:8px 14px}
+    /* Sidebar compacto (narrow) con estética de la imagen */
+    .sidebar{position:fixed; left:0; top:44px; bottom:0; width:200px; background:#0d3b74; color:#fff; padding:6px 0; box-shadow:2px 0 6px rgba(0,0,0,0.06); overflow:auto}
+    .sidebar .section-title{padding:8px 12px; font-weight:700; font-size:12px; text-transform:uppercase; background:#0b2f66; border-top:1px solid #264c86; border-bottom:1px solid #264c86}
+    .sidebar a{display:block; position:relative; color:#fff; padding:8px 14px 8px 22px; text-decoration:none; font-size:13px; font-weight:600; border-bottom:1px dotted #e8d99d}
+    .sidebar a::before{content:'\203A'; /* › */ position:absolute; left:10px; color:#cfd9ea}
+    .sidebar a[data-star]:after{content:'\2605'; /* ★ */ position:absolute; right:10px; color:#f7c948; font-size:10px}
+    .sidebar a:hover{background:rgba(255,255,255,0.06)}
 
         /* Main: separado del sidebar. Usamos un contenedor interior para centrar contenido similar a la imagen */
         .main{margin-left:220px; padding:14px 20px; min-height:calc(100vh - 44px)}
@@ -50,10 +51,22 @@
 
         .small-muted{color:var(--muted); font-size:12px}
 
-        /* Grid principal: contenido + bloque derecho (calendarios) */
+    /* Grid principal: contenido + bloque derecho (calendarios) */
         .grid-2{display:grid; grid-template-columns:1fr 300px; gap:18px}
         .calendar-box{border:2px solid #bdbdbd; padding:8px; border-radius:2px; background:#f7f7f7}
         .calendar-box .btn{display:block; margin-bottom:8px; text-align:left}
+
+    /* Encabezado secciones grises (BENEFICIOS, etc.) */
+    .section-legend{font-weight:700; color:#6b6b6b; margin:16px 0 8px; text-transform:uppercase}
+    .muted-divider{height:1px; background:#e6e6e6; margin:6px 0 14px}
+
+    /* Beneficios en dos columnas */
+    .benefits{display:flex; align-items:flex-start; gap:48px; margin:10px 0 24px}
+    .benefit{display:flex; align-items:center; gap:18px; flex:1}
+    .benefit .icon{font-size:58px; line-height:1}
+    .benefit.wifi .icon{color:var(--blue)}
+    .benefit.ficha .icon{color:#efb02f}
+    .btn-download{background:#0a2a66; color:#fff; padding:10px 22px; border-radius:2px; font-weight:700; text-decoration:none}
 
         /* Estética de tabla y listas para que se vea compacto */
         ul{margin:0; padding-left:18px}
@@ -71,7 +84,7 @@
 </head>
 <body>
     <div class="topbar">
-        <div class="brand">Net.UPT.edu.pe <small style="font-weight:400; font-size:12px; margin-left:8px;">versión 1.5</small></div>
+    <div class="brand">Net.UPT.edu.pe</div>
         <div class="user">
             <div>Usuario: <?php echo htmlspecialchars(
                 isset($_SESSION['nombre_completo'])?$_SESSION['nombre_completo']:''
@@ -92,7 +105,7 @@
             <a href="#">Calendario</a>
             <a href="#">Matrícula</a>
             <div class="section-title">Servicios</div>
-            <a href="#">Google Workspace</a>
+            <a href="#" data-star="1">Google Workspace</a>
             <a href="#">Office365@Edu</a>
             <a href="#">Convenio Microsoft</a>
             <div class="section-title">Pasarela</div>
@@ -172,32 +185,30 @@
                 </aside>
             </div>
 
-            <!-- Tickets section (kept but hidden by default and preserved JS hooks) -->
-            <!-- BENEFICIOS: Generar Clave WIFI + Ficha de Matrícula (se muestra bajo el grid principal) -->
+            <!-- Encabezado y bloque de beneficios en dos columnas -->
             <div class="content-inner">
-                <div class="card" style="display:flex; align-items:center; gap:18px">
-                    <div style="flex:0 0 120px; text-align:center">
-                        <div style="font-size:48px; color:var(--blue)">📶</div>
+                <div class="section-legend">Beneficios</div>
+                <div class="muted-divider"></div>
+                <div class="benefits">
+                    <div class="benefit wifi">
+                        <div class="icon">📶</div>
+                        <div class="info" style="flex:1">
+                            <h4 style="margin:0 0 6px 0">GENERAR CLAVE WIFI:</h4>
+                            <div class="small-muted">Procedimiento para acceder a UPT_WIFI</div>
+                        </div>
+                        <div style="flex:0 0 150px; text-align:right">
+                            <a class="btn-download" href="#">Descargar</a>
+                        </div>
                     </div>
-                    <div style="flex:1">
-                        <h4 style="margin:0 0 8px 0">GENERAR CLAVE WIFI:</h4>
-                        <div class="small-muted">Procedimiento para acceder a UPT_WIFI</div>
-                    </div>
-                    <div style="flex:0 0 140px; text-align:right">
-                        <a class="btn" href="#">Descargar</a>
-                    </div>
-                </div>
-
-                <div class="card" style="display:flex; align-items:center; gap:18px; margin-top:16px">
-                    <div style="flex:0 0 80px; text-align:center">
-                        <div style="font-size:40px; color:#efb02f">🧾</div>
-                    </div>
-                    <div style="flex:1">
-                        <h4 style="margin:0 0 8px 0">FICHA DE MATRÍCULA</h4>
-                        <div class="small-muted">Esta opción estará habilitada hasta la rectificación de matrícula (demo)</div>
-                    </div>
-                    <div style="flex:0 0 140px; text-align:right">
-                        <a class="btn" href="#">Descargar</a>
+                    <div class="benefit ficha">
+                        <div class="icon">🧾</div>
+                        <div class="info" style="flex:1">
+                            <h4 style="margin:0 0 6px 0">FICHA DE MATRÍCULA</h4>
+                            <div class="small-muted">Esta opción estará habilitada hasta la rectificación de matrícula (demo)</div>
+                        </div>
+                        <div style="flex:0 0 150px; text-align:right">
+                            <a class="btn-download" href="#">Descargar</a>
+                        </div>
                     </div>
                 </div>
             </div>
