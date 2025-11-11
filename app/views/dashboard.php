@@ -29,88 +29,72 @@
         }
         }
 
-        .global-bar{
-            background:#ffffff;
-            color:var(--navy-dark);
+        .top-strip{
+            background:var(--navy-dark);
+            color:#fff;
             display:flex;
             justify-content:space-between;
-            align-items:flex-start;
-            padding:12px 32px 10px;
+            align-items:center;
+            padding:8px 26px;
             font-size:12px;
             flex-wrap:wrap;
-            gap:16px;
+            gap:18px;
             width:100%;
-            border-bottom:2px solid #d5d9df;
+            box-shadow:0 2px 4px rgba(0,0,0,0.25);
         }
 
-        .global-left{
-            display:flex;
-            flex-direction:column;
-            gap:4px;
-        }
-
-        .global-brand{
-            display:flex;
-            align-items:center;
-            gap:6px;
-            font-weight:700;
-            font-size:15px;
-        }
-
-        .global-brand .indicator{
-            width:12px;
-            height:12px;
-            border:2px solid var(--navy-dark);
-            background:#fdfdfd;
-            display:inline-block;
-        }
-
-        .global-user{
-            display:flex;
-            align-items:center;
-            gap:10px;
-        }
-
-        .global-user-actions{
+        .top-strip__left{
             display:flex;
             align-items:center;
             gap:8px;
-        }
-
-        .global-user-actions a{
-            text-decoration:none;
             font-weight:700;
-            color:var(--navy-dark);
-            display:inline-flex;
-            align-items:center;
-            gap:4px;
-            font-size:12px;
         }
 
-        .global-user-actions a.help{
-            color:#c21807;
+        .top-strip__left .brand{
+            font-size:18px;
         }
 
-        .global-user-actions a.help::before{
-            content:'?';
-            font-weight:700;
-            font-size:14px;
+        .top-strip__left .indicator{
+            width:14px;
+            height:14px;
+            border:2px solid #fff;
+            background:transparent;
+            display:inline-block;
         }
 
-        .global-user-actions a.logout::before{
-            content:'\23FB';
-            font-size:13px;
-        }
-
-        .global-right{
+        .top-strip__center{
             display:flex;
-            align-items:flex-end;
-            gap:16px;
+            align-items:center;
+            gap:14px;
             flex-wrap:wrap;
         }
 
-        .global-right .system-time{
-            font-weight:700;
+        .top-strip__center .user{
+            font-weight:600;
+        }
+
+        .top-strip__center a{
+            color:#fff;
+            text-decoration:none;
+            font-weight:600;
+            display:inline-flex;
+            align-items:center;
+            gap:4px;
+        }
+
+        .top-strip__center a .icon{
+            font-size:14px;
+        }
+
+        .top-strip__right{
+            display:flex;
+            align-items:center;
+            gap:6px;
+            font-weight:600;
+        }
+
+        .top-strip__right .icon{
+            font-size:14px;
         }
 
         .page{
@@ -514,7 +498,7 @@
         }
 
         @media(max-width:1100px){
-            .global-bar{
+            .top-strip{
                 justify-content:center;
             }
 
@@ -572,19 +556,20 @@
         $nombreCompleto = isset($_SESSION['nombre_completo']) && $_SESSION['nombre_completo'] !== '' ? htmlspecialchars($_SESSION['nombre_completo']) : $usuario;
         $emailPersonal = isset($_SESSION['email_personal']) && $_SESSION['email_personal'] !== '' ? htmlspecialchars($_SESSION['email_personal']) : '';
     ?>
-    <header class="global-bar">
-        <div class="global-left">
-            <div class="global-brand">Net.UPT.edu.pe <span class="indicator" aria-hidden="true"></span></div>
-            <div class="global-user">
-                <span>Usuario: <strong><?php echo $nombreCompleto; ?></strong></span>
-                <div class="global-user-actions">
-                    <a class="help" href="#">Ayuda</a>
-                    <a class="logout" href="logout.php">Finalizar</a>
-                </div>
-            </div>
+    <header class="top-strip">
+        <div class="top-strip__left">
+            <span class="brand">Net.UPT.edu.pe</span>
+            <span class="indicator" aria-hidden="true"></span>
         </div>
-        <div class="global-right">
-            <span class="system-time">Hora del sistema: <span id="sys-time">--:--:--</span></span>
+        <div class="top-strip__center">
+            <span class="user">Usuario: <strong><?php echo $nombreCompleto; ?></strong></span>
+            <a href="#"><span class="icon">?</span>Ayuda</a>
+            <a href="logout.php"><span class="icon">⏻</span>Finalizar</a>
+        </div>
+        <div class="top-strip__right">
+            <span class="icon">🕒</span>
+            <span>Hora del sistema:</span>
+            <span id="sys-time">--:--:--</span>
         </div>
     </header>
 
