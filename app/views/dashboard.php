@@ -44,7 +44,9 @@
         /* Botones pequeños (estilo intranet clásico) */
         .btn{background:var(--blue); color:#fff; padding:6px 10px; border-radius:2px; text-decoration:none; display:inline-block; font-size:12px}
         .btn.secondary{background:#e9ecef; color:#212529; border:1px solid #cfcfcf}
-        .logout-btn{background:#e74c3c;color:#fff;padding:6px 10px;border-radius:2px;text-decoration:none}
+    .logout-btn{background:#e74c3c;color:#fff;padding:6px 10px;border-radius:2px;text-decoration:none}
+    /* Topbar link style (used for Cerrar Sesión) */
+    .top-link{color:#fff; text-decoration:none; font-weight:600}
 
         .small-muted{color:var(--muted); font-size:12px}
 
@@ -75,9 +77,9 @@
                 isset($_SESSION['nombre_completo'])?$_SESSION['nombre_completo']:''
             ); ?></div>
             <div class="small-muted">Ayuda</div>
-            <div class="small-muted">Finalizar</div>
-            <div class="small-muted">⏰ Hora del sistema: <?php echo date('H:i:s'); ?></div>
-            <a href="logout.php" class="logout-btn">Cerrar Sesión</a>
+            <!-- Reemplazamos "Finalizar" por un enlace de Cerrar Sesión para evitar duplicados -->
+            <div class="small-muted"><a href="logout.php" class="top-link">Cerrar Sesión</a></div>
+            <div class="small-muted">⏰ Hora del sistema: <span id="sys-time"><?php echo date('H:i:s'); ?></span></div>
         </div>
     </div>
 
@@ -101,9 +103,7 @@
             <a href="#">Guía Estudiante</a>
             <a href="#">Ofertas</a>
             <!-- botones sin redirección, solo UI -->
-            <div style="padding:12px 18px;">
-                <a class="btn" href="#">Generar Clave WIFI</a>
-            </div>
+            <!-- Generar Clave WIFI movido a la sección de beneficios en el main -->
         </aside>
 
         <main class="main">
@@ -173,6 +173,34 @@
             </div>
 
             <!-- Tickets section (kept but hidden by default and preserved JS hooks) -->
+            <!-- BENEFICIOS: Generar Clave WIFI + Ficha de Matrícula (se muestra bajo el grid principal) -->
+            <div class="content-inner">
+                <div class="card" style="display:flex; align-items:center; gap:18px">
+                    <div style="flex:0 0 120px; text-align:center">
+                        <div style="font-size:48px; color:var(--blue)">📶</div>
+                    </div>
+                    <div style="flex:1">
+                        <h4 style="margin:0 0 8px 0">GENERAR CLAVE WIFI:</h4>
+                        <div class="small-muted">Procedimiento para acceder a UPT_WIFI</div>
+                    </div>
+                    <div style="flex:0 0 140px; text-align:right">
+                        <a class="btn" href="#">Descargar</a>
+                    </div>
+                </div>
+
+                <div class="card" style="display:flex; align-items:center; gap:18px; margin-top:16px">
+                    <div style="flex:0 0 80px; text-align:center">
+                        <div style="font-size:40px; color:#efb02f">🧾</div>
+                    </div>
+                    <div style="flex:1">
+                        <h4 style="margin:0 0 8px 0">FICHA DE MATRÍCULA</h4>
+                        <div class="small-muted">Esta opción estará habilitada hasta la rectificación de matrícula (demo)</div>
+                    </div>
+                    <div style="flex:0 0 140px; text-align:right">
+                        <a class="btn" href="#">Descargar</a>
+                    </div>
+                </div>
+            </div>
             <div id="tickets" style="display:none; margin-top:18px" class="card">
                 <h3>🎫 Mis Tickets de Soporte</h3>
                 <div id="tickets-container" style="min-height:200px">Cargando tus tickets...</div>
@@ -187,5 +215,21 @@
     <script src="js/config.js"></script>
     <script src="js/tickets-user.js"></script>
     <script src="js/chatbox-with-history.js"></script>
+    <script>
+        // Actualiza la hora del sistema en tiempo real cada segundo
+        (function(){
+            const el = document.getElementById('sys-time');
+            if(!el) return;
+            function pad(n){return n<10? '0'+n : n}
+            function update(){
+                const d = new Date();
+                // Formato HH:MM:SS
+                const s = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+                el.textContent = s;
+            }
+            update();
+            setInterval(update,1000);
+        })();
+    </script>
 </body>
 </html>
