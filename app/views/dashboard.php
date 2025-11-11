@@ -7,28 +7,64 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/chatbox-with-history.css">
     <style>
-        /* Estilos básicos para imitar el look de intranet-upt */
-        :root{ --blue:#103a78; --navy:#052a57; --accent:#ffc107; }
-        body{font-family: Arial, Helvetica, sans-serif; margin:0; background:#f2f4f7; color:#222}
-        .topbar{background:var(--navy); color:#fff; padding:10px 20px; display:flex; align-items:center; justify-content:space-between}
-        .topbar .brand{font-size:20px; font-weight:700}
-        .topbar .user{font-size:13px; display:flex; gap:16px; align-items:center}
-        .container{display:flex; min-height:calc(100vh - 52px)}
-        .sidebar{width:240px; background:#0d3b74; color:#fff; padding:10px 0; box-shadow:2px 0 6px rgba(0,0,0,0.05)}
-        .sidebar a{display:block; color:#fff; padding:10px 18px; text-decoration:none; border-bottom:1px solid rgba(255,255,255,0.03)}
+        /* Estilos refinados para asemejarse a la imagen: compact, lineal y con contraste */
+        :root{ --blue:#103a78; --navy:#0a2a66; --accent:#efb02f; --muted:#6c757d }
+        html,body{height:100%;}
+        body{font-family: Arial, Helvetica, sans-serif; margin:0; background:#fff; color:#222; font-size:13px}
+
+        /* Topbar (más compacta) */
+        .topbar{background:var(--navy); color:#fff; padding:6px 18px; display:flex; align-items:center; justify-content:space-between; position:fixed; top:0; left:0; right:0; height:44px; z-index:1000}
+        .topbar .brand{font-size:16px; font-weight:700}
+        .topbar .user{font-size:12px; display:flex; gap:14px; align-items:center}
+
+        /* Contenedor principal: dejar espacio para header */
+        .container{display:block; padding-top:44px; min-height:calc(100vh - 44px); background:#fff}
+
+        /* Sidebar compacto (narrow) */
+        .sidebar{position:fixed; left:0; top:44px; bottom:0; width:200px; background:#0d3b74; color:#fff; padding:6px 0; box-shadow:2px 0 6px rgba(0,0,0,0.06); overflow:auto}
+        .sidebar a{display:block; color:#fff; padding:8px 14px; text-decoration:none; border-bottom:1px solid rgba(255,255,255,0.04); font-size:13px}
         .sidebar a:hover{background:rgba(255,255,255,0.03)}
-        .sidebar .section-title{padding:12px 18px; font-weight:700; font-size:12px; opacity:0.9}
-        .main{flex:1; padding:20px}
-        .card{background:#fff; border-radius:4px; padding:18px; box-shadow:0 1px 3px rgba(0,0,0,0.06); margin-bottom:18px}
-        .banner{display:flex; justify-content:space-between; align-items:center; gap:12px}
-        .banner .text{font-weight:700; color:#1e3c72}
-        .btn{background:var(--blue); color:#fff; padding:8px 12px; border-radius:4px; text-decoration:none}
-        .small-muted{color:#6c757d; font-size:13px}
-        .grid-2{display:grid; grid-template-columns:1fr 360px; gap:18px}
-        .calendar-box{border:1px solid #ddd; padding:12px; border-radius:4px; background:#fafafa}
-        /* preserve existing controls look */
-        .logout-btn{background:#e74c3c;color:#fff;padding:6px 10px;border-radius:4px;text-decoration:none}
-        @media(max-width:900px){.grid-2{grid-template-columns:1fr}}
+        .sidebar .section-title{padding:10px 14px; font-weight:700; font-size:12px; opacity:0.95}
+        .sidebar .btn{display:block; margin:8px 14px}
+
+        /* Main: separado del sidebar. Usamos un contenedor interior para centrar contenido similar a la imagen */
+        .main{margin-left:220px; padding:14px 20px; min-height:calc(100vh - 44px)}
+        .main .content-inner{max-width:980px; margin:0 auto}
+
+        /* Welcome header estilo similar a la imagen */
+        .banner{background:transparent; padding:6px 0; margin-bottom:6px}
+        .banner .text{font-weight:700; color:var(--accent); font-size:22px}
+        .page-sub{display:block; margin-top:6px; color:#222; font-size:12px}
+        .thin-divider{height:4px; background:var(--navy); margin:8px 0 18px 0}
+
+        /* Tarjetas compactas */
+        .card{background:#fff; border-radius:2px; padding:12px; box-shadow:none; border-top:1px solid #e6e6e6; margin-bottom:14px}
+        .card h3, .card h4{margin-top:0}
+
+        /* Botones pequeños (estilo intranet clásico) */
+        .btn{background:var(--blue); color:#fff; padding:6px 10px; border-radius:2px; text-decoration:none; display:inline-block; font-size:12px}
+        .btn.secondary{background:#e9ecef; color:#212529; border:1px solid #cfcfcf}
+        .logout-btn{background:#e74c3c;color:#fff;padding:6px 10px;border-radius:2px;text-decoration:none}
+
+        .small-muted{color:var(--muted); font-size:12px}
+
+        /* Grid principal: contenido + bloque derecho (calendarios) */
+        .grid-2{display:grid; grid-template-columns:1fr 300px; gap:18px}
+        .calendar-box{border:2px solid #bdbdbd; padding:8px; border-radius:2px; background:#f7f7f7}
+        .calendar-box .btn{display:block; margin-bottom:8px; text-align:left}
+
+        /* Estética de tabla y listas para que se vea compacto */
+        ul{margin:0; padding-left:18px}
+        table{width:100%; border-collapse:collapse; font-size:13px}
+        table td, table th{padding:6px; border:1px solid #eee}
+
+        /* Responsive: colapsar sidebar y recolocar contenido */
+        @media(max-width:1000px){
+            .sidebar{position:static; width:100%; height:auto}
+            .main{margin-left:0; padding:12px}
+            .main .content-inner{max-width:100%}
+            .grid-2{grid-template-columns:1fr}
+        }
     </style>
 </head>
 <body>
