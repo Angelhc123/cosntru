@@ -26,71 +26,49 @@
             color:var(--text);
         }
 
+        .system-bar{
+            background:var(--navy-dark);
+            color:#fff;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:6px 28px;
+            font-size:12px;
+            flex-wrap:wrap;
+            gap:12px;
+        }
+
+        .system-bar__left{
+            font-size:20px;
+            font-weight:700;
+            letter-spacing:-0.3px;
+        }
+
+        .system-bar__right{
+            display:flex;
+            align-items:center;
+            gap:16px;
+            flex-wrap:wrap;
+        }
+
+        .system-bar__right a{
+            color:#fff;
+            text-decoration:underline;
+            font-weight:600;
+        }
+
+        .system-bar__user strong{
+            font-weight:700;
+        }
+
+        .system-bar__time{
+            font-weight:600;
+        }
+
         .page{
             display:flex;
             min-height:100vh;
             background:#ffffff;
-        }
-
-        .top-header{
-            padding:14px 32px 10px;
-            border-bottom:3px double var(--navy-dark);
-            border-top:4px solid transparent;
-            display:flex;
-            justify-content:space-between;
-            align-items:flex-start;
-            gap:24px;
-        }
-
-        .top-title{
-            margin:0;
-            font-size:28px;
-            font-weight:700;
-            letter-spacing:-0.4px;
-        }
-
-        .top-title .accent{
-            color:var(--accent);
-        }
-
-        .top-title .brand{
-            color:var(--navy-dark);
-        }
-
-        .top-meta{
-            display:flex;
-            align-items:flex-end;
-            gap:8px;
-            font-size:11px;
-            color:var(--navy-dark);
-            font-weight:700;
-        }
-
-        .top-meta .badge{
-            width:16px;
-            height:16px;
-            background:var(--navy-dark);
-            border:2px solid #fff;
-            box-shadow:0 0 0 1px var(--navy-dark);
-            display:inline-block;
-        }
-
-        .user-bar{
-            display:flex;
-            align-items:center;
-            gap:14px;
-            margin-top:4px;
-        }
-
-        .user-bar .username{
-            font-weight:700;
-            color:var(--navy-dark);
-        }
-
-        .user-bar a{
-            color:var(--navy-dark);
-            font-weight:700;
-            text-decoration:underline;
         }
 
         /* Sidebar */
@@ -167,42 +145,68 @@
         /* Contenido principal */
         .content{
             flex:1;
-            padding:26px 32px 40px;
+            padding:28px 34px 44px;
         }
 
-        .section-lead{
+        .main-header{
             display:flex;
             justify-content:space-between;
-            align-items:flex-start;
+            align-items:flex-end;
             gap:20px;
-            margin-top:18px;
         }
 
-        .section-lead .title{
+        .welcome-title{
             margin:0;
-            font-size:26px;
+            font-size:30px;
             font-weight:700;
-            letter-spacing:-0.3px;
+            letter-spacing:-0.4px;
         }
 
-        .section-lead .subtitle{
-            margin:2px 0 0;
+        .welcome-title .accent{
+            color:var(--accent);
+        }
+
+        .welcome-title .brand{
+            color:var(--navy-dark);
+        }
+
+        .version-info{
+            display:flex;
+            align-items:center;
+            gap:8px;
+            font-size:11px;
+            color:var(--navy-dark);
+            font-weight:700;
+            margin-top:4px;
+        }
+
+        .version-info .badge{
+            width:16px;
+            height:16px;
+            background:var(--navy-dark);
+            border:2px solid #fff;
+            box-shadow:0 0 0 1px var(--navy-dark);
+            display:inline-block;
+        }
+
+        .info-subtitle{
+            margin:4px 0 0;
             color:#4a4a4a;
             font-style:italic;
             font-size:12px;
         }
 
-        .section-lead a{
+        .directory-link{
             color:var(--navy-dark);
             font-weight:700;
             text-decoration:underline;
-            margin-top:4px;
+            font-size:13px;
         }
 
         .divider{
-            height:3px;
+            height:2px;
             background:var(--navy-dark);
-            margin:12px 0 20px;
+            margin:16px 0 24px;
         }
 
         .content-grid{
@@ -260,19 +264,22 @@
         }
 
         .banner{
-            margin:16px 0 18px;
+            margin:18px 0 20px;
             background:var(--navy-dark);
             color:#fff;
             padding:12px 18px;
             font-weight:700;
             text-transform:uppercase;
             font-size:13px;
+            display:flex;
+            flex-wrap:wrap;
+            gap:6px;
         }
 
         .banner a{
             color:#fff;
             text-decoration:underline;
-            margin-left:6px;
+            font-weight:700;
         }
 
         .email-row{
@@ -294,6 +301,7 @@
             min-width:220px;
             font-size:13px;
             background:#f7f7f7;
+            color:#1f1f1f;
         }
 
         .btn-primary{
@@ -319,12 +327,34 @@
         .password-row .note{
             font-weight:600;
             color:#1f1f1f;
+            font-size:13px;
         }
 
         .list{
             margin:0;
             padding-left:18px;
             color:#333;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            margin-top:12px;
+            font-size:12px;
+        }
+
+        th,
+        td{
+            border:1px solid #d0d4d9;
+            padding:6px 8px;
+        }
+
+        th{
+            background:#f4f4f5;
+            color:#4a4a4a;
+            text-transform:uppercase;
+            font-weight:700;
+            letter-spacing:0.3px;
         }
 
         .calendar-card{
@@ -334,7 +364,7 @@
 
         .calendar-card strong{
             display:block;
-            margin-bottom:10px;
+            margin-bottom:12px;
             color:#6b6b6b;
             font-weight:700;
         }
@@ -363,8 +393,13 @@
             margin:0 0 12px;
         }
 
+        .record-card .btn-primary{
+            width:100%;
+            justify-content:center;
+        }
+
         .benefits-area{
-            margin-top:32px;
+            margin-top:36px;
         }
 
         .benefits-area h4{
@@ -396,7 +431,7 @@
         .benefit-card .icon{
             width:90px;
             text-align:center;
-            font-size:60px;
+            font-size:56px;
             color:var(--navy-dark);
         }
 
@@ -407,17 +442,17 @@
             text-transform:uppercase;
         }
 
+        .benefit-card .info .small-muted{
+            font-size:12px;
+            color:#444;
+        }
+
         .benefit-card .download{
             margin-left:auto;
         }
 
         .download .btn-primary{
             padding:10px 20px;
-        }
-
-        .record-card .btn-primary{
-            width:100%;
-            justify-content:center;
         }
 
         .tickets-card{
@@ -430,6 +465,10 @@
         }
 
         @media(max-width:1100px){
+            .system-bar{
+                justify-content:center;
+            }
+
             .page{
                 flex-direction:column;
             }
@@ -453,6 +492,7 @@
 
             .benefits-list{
                 flex-direction:column;
+                gap:20px;
             }
 
             .email-row{
@@ -468,22 +508,28 @@
                 flex-direction:column;
                 align-items:flex-start;
             }
+
+            .main-header{
+                flex-direction:column;
+                align-items:flex-start;
+                gap:12px;
+            }
         }
     </style>
 </head>
 <body>
-    <?php $usuario = isset($_SESSION['usuario']) ? htmlspecialchars($_SESSION['usuario']) : 'Invitado'; ?>
-    <header class="top-header">
-        <div>
-            <h1 class="top-title"><span class="accent">Bienvenido a</span> <span class="brand">Net.UPT.edu.pe</span></h1>
-            <div class="top-meta">
-                <span>versión 1.5 by Of. Tecnologías de la Información</span>
-                <span class="badge"></span>
-            </div>
-        </div>
-        <div class="user-bar">
-            <span class="username">Usuario: <?php echo $usuario; ?></span>
-            <a href="logout.php">Cerrar sesión</a>
+    <?php
+        $usuario = isset($_SESSION['usuario']) ? htmlspecialchars($_SESSION['usuario']) : 'Invitado';
+        $nombreCompleto = isset($_SESSION['nombre_completo']) && $_SESSION['nombre_completo'] !== '' ? htmlspecialchars($_SESSION['nombre_completo']) : $usuario;
+        $emailPersonal = isset($_SESSION['email_personal']) && $_SESSION['email_personal'] !== '' ? htmlspecialchars($_SESSION['email_personal']) : '';
+    ?>
+    <header class="system-bar">
+        <div class="system-bar__left">Net.UPT.edu.pe</div>
+        <div class="system-bar__right">
+            <span class="system-bar__user">Usuario: <strong><?php echo $nombreCompleto; ?></strong></span>
+            <a href="#">Ayuda</a>
+            <a href="logout.php">Finalizar</a>
+            <span class="system-bar__time">Hora del sistema: <span id="sys-time">--:--:--</span></span>
         </div>
     </header>
 
@@ -546,12 +592,16 @@
         </aside>
 
         <main class="content">
-            <div class="section-lead">
+            <div class="main-header">
                 <div>
-                    <h2 class="title">Bienvenido al Sistema Académico</h2>
-                    <p class="subtitle">Información importante</p>
+                    <h1 class="welcome-title"><span class="accent">Bienvenido a</span> <span class="brand">Net.UPT.edu.pe</span></h1>
+                    <div class="version-info">
+                        <span>versión 1.5 by Of. Tecnologías de la Información</span>
+                        <span class="badge"></span>
+                    </div>
+                    <div class="info-subtitle">Información importante</div>
                 </div>
-                <a href="#">Ver Directorio</a>
+                <a class="directory-link" href="#">Ver Directorio</a>
             </div>
 
             <div class="divider"></div>
@@ -565,19 +615,19 @@
                         <p class="info-text"><strong>¿Tienes problemas con tu cuenta de Google?</strong> entonces escríbenos a soportegsuite@virtual.upt.pe enviando tu código universitario y datos personales.</p>
 
                         <div class="banner">
-                            ACTIVA TU CORREO INSTITUCIONAL UPT.PE hasta el 20/09/2025
+                            <span>ACTIVA TU CORREO INSTITUCIONAL UPT.PE hasta el 20/09/2025</span>
                             <a href="#">Ingrese aquí (Solo para estudiantes ingresantes)</a>
                         </div>
 
                         <div class="email-row">
                             <label for="personal-email">Su cuenta de correo personal es:</label>
-                            <input id="personal-email" type="text" value="<?php echo isset($_SESSION['correo_personal'])?htmlspecialchars($_SESSION['correo_personal']):$usuario; ?>" readonly>
-                            <button class="btn-primary" type="button">🔒 Cambiar Email</button>
+                            <input id="personal-email" type="text" value="<?php echo $emailPersonal !== '' ? $emailPersonal : $usuario . '@gmail.com'; ?>" readonly>
+                            <button class="btn-primary" type="button">&#128274; Cambiar Email</button>
                         </div>
 
                         <div class="password-row">
                             <div class="note">Seleccione el botón si desea cambiar su contraseña de la Intranet:</div>
-                            <button class="btn-primary" type="button" onclick="alert('Función de cambiar contraseña (demo)')">� Cambiar Contraseña</button>
+                            <button class="btn-primary" type="button" onclick="alert('Función de cambiar contraseña (demo)')">&#128274; Cambiar Contraseña</button>
                         </div>
                     </div>
 
@@ -651,7 +701,7 @@
                         <div class="icon" style="color:var(--accent);">🧾</div>
                         <div class="info">
                             <h5>FICHA DE MATRÍCULA</h5>
-                            <div class="small-muted">Esta opción estará habilitada hasta la rectificación de matrícula (demo)</div>
+                            <div class="small-muted"><strong>NOTA:</strong> Esta opción estará habilitada hasta la rectificación de matrícula (demo)</div>
                         </div>
                         <div class="download"><button class="btn-primary" type="button">⬇ Descargar</button></div>
                     </article>
