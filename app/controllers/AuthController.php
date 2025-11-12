@@ -138,6 +138,14 @@ class AuthController {
         include '../app/views/dashboard.php';
     }
 
+    public function academicoModule() {
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: login.php");
+            exit();
+        }
+        include '../app/views/academico.php';
+    }
+
     private function createDemoUser() {
         // Verificar si ya existe un usuario demo
         $query = "SELECT COUNT(*) as count FROM usuarios WHERE usuario = 'demo'";

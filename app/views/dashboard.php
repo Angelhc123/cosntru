@@ -621,7 +621,7 @@
         <aside class="sidebar">
             <ul class="menu">
                 <li><a class="menu-item menu-item--highlight" href="#">Inicio</a></li>
-                <li><a class="menu-item menu-item--uppercase" href="#">ACADÉMICO</a></li>
+                <li><a class="menu-item menu-item--uppercase" href="academico.php" target="_blank" rel="noopener noreferrer">ACADÉMICO</a></li>
                 <li><a class="menu-item menu-item--highlight" href="#" data-star="1">Google Workspace</a></li>
                 <li><a class="menu-item" href="#">Office365@Edu</a></li>
                 <li><a class="menu-item" href="#">Convenio Microsoft</a></li>
