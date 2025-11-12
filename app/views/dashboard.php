@@ -814,13 +814,11 @@
                 <li><a class="menu-item" href="https://azure.microsoft.com/es-es/get-started/azure-portal/" target="_blank" rel="noopener noreferrer">Convenio Microsoft</a></li>
                 <li class="menu-separator"></li>
                 <li><a class="menu-item menu-item--highlight menu-item--uppercase" href="#">ELECCIONES</a></li>
-                <li><a class="menu-item" href="#">Comprobantes Electrónicos</a></li>
-                <li class="menu-separator"></li>
                 <li><a class="menu-item menu-item--highlight menu-item--uppercase" href="#">PASARELA</a></li>
                 <li><a class="menu-item" href="#">Alumno</a></li>
                 <li><a class="menu-item" href="https://aulavirtual.upt.edu.pe/" target="_blank" rel="noopener noreferrer">Aula Virtual</a></li>
                 <li><a class="menu-item menu-item--highlight menu-item--uppercase" href="academico.php" target="_blank" rel="noopener noreferrer">GPS ALUMNI</a></li>
-                <li class="menu-separator"></li>
+                <li><a class="menu-item" href="#">Comprobantes Electrónicos</a></li>
                 <li><a class="menu-item" href="#">Biblioteca</a></li>
                 <li><a class="menu-item" href="#" data-modal-target="modal-seguro">Seguro Estudiantil</a></li>
                 <li><a class="menu-item" href="#" data-modal-target="modal-buses">Recorrido de Buses</a></li>
