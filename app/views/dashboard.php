@@ -116,18 +116,6 @@
             border-right:1px solid #d0d4d9;
         }
 
-        .sidebar .block-title{
-            padding:8px 14px;
-            font-weight:700;
-            font-size:12px;
-            text-transform:uppercase;
-            background:var(--navy-dark);
-            color:#fff;
-            border-top:1px solid rgba(255,255,255,0.35);
-            border-bottom:1px solid rgba(0,0,0,0.35);
-            letter-spacing:0.4px;
-        }
-
         .sidebar ul{
             list-style:none;
             margin:0;
@@ -136,14 +124,19 @@
 
         .sidebar li{
             border-bottom:1px dotted #d4b45a;
-            background:#ffffff;
         }
 
         .sidebar li:last-child{
             border-bottom:none;
         }
 
-        .sidebar a{
+        .sidebar li.menu-separator{
+            height:0;
+            margin:6px 0;
+            border-bottom:1px dotted #d4b45a;
+        }
+
+        .sidebar .menu-item{
             display:block;
             padding:7px 18px 7px 32px;
             color:var(--navy-dark);
@@ -153,8 +146,8 @@
             transition:color 0.2s ease;
         }
 
-        .sidebar a::before{
-            content:'\003E';
+        .sidebar .menu-item::before{
+            content:'>';
             position:absolute;
             left:14px;
             top:50%;
@@ -164,7 +157,7 @@
             font-weight:700;
         }
 
-        .sidebar a[data-star]::after{
+        .sidebar .menu-item[data-star]::after{
             content:'\2605';
             position:absolute;
             right:14px;
@@ -174,19 +167,46 @@
             font-size:12px;
         }
 
-        .sidebar a:hover{
+        .sidebar .menu-item:hover{
             color:#f6b541;
         }
 
-        .sidebar a:hover::before{
+        .sidebar .menu-item:hover::before{
             color:#f6b541;
         }
 
-        .sidebar .separator{
-            height:1px;
-            background:transparent;
-            border-top:1px dotted #d4b45a;
-            margin:10px 0;
+        .menu-item--highlight{
+            background:var(--navy-dark);
+            color:#ffffff;
+        }
+
+        .menu-item--highlight::before{
+            color:#ffffff;
+        }
+
+        .menu-item--highlight:hover{
+            color:#f5d88b;
+        }
+
+        .menu-item--highlight:hover::before{
+            color:#f5d88b;
+        }
+
+        .menu-item--uppercase{
+            text-transform:uppercase;
+            letter-spacing:0.25px;
+        }
+
+        .menu-item--label{
+            cursor:default;
+        }
+
+        .menu-item--label::before{
+            display:none;
+        }
+
+        .menu-item--label:hover{
+            color:#f5d88b;
         }
 
         /* Contenido principal */
@@ -590,59 +610,34 @@
 
     <div class="page">
         <aside class="sidebar">
-            <div class="block-title">INICIO</div>
             <ul class="menu">
-                <li><a href="#">Inicio</a></li>
-            </ul>
-
-            <div class="block-title">ACADÉMICO</div>
-            <ul class="menu">
-                <li><a href="#" data-star="1">Google Workspace</a></li>
-                <li><a href="#">Office365@Edu</a></li>
-                <li><a href="#">Convenio Microsoft</a></li>
-            </ul>
-
-            <div class="block-title">ELECCIONES</div>
-            <ul class="menu">
-                <li><a href="#">Comprobantes Electrónicos</a></li>
-            </ul>
-
-            <div class="block-title">PASARELA</div>
-            <ul class="menu">
-                <li><a href="#">Alumno</a></li>
-                <li><a href="#">Aula Virtual</a></li>
-                <li><a href="#">GPS Alumni</a></li>
-            </ul>
-
-            <div class="separator"></div>
-            <ul class="menu">
-                <li><a href="#">Biblioteca</a></li>
-                <li><a href="#">Seguro Estudiantil</a></li>
-            </ul>
-
-            <div class="separator"></div>
-            <ul class="menu">
-                <li><a href="#">Recorrido de Buses</a></li>
-            </ul>
-
-            <div class="separator"></div>
-            <ul class="menu">
-                <li><a href="#">Reglamento y Directivas</a></li>
-            </ul>
-
-            <div class="separator"></div>
-            <ul class="menu">
-                <li><a href="#">Becas y Subvenciones</a></li>
-            </ul>
-
-            <div class="block-title">ANUNCIOS</div>
-            <ul class="menu">
-                <li><a href="#">Guía Estudiante</a></li>
-                <li><a href="#">¿Office365@Edu?</a></li>
-                <li><a href="#">C. Institucional</a></li>
-                <li><a href="#">Veritrade</a></li>
-                <li><a href="#">Palestra</a></li>
-                <li><a href="#">Valor del Crédito</a></li>
+                <li><a class="menu-item menu-item--highlight" href="#">Inicio</a></li>
+                <li><a class="menu-item menu-item--uppercase" href="#">ACADÉMICO</a></li>
+                <li><a class="menu-item menu-item--highlight" href="#" data-star="1">Google Workspace</a></li>
+                <li><a class="menu-item" href="#">Office365@Edu</a></li>
+                <li><a class="menu-item" href="#">Convenio Microsoft</a></li>
+                <li class="menu-separator"></li>
+                <li><a class="menu-item menu-item--highlight menu-item--uppercase" href="#">ELECCIONES</a></li>
+                <li><a class="menu-item" href="#">Comprobantes Electrónicos</a></li>
+                <li class="menu-separator"></li>
+                <li><a class="menu-item menu-item--highlight menu-item--uppercase" href="#">PASARELA</a></li>
+                <li><a class="menu-item" href="#">Alumno</a></li>
+                <li><a class="menu-item" href="#">Aula Virtual</a></li>
+                <li><a class="menu-item menu-item--highlight menu-item--uppercase" href="#">GPS ALUMNI</a></li>
+                <li class="menu-separator"></li>
+                <li><a class="menu-item" href="#">Biblioteca</a></li>
+                <li><a class="menu-item" href="#">Seguro Estudiantil</a></li>
+                <li><a class="menu-item" href="#">Recorrido de Buses</a></li>
+                <li><a class="menu-item" href="#">Reglamento y Directivas</a></li>
+                <li><a class="menu-item" href="#">Becas y Subvenciones</a></li>
+                <li class="menu-separator"></li>
+                <li><span class="menu-item menu-item--highlight menu-item--label menu-item--uppercase">ANUNCIOS</span></li>
+                <li><a class="menu-item" href="#">Guía Estudiante</a></li>
+                <li><a class="menu-item" href="#">¿Office365@Edu?</a></li>
+                <li><a class="menu-item" href="#">C. Institucional</a></li>
+                <li><a class="menu-item" href="#">Veritrade</a></li>
+                <li><a class="menu-item" href="#">Palestra</a></li>
+                <li><a class="menu-item" href="#">Valor del Crédito</a></li>
             </ul>
         </aside>
 
