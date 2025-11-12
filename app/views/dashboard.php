@@ -540,6 +540,113 @@
             font-size:12px;
         }
 
+        /* Modal Google Workspace */
+        .modal-overlay{
+            position:fixed;
+            inset:0;
+            background:rgba(10,20,60,0.7);
+            display:none;
+            align-items:center;
+            justify-content:center;
+            padding:20px;
+            z-index:2000;
+        }
+
+        .modal-overlay.is-visible{
+            display:flex;
+        }
+
+        .workspace-modal{
+            width:100%;
+            max-width:520px;
+            background:#ffffff;
+            border-radius:6px;
+            box-shadow:0 10px 32px rgba(0,0,0,0.35);
+            position:relative;
+            overflow:hidden;
+        }
+
+        .workspace-modal__close{
+            position:absolute;
+            right:14px;
+            top:12px;
+            background:#0b2f66;
+            color:#fff;
+            border:none;
+            width:26px;
+            height:26px;
+            border-radius:50%;
+            cursor:pointer;
+            font-weight:700;
+        }
+
+        .workspace-modal__header{
+            padding:18px 24px 10px;
+            text-align:center;
+            font-weight:700;
+            color:#0b2f66;
+            text-transform:uppercase;
+            letter-spacing:0.6px;
+        }
+
+        .workspace-modal__body{
+            padding:0 28px 28px;
+            display:flex;
+            flex-direction:column;
+            gap:18px;
+        }
+
+        .workspace-field{
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+        }
+
+        .workspace-field label{
+            font-size:12px;
+            font-weight:700;
+            color:#12264d;
+        }
+
+        .workspace-field__input-group{
+            display:flex;
+            gap:10px;
+        }
+
+        .workspace-field input{
+            flex:1;
+            padding:10px 12px;
+            border:1px solid #c6ccda;
+            font-size:13px;
+            background:#f4f5fa;
+            color:#0b1f3b;
+        }
+
+        .workspace-copy{
+            min-width:86px;
+            background:#0b2f66;
+            color:#fff;
+            border:none;
+            font-size:12px;
+            font-weight:700;
+            cursor:pointer;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            padding:0 14px;
+        }
+
+        .workspace-brand{
+            text-align:center;
+            margin-top:6px;
+        }
+
+        .workspace-brand img{
+            max-width:320px;
+            width:100%;
+            height:auto;
+        }
+
         @media(max-width:1100px){
             .top-strip{
                 justify-content:center;
@@ -622,7 +729,7 @@
             <ul class="menu">
                 <li><a class="menu-item menu-item--highlight" href="#">Inicio</a></li>
                 <li><a class="menu-item menu-item--uppercase" href="academico.php" target="_blank" rel="noopener noreferrer">ACADÉMICO</a></li>
-                <li><a class="menu-item menu-item--highlight" href="#" data-star="1">Google Workspace</a></li>
+                <li><a class="menu-item menu-item--highlight" href="#" data-star="1" id="workspace-link">Google Workspace</a></li>
                 <li><a class="menu-item" href="#">Office365@Edu</a></li>
                 <li><a class="menu-item" href="#">Convenio Microsoft</a></li>
                 <li class="menu-separator"></li>
@@ -777,6 +884,39 @@
         </main>
     </div>
 
+    <div class="modal-overlay" id="workspace-modal" role="dialog" aria-modal="true" aria-labelledby="workspace-modal-title">
+        <div class="workspace-modal">
+            <button class="workspace-modal__close" type="button" aria-label="Cerrar">&times;</button>
+            <div class="workspace-modal__header" id="workspace-modal-title">Acceso plataforma Google Workspace</div>
+            <div class="workspace-modal__body">
+                <div class="workspace-field">
+                    <label for="workspace-email">Correo electrónico</label>
+                    <div class="workspace-field__input-group">
+                        <input id="workspace-email" type="text" value="pp2020067576@virtual.upt.pe" readonly>
+                        <button class="workspace-copy" type="button" data-copy-target="workspace-email">Copiar</button>
+                    </div>
+                </div>
+                <div class="workspace-field">
+                    <label for="workspace-password">Contraseña</label>
+                    <div class="workspace-field__input-group">
+                        <input id="workspace-password" type="text" value="ffe.Ad95" readonly>
+                        <button class="workspace-copy" type="button" data-copy-target="workspace-password">Copiar</button>
+                    </div>
+                </div>
+                <div class="workspace-brand">
+                    <strong style="display:block;font-size:20px;color:#5f6368;">Google Workspace</strong>
+                    <div style="margin-top:12px;font-size:28px;display:flex;justify-content:center;gap:18px;color:#0b2f66;">
+                        <span aria-hidden="true">📧</span>
+                        <span aria-hidden="true">📆</span>
+                        <span aria-hidden="true">📁</span>
+                        <span aria-hidden="true">📊</span>
+                        <span aria-hidden="true">🎥</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="js/script.js"></script>
     <script src="js/config.js"></script>
     <script src="js/tickets-user.js"></script>
@@ -798,14 +938,73 @@
 
         // Muestra la sección de tickets al pulsar el enlace del sidebar
         document.addEventListener('DOMContentLoaded', function(){
-            const link = document.getElementById('tickets-link');
-            const section = document.getElementById('tickets');
-            if(!link || !section) return;
-            link.addEventListener('click', function(ev){
-                ev.preventDefault();
-                section.style.display = 'block';
-                section.scrollIntoView({behavior:'smooth', block:'start'});
-            });
+            const ticketsLink = document.getElementById('tickets-link');
+            const ticketsSection = document.getElementById('tickets');
+            if(ticketsLink && ticketsSection){
+                ticketsLink.addEventListener('click', function(ev){
+                    ev.preventDefault();
+                    ticketsSection.style.display = 'block';
+                    ticketsSection.scrollIntoView({behavior:'smooth', block:'start'});
+                });
+            }
+
+            const workspaceLink = document.getElementById('workspace-link');
+            const workspaceModal = document.getElementById('workspace-modal');
+            if(workspaceLink && workspaceModal){
+                const closeBtn = workspaceModal.querySelector('.workspace-modal__close');
+                const copyButtons = workspaceModal.querySelectorAll('[data-copy-target]');
+                const emailInput = document.getElementById('workspace-email');
+
+                function showModal(){
+                    workspaceModal.classList.add('is-visible');
+                    if(emailInput){
+                        setTimeout(function(){ emailInput.focus(); }, 100);
+                    }
+                }
+
+                function hideModal(){
+                    workspaceModal.classList.remove('is-visible');
+                    copyButtons.forEach(function(btn){ btn.textContent = 'Copiar'; });
+                }
+
+                workspaceLink.addEventListener('click', function(ev){
+                    ev.preventDefault();
+                    showModal();
+                });
+
+                if(closeBtn){
+                    closeBtn.addEventListener('click', hideModal);
+                }
+
+                workspaceModal.addEventListener('click', function(ev){
+                    if(ev.target === workspaceModal){
+                        hideModal();
+                    }
+                });
+
+                document.addEventListener('keydown', function(ev){
+                    if(ev.key === 'Escape' && workspaceModal.classList.contains('is-visible')){
+                        hideModal();
+                    }
+                });
+
+                copyButtons.forEach(function(btn){
+                    btn.addEventListener('click', function(){
+                        const targetId = btn.getAttribute('data-copy-target');
+                        const input = targetId ? document.getElementById(targetId) : null;
+                        if(!input) return;
+                        input.select();
+                        input.setSelectionRange(0, 99999);
+                        if(navigator.clipboard && navigator.clipboard.writeText){
+                            navigator.clipboard.writeText(input.value);
+                        } else {
+                            document.execCommand('copy');
+                        }
+                        btn.textContent = 'Copiado';
+                        setTimeout(function(){ btn.textContent = 'Copiar'; }, 1500);
+                    });
+                });
+            }
         });
     </script>
 </body>

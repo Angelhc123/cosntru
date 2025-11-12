@@ -304,7 +304,7 @@
             <div class="profile">
                 <div class="profile__avatar"><?php echo $inicial; ?></div>
                 <div class="profile__name"><?php echo $nombreCompleto; ?></div>
-                <div class="profile__code">PAJA <?php echo $usuario; ?></div>
+                <div class="profile__code"><?php echo $usuario; ?></div>
                 <div class="profile__role"><?php echo strtoupper($tipoUsuario); ?></div>
             </div>
             <div>
