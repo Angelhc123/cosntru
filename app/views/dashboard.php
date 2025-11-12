@@ -647,6 +647,86 @@
             height:auto;
         }
 
+        .info-modal{
+            width:100%;
+            max-width:560px;
+            background:#ffffff;
+            border-radius:6px;
+            box-shadow:0 10px 28px rgba(0,0,0,0.32);
+            position:relative;
+            padding:30px 32px 34px;
+            overflow:hidden;
+        }
+
+        .info-modal::before{
+            content:'Universidad Privada de Tacna     Universidad Privada de Tacna     Universidad Privada de Tacna\AUniversidad Privada de Tacna     Universidad Privada de Tacna     Universidad Privada de Tacna\AUniversidad Privada de Tacna     Universidad Privada de Tacna     Universidad Privada de Tacna';
+            white-space:pre;
+            position:absolute;
+            inset:-120px -80px;
+            font-size:20px;
+            color:#b3bccf;
+            opacity:0.18;
+            transform:rotate(-28deg);
+            pointer-events:none;
+            line-height:42px;
+        }
+
+        .info-modal__title{
+            text-align:center;
+            text-transform:uppercase;
+            font-weight:700;
+            letter-spacing:0.6px;
+            margin:0 0 18px;
+            color:#0b2f66;
+            position:relative;
+        }
+
+        .info-modal__body{
+            position:relative;
+            background:rgba(255,255,255,0.94);
+            padding:0 4px 12px 0;
+            max-height:320px;
+            overflow-y:auto;
+        }
+
+        .info-modal__list{
+            list-style:none;
+            margin:0;
+            padding:0 4px 0 12px;
+        }
+
+        .info-modal__list li{
+            font-weight:700;
+            color:#0d2350;
+            margin-bottom:14px;
+        }
+
+        .info-modal__list li:last-child{
+            margin-bottom:0;
+        }
+
+        .info-modal__list a{
+            color:#c3122f;
+            text-decoration:none;
+            font-weight:700;
+            margin-left:6px;
+        }
+
+        .info-modal__list a:hover{
+            text-decoration:underline;
+        }
+
+        .info-modal__badge{
+            display:inline-block;
+            background:#c3122f;
+            color:#fff;
+            text-transform:uppercase;
+            font-size:11px;
+            padding:2px 6px;
+            border-radius:3px;
+            margin-left:8px;
+        }
+
         @media(max-width:1100px){
             .top-strip{
                 justify-content:center;
@@ -729,23 +809,23 @@
             <ul class="menu">
                 <li><a class="menu-item menu-item--highlight" href="#">Inicio</a></li>
                 <li><a class="menu-item menu-item--uppercase" href="academico.php" target="_blank" rel="noopener noreferrer">ACADÉMICO</a></li>
-                <li><a class="menu-item menu-item--highlight" href="#" data-star="1" id="workspace-link">Google Workspace</a></li>
+                <li><a class="menu-item menu-item--highlight" href="#" data-star="1" id="workspace-link" data-modal-target="workspace-modal">Google Workspace</a></li>
                 <li><a class="menu-item" href="#">Office365@Edu</a></li>
-                <li><a class="menu-item" href="#">Convenio Microsoft</a></li>
+                <li><a class="menu-item" href="https://azure.microsoft.com/es-es/get-started/azure-portal/" target="_blank" rel="noopener noreferrer">Convenio Microsoft</a></li>
                 <li class="menu-separator"></li>
                 <li><a class="menu-item menu-item--highlight menu-item--uppercase" href="#">ELECCIONES</a></li>
                 <li><a class="menu-item" href="#">Comprobantes Electrónicos</a></li>
                 <li class="menu-separator"></li>
                 <li><a class="menu-item menu-item--highlight menu-item--uppercase" href="#">PASARELA</a></li>
                 <li><a class="menu-item" href="#">Alumno</a></li>
-                <li><a class="menu-item" href="#">Aula Virtual</a></li>
-                <li><a class="menu-item menu-item--highlight menu-item--uppercase" href="#">GPS ALUMNI</a></li>
+                <li><a class="menu-item" href="https://aulavirtual.upt.edu.pe/" target="_blank" rel="noopener noreferrer">Aula Virtual</a></li>
+                <li><a class="menu-item menu-item--highlight menu-item--uppercase" href="academico.php" target="_blank" rel="noopener noreferrer">GPS ALUMNI</a></li>
                 <li class="menu-separator"></li>
                 <li><a class="menu-item" href="#">Biblioteca</a></li>
-                <li><a class="menu-item" href="#">Seguro Estudiantil</a></li>
-                <li><a class="menu-item" href="#">Recorrido de Buses</a></li>
-                <li><a class="menu-item" href="#">Reglamento y Directivas</a></li>
-                <li><a class="menu-item" href="#">Becas y Subvenciones</a></li>
+                <li><a class="menu-item" href="#" data-modal-target="modal-seguro">Seguro Estudiantil</a></li>
+                <li><a class="menu-item" href="#" data-modal-target="modal-buses">Recorrido de Buses</a></li>
+                <li><a class="menu-item" href="#" data-modal-target="modal-reglamentos">Reglamento y Directivas</a></li>
+                <li><a class="menu-item" href="https://net.upt.edu.pe/documentos/BecasySubvenciones.pdf" target="_blank" rel="noopener noreferrer">Becas y Subvenciones</a></li>
                 <li><a class="menu-item" href="#" id="tickets-link">Mis Tickets de Soporte</a></li>
                 <li class="menu-separator"></li>
                 <li><span class="menu-item menu-item--highlight menu-item--label menu-item--uppercase">ANUNCIOS</span></li>
@@ -754,7 +834,7 @@
                 <li><a class="menu-item" href="#">C. Institucional</a></li>
                 <li><a class="menu-item" href="#">Veritrade</a></li>
                 <li><a class="menu-item" href="#">Palestra</a></li>
-                <li><a class="menu-item" href="#">Valor del Crédito</a></li>
+                <li><a class="menu-item" href="https://net.upt.edu.pe/documentos/2025-II/COSTO_DEL_CREDITO_2025-I_Y_2025-II_PREGRADO.pdf" target="_blank" rel="noopener noreferrer">Valor del Crédito</a></li>
             </ul>
         </aside>
 
@@ -884,9 +964,9 @@
         </main>
     </div>
 
-    <div class="modal-overlay" id="workspace-modal" role="dialog" aria-modal="true" aria-labelledby="workspace-modal-title">
+    <div class="modal-overlay" id="workspace-modal" role="dialog" aria-modal="true" aria-labelledby="workspace-modal-title" data-modal-focus="#workspace-email">
         <div class="workspace-modal">
-            <button class="workspace-modal__close" type="button" aria-label="Cerrar">&times;</button>
+            <button class="workspace-modal__close" type="button" aria-label="Cerrar" data-modal-close>&times;</button>
             <div class="workspace-modal__header" id="workspace-modal-title">Acceso plataforma Google Workspace</div>
             <div class="workspace-modal__body">
                 <div class="workspace-field">
@@ -913,6 +993,50 @@
                         <span aria-hidden="true">🎥</span>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-seguro" role="dialog" aria-modal="true" aria-labelledby="modal-seguro-title">
+        <div class="info-modal">
+            <button class="workspace-modal__close" type="button" aria-label="Cerrar" data-modal-close>&times;</button>
+            <h2 class="info-modal__title" id="modal-seguro-title">Información del Seguro</h2>
+            <div class="info-modal__body">
+                <ul class="info-modal__list">
+                    <li>Información básica del Seguro de Accidentes Personales <a href="#" target="_blank" rel="noopener noreferrer">(Descargar)</a></li>
+                    <li>Programa de Protección de Accidentes Estudiantiles (Cobertura) <a href="#" target="_blank" rel="noopener noreferrer">(Descargar)</a></li>
+                    <li>Hoja de denuncia de Accidentes <a href="#" target="_blank" rel="noopener noreferrer">(Descargar)</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-buses" role="dialog" aria-modal="true" aria-labelledby="modal-buses-title">
+        <div class="info-modal">
+            <button class="workspace-modal__close" type="button" aria-label="Cerrar" data-modal-close>&times;</button>
+            <h2 class="info-modal__title" id="modal-buses-title">Recorrido de Buses</h2>
+            <div class="info-modal__body">
+                <ul class="info-modal__list">
+                    <li>Recorrido de la Ruta A <a href="#" target="_blank" rel="noopener noreferrer">(Descargar)</a></li>
+                    <li>Recorrido de la Ruta B <a href="#" target="_blank" rel="noopener noreferrer">(Descargar)</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-reglamentos" role="dialog" aria-modal="true" aria-labelledby="modal-reglamentos-title">
+        <div class="info-modal">
+            <button class="workspace-modal__close" type="button" aria-label="Cerrar" data-modal-close>&times;</button>
+            <h2 class="info-modal__title" id="modal-reglamentos-title">Reglamentos</h2>
+            <div class="info-modal__body">
+                <ul class="info-modal__list">
+                    <li>Directiva para la gestión de pagos por derecho de enseñanza en la Universidad Privada de Tacna <a href="#" target="_blank" rel="noopener noreferrer">(Descargar)</a><span class="info-modal__badge">Nuevo</span></li>
+                    <li>Reglamento General de la Universidad Privada de Tacna <a href="#" target="_blank" rel="noopener noreferrer">(Descargar)</a></li>
+                    <li>Estatuto de la Universidad Privada de Tacna - Edición 2014 <a href="#" target="_blank" rel="noopener noreferrer">(Descargar)</a></li>
+                    <li>Reglamento de Matrícula Estudios y Evaluación <a href="#" target="_blank" rel="noopener noreferrer">(Descargar)</a><span class="info-modal__badge">Nuevo</span></li>
+                    <li>Reglamento para optar Grados Académicos y Títulos Profesionales en la Universidad Privada de Tacna <a href="#" target="_blank" rel="noopener noreferrer">(Descargar)</a></li>
+                    <li>Reglamento de Diplomado de Post Grado de la Universidad Privada de Tacna <a href="#" target="_blank" rel="noopener noreferrer">(Descargar)</a></li>
+                </ul>
             </div>
         </div>
     </div>
@@ -948,63 +1072,82 @@
                 });
             }
 
-            const workspaceLink = document.getElementById('workspace-link');
-            const workspaceModal = document.getElementById('workspace-modal');
-            if(workspaceLink && workspaceModal){
-                const closeBtn = workspaceModal.querySelector('.workspace-modal__close');
-                const copyButtons = workspaceModal.querySelectorAll('[data-copy-target]');
-                const emailInput = document.getElementById('workspace-email');
+            let activeModal = null;
 
-                function showModal(){
-                    workspaceModal.classList.add('is-visible');
-                    if(emailInput){
-                        setTimeout(function(){ emailInput.focus(); }, 100);
+            function openModal(modal){
+                if(!modal) return;
+                if(activeModal && activeModal !== modal){
+                    closeModal(activeModal);
+                }
+                modal.classList.add('is-visible');
+                activeModal = modal;
+
+                const focusSelector = modal.getAttribute('data-modal-focus');
+                if(focusSelector){
+                    const focusElement = modal.querySelector(focusSelector);
+                    if(focusElement){
+                        setTimeout(function(){ focusElement.focus(); }, 100);
                     }
                 }
+            }
 
-                function hideModal(){
-                    workspaceModal.classList.remove('is-visible');
-                    copyButtons.forEach(function(btn){ btn.textContent = 'Copiar'; });
+            function closeModal(modal){
+                if(!modal) return;
+                modal.classList.remove('is-visible');
+                if(activeModal === modal){
+                    activeModal = null;
                 }
-
-                workspaceLink.addEventListener('click', function(ev){
-                    ev.preventDefault();
-                    showModal();
-                });
-
-                if(closeBtn){
-                    closeBtn.addEventListener('click', hideModal);
-                }
-
-                workspaceModal.addEventListener('click', function(ev){
-                    if(ev.target === workspaceModal){
-                        hideModal();
-                    }
-                });
-
-                document.addEventListener('keydown', function(ev){
-                    if(ev.key === 'Escape' && workspaceModal.classList.contains('is-visible')){
-                        hideModal();
-                    }
-                });
-
-                copyButtons.forEach(function(btn){
-                    btn.addEventListener('click', function(){
-                        const targetId = btn.getAttribute('data-copy-target');
-                        const input = targetId ? document.getElementById(targetId) : null;
-                        if(!input) return;
-                        input.select();
-                        input.setSelectionRange(0, 99999);
-                        if(navigator.clipboard && navigator.clipboard.writeText){
-                            navigator.clipboard.writeText(input.value);
-                        } else {
-                            document.execCommand('copy');
-                        }
-                        btn.textContent = 'Copiado';
-                        setTimeout(function(){ btn.textContent = 'Copiar'; }, 1500);
-                    });
+                modal.querySelectorAll('[data-copy-target]').forEach(function(btn){
+                    btn.textContent = 'Copiar';
                 });
             }
+
+            document.querySelectorAll('[data-modal-target]').forEach(function(trigger){
+                const modalId = trigger.getAttribute('data-modal-target');
+                const modal = document.getElementById(modalId);
+                if(!modal) return;
+
+                trigger.addEventListener('click', function(ev){
+                    ev.preventDefault();
+                    openModal(modal);
+                });
+
+                modal.querySelectorAll('[data-modal-close]').forEach(function(btn){
+                    btn.addEventListener('click', function(){
+                        closeModal(modal);
+                    });
+                });
+
+                modal.addEventListener('click', function(ev){
+                    if(ev.target === modal){
+                        closeModal(modal);
+                    }
+                });
+            });
+
+            document.addEventListener('keydown', function(ev){
+                if(ev.key === 'Escape' && activeModal){
+                    closeModal(activeModal);
+                }
+            });
+
+            document.querySelectorAll('[data-copy-target]').forEach(function(btn){
+                btn.addEventListener('click', function(){
+                    const targetId = btn.getAttribute('data-copy-target');
+                    const input = targetId ? document.getElementById(targetId) : null;
+                    if(!input) return;
+                    input.focus();
+                    input.select();
+                    input.setSelectionRange(0, input.value.length);
+                    if(navigator.clipboard && navigator.clipboard.writeText){
+                        navigator.clipboard.writeText(input.value);
+                    } else {
+                        document.execCommand('copy');
+                    }
+                    btn.textContent = 'Copiado';
+                    setTimeout(function(){ btn.textContent = 'Copiar'; }, 1500);
+                });
+            });
         });
     </script>
 </body>
