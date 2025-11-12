@@ -180,15 +180,22 @@
             color:#ffffff;
         }
 
-        .menu-item--highlight::before{
+        .sidebar .menu-item.menu-item--highlight:visited{
             color:#ffffff;
         }
 
-        .menu-item--highlight:hover{
+        .menu-item--highlight::before,
+        .sidebar .menu-item.menu-item--highlight:visited::before{
+            color:#ffffff;
+        }
+
+        .menu-item--highlight:hover,
+        .sidebar .menu-item.menu-item--highlight:visited:hover{
             color:#f5d88b;
         }
 
-        .menu-item--highlight:hover::before{
+        .menu-item--highlight:hover::before,
+        .sidebar .menu-item.menu-item--highlight:visited:hover::before{
             color:#f5d88b;
         }
 
@@ -199,6 +206,8 @@
 
         .menu-item--label{
             cursor:default;
+            display:block;
+            padding:7px 18px;
         }
 
         .menu-item--label::before{
@@ -630,6 +639,7 @@
                 <li><a class="menu-item" href="#">Recorrido de Buses</a></li>
                 <li><a class="menu-item" href="#">Reglamento y Directivas</a></li>
                 <li><a class="menu-item" href="#">Becas y Subvenciones</a></li>
+                <li><a class="menu-item" href="#" id="tickets-link">Mis Tickets de Soporte</a></li>
                 <li class="menu-separator"></li>
                 <li><span class="menu-item menu-item--highlight menu-item--label menu-item--uppercase">ANUNCIOS</span></li>
                 <li><a class="menu-item" href="#">Guía Estudiante</a></li>
@@ -785,6 +795,18 @@
             update();
             setInterval(update, 1000);
         })();
+
+        // Muestra la sección de tickets al pulsar el enlace del sidebar
+        document.addEventListener('DOMContentLoaded', function(){
+            const link = document.getElementById('tickets-link');
+            const section = document.getElementById('tickets');
+            if(!link || !section) return;
+            link.addEventListener('click', function(ev){
+                ev.preventDefault();
+                section.style.display = 'block';
+                section.scrollIntoView({behavior:'smooth', block:'start'});
+            });
+        });
     </script>
 </body>
 </html>
