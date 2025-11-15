@@ -1065,8 +1065,36 @@
             if(ticketsLink && ticketsSection){
                 ticketsLink.addEventListener('click', function(ev){
                     ev.preventDefault();
-                    ticketsSection.style.display = 'block';
-                    ticketsSection.scrollIntoView({behavior:'smooth', block:'start'});
+                    // Toggle: si está visible, ocultar sección (y cerrar chat si está abierto)
+                    const isVisible = ticketsSection.style.display !== 'none' && ticketsSection.style.display !== '';
+                    if(isVisible){
+                        // Si el chat está abierto, cerrarlo
+                        if(typeof closeTicketChat === 'function'){
+                            try{ closeTicketChat(); }catch(e){
+                                // fallback: hide chat and show nothing
+                                const chat = document.getElementById('ticket-chat-container');
+                                if(chat) chat.style.display = 'none';
+                                const list = document.getElementById('tickets-container');
+                                if(list) list.style.display = 'none';
+                            }
+                        } else {
+                            const chat = document.getElementById('ticket-chat-container');
+                            if(chat) chat.style.display = 'none';
+                            const list = document.getElementById('tickets-container');
+                            if(list) list.style.display = 'none';
+                        }
+                        ticketsSection.style.display = 'none';
+                    } else {
+                        // Mostrar sección y desplegar lista de tickets
+                        ticketsSection.style.display = 'block';
+                        const list = document.getElementById('tickets-container');
+                        if(list) list.style.display = 'block';
+                        ticketsSection.scrollIntoView({behavior:'smooth', block:'start'});
+                        // loadUserTickets se encarga mediante observer, pero llamamos por si acaso
+                        if(typeof loadUserTickets === 'function'){
+                            try{ loadUserTickets(); }catch(e){ /* ignore */ }
+                        }
+                    }
                 });
             }
 
