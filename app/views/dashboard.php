@@ -955,7 +955,7 @@
 
             <section id="tickets" class="card tickets-card" style="display:none;">
                 <h3>🎫 Mis Tickets de Soporte</h3>
-                <div id="tickets-container" style="min-height:200px;">Cargando tus tickets...</div>
+                <div id="tickets-container-inline" style="min-height:200px;">Cargando tus tickets...</div>
             </section>
 
             <div id="user-id-data" data-user-id="<?php echo isset($_SESSION['user_id'])?htmlspecialchars($_SESSION['user_id']):''; ?>" style="display:none;"></div>
