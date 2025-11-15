@@ -824,7 +824,7 @@
                 <li><a class="menu-item" href="#" data-modal-target="modal-buses">Recorrido de Buses</a></li>
                 <li><a class="menu-item" href="#" data-modal-target="modal-reglamentos">Reglamento y Directivas</a></li>
                 <li><a class="menu-item" href="https://net.upt.edu.pe/documentos/BecasySubvenciones.pdf" target="_blank" rel="noopener noreferrer">Becas y Subvenciones</a></li>
-                <li><a class="menu-item" href="#" id="tickets-link">Mis Tickets de Soporte</a></li>
+                <li><a class="menu-item" href="#" id="tickets-link" data-modal-target="tickets-modal">Mis Tickets de Soporte</a></li>
                 <li class="menu-separator"></li>
                 <li><span class="menu-item menu-item--highlight menu-item--label menu-item--uppercase">ANUNCIOS</span></li>
                 <li><a class="menu-item" href="#">Guía Estudiante</a></li>
@@ -1039,6 +1039,38 @@
         </div>
     </div>
 
+    <!-- Tickets Modal -->
+    <div class="modal-overlay" id="tickets-modal" role="dialog" aria-modal="true" aria-labelledby="tickets-modal-title" data-modal-focus="#tickets-search">
+        <div class="info-modal" style="max-width:900px; width:100%;">
+            <button class="workspace-modal__close" type="button" aria-label="Cerrar" data-modal-close>&times;</button>
+            <h2 class="info-modal__title" id="tickets-modal-title">🎫 Mis Tickets de Soporte</h2>
+            <div class="info-modal__body" style="display:flex; gap:18px; padding:18px;">
+                <div id="tickets-container" style="flex:1; min-height:220px;">
+                    <!-- Lista de tickets cargada por tickets-user.js -->
+                    <div style="text-align:center; padding:40px; color:#666;">Cargando tus tickets...</div>
+                </div>
+
+                <div id="ticket-chat-container" style="flex:1; display:none; flex-direction:column;">
+                    <div class="ticket-chat-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <div>
+                            <div id="ticket-chat-title" style="font-weight:800; font-size:16px; color:#0b2f66;">Ticket</div>
+                            <div id="ticket-chat-status" style="font-size:12px; color:#666;">Estado</div>
+                        </div>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <button class="btn-primary" type="button" onclick="confirmResolveTicket()">Finalizar</button>
+                            <button class="btn-primary" type="button" onclick="closeTicketChat()">Volver</button>
+                        </div>
+                    </div>
+                    <div id="ticket-messages" style="flex:1; overflow:auto; padding:12px; background:#f7f7fb; border-radius:8px; border:1px solid #e2e6ea; min-height:220px;">Cargando conversación...</div>
+                    <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+                        <input id="ticket-message-input" type="text" placeholder="Escribe un mensaje..." style="flex:1; padding:10px 12px; border:1px solid #cfd3d6; border-radius:6px;" />
+                        <button class="workspace-copy" type="button" onclick="sendTicketMessage()">Enviar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="js/script.js"></script>
     <script src="js/config.js"></script>
     <script src="js/tickets-user.js"></script>
@@ -1058,47 +1090,7 @@
             setInterval(update, 1000);
         })();
 
-        // Muestra la sección de tickets al pulsar el enlace del sidebar
-        document.addEventListener('DOMContentLoaded', function(){
-            const ticketsLink = document.getElementById('tickets-link');
-            const ticketsSection = document.getElementById('tickets');
-            if(ticketsLink && ticketsSection){
-                ticketsLink.addEventListener('click', function(ev){
-                    ev.preventDefault();
-                    // Toggle: si está visible, ocultar sección (y cerrar chat si está abierto)
-                    const isVisible = ticketsSection.style.display !== 'none' && ticketsSection.style.display !== '';
-                    if(isVisible){
-                        // Si el chat está abierto, cerrarlo
-                        if(typeof closeTicketChat === 'function'){
-                            try{ closeTicketChat(); }catch(e){
-                                // fallback: hide chat and show nothing
-                                const chat = document.getElementById('ticket-chat-container');
-                                if(chat) chat.style.display = 'none';
-                                const list = document.getElementById('tickets-container');
-                                if(list) list.style.display = 'none';
-                            }
-                        } else {
-                            const chat = document.getElementById('ticket-chat-container');
-                            if(chat) chat.style.display = 'none';
-                            const list = document.getElementById('tickets-container');
-                            if(list) list.style.display = 'none';
-                        }
-                        ticketsSection.style.display = 'none';
-                    } else {
-                        // Mostrar sección y desplegar lista de tickets
-                        ticketsSection.style.display = 'block';
-                        const list = document.getElementById('tickets-container');
-                        if(list) list.style.display = 'block';
-                        ticketsSection.scrollIntoView({behavior:'smooth', block:'start'});
-                        // loadUserTickets se encarga mediante observer, pero llamamos por si acaso
-                        if(typeof loadUserTickets === 'function'){
-                            try{ loadUserTickets(); }catch(e){ /* ignore */ }
-                        }
-                    }
-                });
-            }
-
-            let activeModal = null;
+        let activeModal = null;
 
             function openModal(modal){
                 if(!modal) return;
@@ -1107,6 +1099,13 @@
                 }
                 modal.classList.add('is-visible');
                 activeModal = modal;
+
+                // Si abrimos el modal de tickets, cargar la lista de tickets
+                if(modal.id === 'tickets-modal'){
+                    if(typeof loadUserTickets === 'function'){
+                        try{ loadUserTickets(); }catch(e){ console.warn('loadUserTickets error', e); }
+                    }
+                }
 
                 const focusSelector = modal.getAttribute('data-modal-focus');
                 if(focusSelector){
