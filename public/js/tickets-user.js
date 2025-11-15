@@ -8,6 +8,17 @@ let currentTicketId = null;
 let pollingInterval = null;
 let lastMessageCount = 0;
 
+// Helper para escapar texto y prevenir inyección HTML
+function escapeHtml(unsafe) {
+    if (unsafe === null || unsafe === undefined) return '';
+    return String(unsafe)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // Obtener user_id del elemento oculto
 function getUserId() {
     const userIdElement = document.getElementById('user-id-data');
@@ -229,32 +240,19 @@ function renderTicketMessages(messages) {
         if (isSystem) {
             // Mensaje del sistema (asignación, resolución)
             html += `
-                <div style="text-align: center; margin: 20px 0;">
-                    <span style="background: #f0f0f0; padding: 8px 15px; border-radius: 15px; font-size: 13px; color: #666;">
-                        ℹ️ ${msg.text}
-                    </span>
+                <div class="msg system" style="text-align:center; margin:20px 0;">
+                    <span class="bubble system">ℹ️ ${escapeHtml(msg.text)}</span>
                 </div>
             `;
         } else {
-            // Mensaje de usuario o admin
-            const alignment = isUser ? 'flex-end' : 'flex-start';
-            const bgColor = isUser ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#e9ecef';
-            const textColor = isUser ? 'white' : '#333';
-            
+            // Mensaje de usuario o admin (usar clases para estilizar)
+            const who = isUser ? 'user' : 'admin';
             html += `
-                <div style="display: flex; justify-content: ${alignment}; margin-bottom: 15px;">
-                    <div style="max-width: 70%;">
-                        <div style="background: ${bgColor}; color: ${textColor}; padding: 12px 16px; border-radius: ${isUser ? '15px 15px 0 15px' : '15px 15px 15px 0'}; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                            <div style="font-weight: 600; font-size: 13px; margin-bottom: 5px; opacity: 0.9;">
-                                ${msg.senderName}
-                            </div>
-                            <div style="font-size: 14px; line-height: 1.4;">
-                                ${msg.text}
-                            </div>
-                        </div>
-                        <div style="font-size: 11px; color: #999; margin-top: 5px; text-align: ${isUser ? 'right' : 'left'};">
-                            ${timestamp}
-                        </div>
+                <div class="msg ${who}">
+                    <div class="bubble ${who}">
+                        <div class="sender" style="font-weight:600; font-size:13px; margin-bottom:6px; opacity:0.9;">${escapeHtml(msg.senderName || '')}</div>
+                        <div class="text" style="font-size:14px; line-height:1.5;">${escapeHtml(msg.text)}</div>
+                        <div class="time" style="text-align:${isUser ? 'right' : 'left'}; font-size:11px; color:#999; margin-top:8px;">${timestamp}</div>
                     </div>
                 </div>
             `;

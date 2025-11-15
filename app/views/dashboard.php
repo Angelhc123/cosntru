@@ -727,6 +727,67 @@
             margin-left:8px;
         }
 
+        /* Tickets modal improvements */
+        #tickets-modal .info-modal{
+            max-width:980px;
+            padding:18px 20px 20px;
+            background:linear-gradient(180deg,#fff,#fbfcff);
+        }
+
+        #tickets-modal .info-modal__title{
+            font-size:20px;
+            color:var(--navy-dark);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+        }
+
+        #tickets-modal .workspace-modal__close{
+            position:absolute;
+            right:12px;
+            top:12px;
+            width:34px;
+            height:34px;
+            border-radius:50%;
+            background:#0b2f66;
+            color:#fff;
+            font-size:16px;
+            line-height:1;
+            box-shadow:0 4px 14px rgba(11,47,102,0.18);
+        }
+
+        #tickets-modal .info-modal__body{ padding:16px; }
+
+        #ticket-messages{
+            background: linear-gradient(180deg,#f8fafc,#f3f5f9);
+            border-radius:10px;
+            border:1px solid #e6e9ee;
+            padding:18px;
+            min-height:260px;
+            max-height:420px;
+            overflow:auto;
+        }
+
+        /* Message bubbles (the existing JS uses inline styles; this complements them)
+           Add subtle defaults and alignment helpers */
+        #ticket-messages .msg{ display:flex; margin-bottom:12px; }
+        #ticket-messages .msg.user{ justify-content:flex-end; }
+        #ticket-messages .bubble{ max-width:78%; padding:12px 14px; border-radius:14px; box-shadow:0 6px 18px rgba(30,40,60,0.06); }
+        #ticket-messages .bubble.system{ background:#f0f3f7; color:#516176; border-radius:12px; display:inline-block; padding:8px 12px; }
+        #ticket-messages .bubble.user{ background:linear-gradient(135deg,#7b61ff,#6f9bff); color:white; border-radius:14px 14px 0 14px; }
+        #ticket-messages .bubble.admin{ background:#eef2f7; color:#122039; border-radius:14px 14px 14px 0; }
+        #ticket-messages .time{ font-size:11px; color:#8b98ad; margin-top:6px; }
+
+        /* Input / send area */
+        #ticket-message-input{ padding:12px 14px; border-radius:8px; border:1px solid #d1d7de; background:#fff; }
+        #tickets-modal .workspace-copy{ min-width:86px; padding:10px 14px; border-radius:6px; background:#0b2f66; color:#fff; }
+
+        /* Small scrollbar for messages */
+        #ticket-messages::-webkit-scrollbar{ width:10px; }
+        #ticket-messages::-webkit-scrollbar-thumb{ background:#d6dbe3; border-radius:10px; }
+        #ticket-messages::-webkit-scrollbar-track{ background:transparent; }
+
         @media(max-width:1100px){
             .top-strip{
                 justify-content:center;
@@ -1040,7 +1101,7 @@
     </div>
 
     <!-- Tickets Modal -->
-    <div class="modal-overlay" id="tickets-modal" role="dialog" aria-modal="true" aria-labelledby="tickets-modal-title" data-modal-focus="#tickets-search">
+    <div class="modal-overlay" id="tickets-modal" role="dialog" aria-modal="true" aria-labelledby="tickets-modal-title" data-modal-focus="#ticket-message-input">
         <div class="info-modal" style="max-width:900px; width:100%;">
             <button class="workspace-modal__close" type="button" aria-label="Cerrar" data-modal-close>&times;</button>
             <h2 class="info-modal__title" id="tickets-modal-title">🎫 Mis Tickets de Soporte</h2>
@@ -1126,6 +1187,12 @@
                 modal.querySelectorAll('[data-copy-target]').forEach(function(btn){
                     btn.textContent = 'Copiar';
                 });
+                // Si cerramos el modal de tickets aseguramos limpiar el chat y el polling
+                if(modal.id === 'tickets-modal'){
+                    if(typeof closeTicketChat === 'function'){
+                        try{ closeTicketChat(); }catch(e){ /* ignore */ }
+                    }
+                }
             }
 
             document.querySelectorAll('[data-modal-target]').forEach(function(trigger){
