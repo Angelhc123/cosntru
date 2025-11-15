@@ -1090,7 +1090,8 @@
             setInterval(update, 1000);
         })();
 
-        let activeModal = null;
+        document.addEventListener('DOMContentLoaded', function(){
+            let activeModal = null;
 
             function openModal(modal){
                 if(!modal) return;
