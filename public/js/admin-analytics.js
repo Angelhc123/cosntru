@@ -90,17 +90,12 @@ async function updateDashboard() {
     
     // Mostrar loading
     const loadingEl = document.getElementById('loading');
-    loadingEl.innerHTML = `
-        <div style="text-align: center; padding: 40px;">
-            <div style="font-size: 48px; margin-bottom: 20px; animation: spin 2s linear infinite;">⏳</div>
-            <h3>Cargando datos...</h3>
-        </div>
-        <style>
-            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        </style>
-    `;
-    loadingEl.style.display = 'block';
-    document.getElementById('content').style.display = 'none';
+    const errorEl = document.getElementById('error-message');
+    const statsGrid = document.getElementById('stats-grid');
+    
+    loadingEl.classList.add('active');
+    errorEl.classList.remove('active');
+    statsGrid.style.display = 'none';
     
     try {
         // Cargar todos los datos
@@ -117,42 +112,12 @@ async function updateDashboard() {
         ]);
         
         // Mostrar contenido
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('content').style.display = 'block';
+        loadingEl.classList.remove('active');
+        statsGrid.style.display = 'grid';
     } catch (error) {
-        loadingEl.innerHTML = `
-            <div style="text-align: center; padding: 40px; color: #dc3545;">
-                <div style="font-size: 64px; margin-bottom: 20px;">⚠️</div>
-                <h3>Error al cargar datos</h3>
-                <p style="margin: 20px 0; color: #666;">${error.message}</p>
-                <div style="margin-top: 20px;">
-                    <button onclick="updateDashboard()" style="
-                        background: #667eea; 
-                        color: white; 
-                        border: none; 
-                        padding: 12px 24px; 
-                        border-radius: 5px; 
-                        cursor: pointer;
-                        font-size: 16px;
-                        font-weight: 600;
-                        margin-right: 10px;
-                    ">
-                        🔄 Reintentar
-                    </button>
-                    <a href="/admin" style="
-                        display: inline-block;
-                        padding: 12px 24px;
-                        background: #6c757d;
-                        color: white;
-                        text-decoration: none;
-                        border-radius: 5px;
-                        font-weight: 600;
-                    ">
-                        ← Volver
-                    </a>
-                </div>
-            </div>
-        `;
+        loadingEl.classList.remove('active');
+        errorEl.classList.add('active');
+        document.getElementById('error-text').textContent = 'Error: ' + error.message;
     }
 }
 
