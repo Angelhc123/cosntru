@@ -114,12 +114,14 @@ class Router {
         // Rutas especiales para utilidades
         if ($path === '/captcha') {
             require_once __DIR__ . '/../app/utils/CaptchaUtil.php';
-            return true;
+            CaptchaUtil::generate();
+            exit;
         }
 
         if ($path === '/set_captcha') {
             require_once __DIR__ . '/../app/utils/CaptchaUtil.php';
-            return true;
+            CaptchaUtil::generate();
+            exit;
         }
 
         return false;
