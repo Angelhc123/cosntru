@@ -1,10 +1,10 @@
 /**
  * Dashboard de Analytics - Frontend
- * Conecta con Analytics Service en puerto 3006
+ * Conecta con Analytics Service desplegado en Railway
  */
 
 const ANALYTICS_API_URL = 'https://analytics-service-production-effe.up.railway.app/api/v1/analytics';
-const REQUEST_TIMEOUT = 45000; // 45 segundos - Railway puede tardar en despertar
+const REQUEST_TIMEOUT = 30000;
 
 let chartsInstances = {};
 let currentDates = {
@@ -13,50 +13,29 @@ let currentDates = {
 };
 
 /**
- * Fetch con timeout y reintentos
+ * Fetch con timeout
  */
-async function fetchWithTimeout(url, timeout = REQUEST_TIMEOUT, retries = 2) {
-    for (let attempt = 1; attempt <= retries; attempt++) {
-        try {
-            console.log(`🔄 Intento ${attempt}/${retries} - Fetching: ${url}`);
-            
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), timeout);
-            
-            const response = await fetch(url, { 
-                signal: controller.signal,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
-            
-            clearTimeout(timeoutId);
-            
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error(`❌ HTTP ${response.status}:`, errorText);
-                throw new Error(`HTTP ${response.status}: ${errorText}`);
-            }
-            
-            const data = await response.json();
-            console.log(`✅ Success:`, data.success);
-            return data;
-            
-        } catch (error) {
-            if (attempt === retries) {
-                console.error(`❌ Falló después de ${retries} intentos:`, error);
-                throw error;
-            }
-            
-            if (error.name === 'AbortError') {
-                console.warn(`⏱️ Timeout en intento ${attempt}, reintentando...`);
-            } else {
-                console.warn(`⚠️ Error en intento ${attempt}:`, error.message);
-            }
-            
-            // Esperar 2 segundos antes de reintentar
-            await new Promise(resolve => setTimeout(resolve, 2000));
+async function fetchWithTimeout(url, timeout = REQUEST_TIMEOUT) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
+    try {
+        const response = await fetch(url, { 
+            signal: controller.signal,
+            headers: { 'Accept': 'application/json' },
+            mode: 'cors'
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
+        
+        return await response.json();
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
     }
 }
 
@@ -64,8 +43,6 @@ async function fetchWithTimeout(url, timeout = REQUEST_TIMEOUT, retries = 2) {
  * Inicializar dashboard al cargar la página
  */
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('📊 Inicializando Dashboard de Analytics...');
-    
     // Configurar selector de período personalizado
     document.getElementById('period-select').addEventListener('change', function() {
         const value = this.value;
@@ -97,10 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
  * Actualizar todo el dashboard
  */
 async function updateDashboard() {
-    console.log('🔄 Actualizando dashboard...');
-    console.log('⚠️ Nota: Railway puede tardar ~30 segundos si el servicio estaba inactivo');
-    
-    // Calcular fechas según el período seleccionado
     const period = document.getElementById('period-select').value;
     const endDate = new Date();
     let startDate = new Date();
@@ -115,19 +88,12 @@ async function updateDashboard() {
     currentDates.start = startDate;
     currentDates.end = endDate;
     
-    // Mostrar loading con mensaje más informativo
+    // Mostrar loading
     const loadingEl = document.getElementById('loading');
     loadingEl.innerHTML = `
         <div style="text-align: center; padding: 40px;">
             <div style="font-size: 48px; margin-bottom: 20px; animation: spin 2s linear infinite;">⏳</div>
-            <h3>Cargando datos desde Analytics Service...</h3>
-            <p style="color: #666; margin-top: 15px;">
-                Si el servicio estaba inactivo en Railway, puede tardar hasta 45 segundos en despertar.<br>
-                Por favor espera...
-            </p>
-            <div style="margin-top: 20px; color: #999; font-size: 14px;">
-                <div id="loading-progress">Conectando al servicio...</div>
-            </div>
+            <h3>Cargando datos...</h3>
         </div>
         <style>
             @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -137,16 +103,6 @@ async function updateDashboard() {
     document.getElementById('content').style.display = 'none';
     
     try {
-        // Verificar health primero
-        document.getElementById('loading-progress').textContent = 'Verificando estado del servicio...';
-        
-        try {
-            await fetchWithTimeout(`${ANALYTICS_API_URL}/health`, 15000, 1);
-            document.getElementById('loading-progress').textContent = '✅ Servicio activo. Cargando datos...';
-        } catch {
-            document.getElementById('loading-progress').textContent = '⚠️ Despertando servicio en Railway (esto puede tardar ~30s)...';
-        }
-        
         // Cargar todos los datos
         await Promise.all([
             loadDashboardStats(),
@@ -160,38 +116,15 @@ async function updateDashboard() {
             loadEscalationReasonsChart()
         ]);
         
-        // Ocultar loading y mostrar contenido
+        // Mostrar contenido
         document.getElementById('loading').style.display = 'none';
         document.getElementById('content').style.display = 'block';
-        
-        console.log('✅ Dashboard actualizado correctamente');
     } catch (error) {
-        console.error('❌ Error al actualizar dashboard:', error);
-        
         loadingEl.innerHTML = `
             <div style="text-align: center; padding: 40px; color: #dc3545;">
                 <div style="font-size: 64px; margin-bottom: 20px;">⚠️</div>
-                <h3>Error al cargar datos del Analytics Service</h3>
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px auto; max-width: 700px; text-align: left;">
-                    <strong>🔍 Detalles del error:</strong><br>
-                    <code style="display: block; margin-top: 10px; padding: 10px; background: white; border-radius: 5px; color: #dc3545;">
-                        ${error.message || error}
-                    </code>
-                    <br>
-                    <strong>🌐 URL del servicio:</strong><br>
-                    <code style="display: block; margin-top: 5px; padding: 10px; background: white; border-radius: 5px;">
-                        ${ANALYTICS_API_URL}
-                    </code>
-                    <br>
-                    <strong>💡 Posibles causas:</strong>
-                    <ul style="margin-top: 10px; text-align: left; color: #666;">
-                        <li>El servicio Analytics no está desplegado en Railway</li>
-                        <li>El servicio está en cold start y necesita más tiempo</li>
-                        <li>La base de datos MongoDB no está conectada</li>
-                        <li>Problemas de CORS en el servicio</li>
-                        <li>La URL del servicio cambió en Railway</li>
-                    </ul>
-                </div>
+                <h3>Error al cargar datos</h3>
+                <p style="margin: 20px 0; color: #666;">${error.message}</p>
                 <div style="margin-top: 20px;">
                     <button onclick="updateDashboard()" style="
                         background: #667eea; 
@@ -204,7 +137,7 @@ async function updateDashboard() {
                         font-weight: 600;
                         margin-right: 10px;
                     ">
-                        🔄 Reintentar Carga
+                        🔄 Reintentar
                     </button>
                     <a href="/admin" style="
                         display: inline-block;
@@ -215,7 +148,7 @@ async function updateDashboard() {
                         border-radius: 5px;
                         font-weight: 600;
                     ">
-                        ← Volver al Panel
+                        ← Volver
                     </a>
                 </div>
             </div>
@@ -240,30 +173,30 @@ async function loadDashboardStats() {
     
     const stats = data.data;
     
-    // Renderizar tarjetas de estadísticas
+    // Renderizar tarjetas de estadísticas con valores seguros
     const statsGrid = document.getElementById('stats-grid');
     statsGrid.innerHTML = `
         <div class="stat-card">
             <div class="icon">💬</div>
-            <div class="value">${stats.totalQueries.toLocaleString()}</div>
+            <div class="value">${(stats.totalQueries || 0).toLocaleString()}</div>
             <div class="label">Consultas Totales</div>
         </div>
         
         <div class="stat-card">
             <div class="icon">🎯</div>
-            <div class="value">${stats.averageConfidence.toFixed(1)}%</div>
+            <div class="value">${(stats.averageConfidence || 0).toFixed(1)}%</div>
             <div class="label">Confianza Promedio</div>
         </div>
         
         <div class="stat-card">
             <div class="icon">👍</div>
-            <div class="value">${stats.positiveRate.toFixed(1)}%</div>
+            <div class="value">${(stats.positiveRate || 0).toFixed(1)}%</div>
             <div class="label">Feedback Positivo</div>
         </div>
         
         <div class="stat-card">
             <div class="icon">🎫</div>
-            <div class="value">${stats.escalationRate.toFixed(1)}%</div>
+            <div class="value">${(stats.escalationRate || 0).toFixed(1)}%</div>
             <div class="label">Tasa de Escalación</div>
         </div>
     `;
@@ -285,7 +218,7 @@ async function loadQueriesChart() {
         throw new Error('Error al cargar consultas');
     }
     
-    const queries = data.data;
+    const queries = data.data || [];
     
     // Destruir chart anterior si existe
     if (chartsInstances['queries']) {
@@ -293,13 +226,20 @@ async function loadQueriesChart() {
     }
     
     const ctx = document.getElementById('queries-chart').getContext('2d');
+    
+    // Si no hay datos, mostrar mensaje
+    if (queries.length === 0) {
+        ctx.canvas.parentElement.innerHTML = '<div style="text-align:center; padding:40px; color:#999;">📭 No hay datos de consultas en este período</div>';
+        return;
+    }
+    
     chartsInstances['queries'] = new Chart(ctx, {
         type: 'line',
         data: {
             labels: queries.map(q => q.period),
             datasets: [{
                 label: 'Consultas',
-                data: queries.map(q => q.count),
+                data: queries.map(q => q.count || 0),
                 borderColor: '#667eea',
                 backgroundColor: 'rgba(102, 126, 234, 0.1)',
                 tension: 0.4,
@@ -681,8 +621,6 @@ async function exportExcel() {
         endDate: currentDates.end.toISOString()
     });
     
-    console.log('📊 Descargando reporte Excel...');
-    
     try {
         const response = await fetch(`${ANALYTICS_API_URL}/export/excel?${params}`);
         
@@ -699,11 +637,8 @@ async function exportExcel() {
         a.click();
         window.URL.revokeObjectURL(url);
         a.remove();
-        
-        console.log('✅ Reporte Excel descargado');
     } catch (error) {
-        console.error('❌ Error al exportar Excel:', error);
-        alert('Error al descargar el reporte Excel. Verifica que el servicio Analytics esté corriendo en el puerto 3006.');
+        alert('Error al descargar el reporte Excel: ' + error.message);
     }
 }
 
@@ -715,8 +650,6 @@ async function exportPDF() {
         startDate: currentDates.start.toISOString(),
         endDate: currentDates.end.toISOString()
     });
-    
-    console.log('📄 Descargando reporte PDF...');
     
     try {
         const response = await fetch(`${ANALYTICS_API_URL}/export/pdf?${params}`);
@@ -734,10 +667,7 @@ async function exportPDF() {
         a.click();
         window.URL.revokeObjectURL(url);
         a.remove();
-        
-        console.log('✅ Reporte PDF descargado');
     } catch (error) {
-        console.error('❌ Error al exportar PDF:', error);
-        alert('Error al descargar el reporte PDF. Verifica que el servicio Analytics esté corriendo en el puerto 3006.');
+        alert('Error al descargar el reporte PDF: ' + error.message);
     }
 }
