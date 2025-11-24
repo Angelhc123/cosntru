@@ -151,7 +151,7 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             logger.info("📅 Intent de Consultar Horario detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=horario"
             return {
-                "fulfillmentText": f"📅 **Consulta de Horario**\n\n👉 Haz clic aquí para ir a tu horario:\n{intranet_url}",
+                "fulfillmentText": f"📅 **Consulta de Horario Académico**\n\nPara ver tu horario de clases actualizado:\n\n[REDIRECT_BUTTON|{intranet_url}|🔗 VER MI HORARIO]",
             }
         
         # ===================================================================
@@ -161,7 +161,7 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             logger.info("📊 Intent de Consultar Notas detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=notas"
             return {
-                "fulfillmentText": f"📊 **Consulta de Notas**\n\n👉 Haz clic aquí para ver tus notas:\n{intranet_url}",
+                "fulfillmentText": f"📊 **Consulta de Notas y Calificaciones**\n\nPara ver tus notas académicas:\n\n[REDIRECT_BUTTON|{intranet_url}|🔗 VER MIS NOTAS]",
             }
         
         # ===================================================================
@@ -171,7 +171,7 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             logger.info("✅ Intent de Consultar Asistencia detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=asistencia"
             return {
-                "fulfillmentText": f"✅ **Consulta de Asistencia**\n\n👉 Haz clic aquí para ver tu asistencia:\n{intranet_url}",
+                "fulfillmentText": f"✅ **Consulta de Asistencia**\n\nPara revisar tu registro de asistencia:\n\n[REDIRECT_BUTTON|{intranet_url}|🔗 VER MI ASISTENCIA]",
             }
         
         # ===================================================================
