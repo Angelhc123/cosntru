@@ -702,7 +702,9 @@ class ChatboxWidget {
             }
             
             const nlpData = await response.json();
-            console.log('✅ Respuesta NLP:', nlpData);
+            console.log('✅ Respuesta NLP COMPLETA:', nlpData);
+            console.log('📦 nlpData.data:', nlpData.data);
+            console.log('💬 nlpData.data.response:', nlpData.data?.response);
             
             // Remover indicador de escritura
             this.removeTypingIndicator();
@@ -716,6 +718,7 @@ class ChatboxWidget {
                 
                 // Prioridad 1: Respuesta directa del NLP Service (incluye Dialogflow)
                 if (nlpData.data.response) {
+                    console.log('🎯 Usando nlpData.data.response:', nlpData.data.response);
                     botResponse = nlpData.data.response;
                 }
                 // Prioridad 2: Respuesta del FAQ (fallback)
