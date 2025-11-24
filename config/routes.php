@@ -16,6 +16,7 @@ class AppConfig {
     
     // Rutas de vistas
     const ACADEMICO_URL = '/academico';
+    const ALUMNO_URL = '/alumno';
     const ADMIN_ANALYTICS_URL = '/admin/analytics';
     const ADMIN_FAQS_URL = '/admin/faqs';
     const ADMIN_TICKETS_URL = '/admin/tickets';

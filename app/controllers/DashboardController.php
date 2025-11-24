@@ -25,5 +25,13 @@ class DashboardController {
         // Cargar vista del módulo académico
         include __DIR__ . '/../views/academico.php';
     }
+
+    public function alumno() {
+        // Verificar autenticación
+        $this->authMiddleware->requireAuth();
+        
+        // Cargar vista del módulo alumno
+        include __DIR__ . '/../views/alumno.php';
+    }
 }
 ?>

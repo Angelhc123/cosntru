@@ -892,7 +892,7 @@
                 <li class="menu-separator"></li>
                 <li><a class="menu-item menu-item--highlight menu-item--uppercase" href="#">ELECCIONES</a></li>
                 <li><a class="menu-item menu-item--highlight menu-item--uppercase" href="#">PASARELA</a></li>
-                <li><a class="menu-item" href="#">Alumno</a></li>
+                <li><a class="menu-item" href="/alumno">Alumno</a></li>
                 <li><a class="menu-item" href="https://aulavirtual.upt.edu.pe/" target="_blank" rel="noopener noreferrer">Aula Virtual</a></li>
                 <li><a class="menu-item menu-item--highlight menu-item--uppercase" href="/academico" target="_blank" rel="noopener noreferrer">GPS ALUMNI</a></li>
                 <li><a class="menu-item" href="#">Comprobantes Electrónicos</a></li>

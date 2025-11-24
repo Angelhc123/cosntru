@@ -20,6 +20,7 @@ class Router {
                 '/login' => ['AuthController', 'showLogin'],
                 '/dashboard' => ['DashboardController', 'index'],
                 '/academico' => ['DashboardController', 'academico'],
+                '/alumno' => ['DashboardController', 'alumno'],
                 '/admin' => ['AdminController', 'dashboard'],
                 '/admin/analytics' => ['AdminController', 'analytics'],
                 '/admin/faqs' => ['AdminController', 'faqs'],
