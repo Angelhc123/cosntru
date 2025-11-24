@@ -41,8 +41,8 @@ class AdminController {
         $this->authMiddleware->requireAuth();
         $this->authMiddleware->requireAdmin();
         
-        // Esta vista no existe aún en app/views, la crearemos después
-        echo "Vista de tickets en desarrollo";
+        // Cargar vista de tickets
+        include __DIR__ . '/../views/admin_tickets.php';
     }
 }
 ?>

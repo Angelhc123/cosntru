@@ -1,12 +1,3 @@
-<?php
-session_start();
-
-// Verificar autenticación
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: ../../public/login.php');
-    exit();
-}
-?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
