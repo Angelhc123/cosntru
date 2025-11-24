@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
+
 // Health check endpoint - SIMPLIFICADO para Railway
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
