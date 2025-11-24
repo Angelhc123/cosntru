@@ -151,26 +151,9 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             logger.info("📅 Intent de Consultar Horario detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=horario"
             
-            # INSERTAR HTML DIRECTO EN EL MENSAJE
-            button_html = f'''
-            <div style="margin-top: 15px; text-align: center;">
-                <button onclick="window.open('{intranet_url}', '_blank')" 
-                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                               color: white; 
-                               border: none; 
-                               padding: 12px 20px; 
-                               border-radius: 8px; 
-                               font-weight: bold; 
-                               cursor: pointer; 
-                               font-size: 14px;">
-                    🔗 VER MI HORARIO
-                </button>
-            </div>
-            '''
-            
-            logger.info("🔥 ENVIANDO RESPUESTA CON BOTÓN HTML INTEGRADO")
+            logger.info("🔥 ENVIANDO RESPUESTA CON MARCADOR PARA BOTÓN")
             return {
-                "fulfillmentText": f"📅 **Consulta de Horario Académico**\n\nPara ver tu horario de clases actualizado:\n\n{button_html}",
+                "fulfillmentText": f"📅 **Consulta de Horario Académico**\n\nPara ver tu horario de clases actualizado:\n\n[BUTTON_CREATE|{intranet_url}|🔗 VER MI HORARIO]",
             }
         
         # ===================================================================
@@ -180,25 +163,9 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             logger.info("📊 Intent de Consultar Notas detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=notas"
             
-            button_html = f'''
-            <div style="margin-top: 15px; text-align: center;">
-                <button onclick="window.open('{intranet_url}', '_blank')" 
-                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                               color: white; 
-                               border: none; 
-                               padding: 12px 20px; 
-                               border-radius: 8px; 
-                               font-weight: bold; 
-                               cursor: pointer; 
-                               font-size: 14px;">
-                    🔗 VER MIS NOTAS
-                </button>
-            </div>
-            '''
-            
-            logger.info("🔥 ENVIANDO RESPUESTA CON BOTÓN HTML INTEGRADO - NOTAS")
+            logger.info("🔥 ENVIANDO RESPUESTA CON MARCADOR PARA BOTÓN - NOTAS")
             return {
-                "fulfillmentText": f"📊 **Consulta de Notas y Calificaciones**\n\nPara ver tus notas académicas:\n\n{button_html}",
+                "fulfillmentText": f"📊 **Consulta de Notas y Calificaciones**\n\nPara ver tus notas académicas:\n\n[BUTTON_CREATE|{intranet_url}|🔗 VER MIS NOTAS]",
             }
         
         # ===================================================================
