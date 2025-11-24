@@ -153,7 +153,7 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             
             logger.info("🔥 ENVIANDO RESPUESTA CON BOTÓN DE REDIRECCIÓN")
             return {
-                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|🔗 VER MI HORARIO|📅 Para consultar tu horario de clases actualizado, haz clic en el botón:]",
+                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|🔗 Ver Mi Horario|📅 Para ver tu horario de clases actualizado, haz clic en el botón:]",
             }
         
         # ===================================================================
@@ -165,7 +165,7 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             
             logger.info("🔥 ENVIANDO RESPUESTA CON BOTÓN DE REDIRECCIÓN - NOTAS")
             return {
-                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|🔗 VER MIS NOTAS|📊 Para consultar tus calificaciones y notas académicas, haz clic en el botón:]",
+                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|� Ver Mis Notas|📊 Para ver tus notas y calificaciones, haz clic en el botón:]",
             }
         
         # ===================================================================
@@ -177,7 +177,7 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             
             logger.info("🔥 ENVIANDO RESPUESTA CON BOTÓN DE REDIRECCIÓN - ASISTENCIA")
             return {
-                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|🔗 VER MI ASISTENCIA|✅ Para revisar tu registro de asistencia a clases, haz clic en el botón:]",
+                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|✅ Ver Mi Asistencia|✅ Para revisar tu registro de asistencia, haz clic en el botón:]",
             }
         
         # ===================================================================
