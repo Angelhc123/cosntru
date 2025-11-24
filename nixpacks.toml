@@ -5,4 +5,4 @@ nixPkgs = ["php83", "php83Extensions.pdo", "php83Extensions.pdo_mysql", "php83Ex
 cmds = ["composer install --no-dev --optimize-autoloader || echo 'No composer.json found'"]
 
 [start]
-cmd = "cd public && php -S 0.0.0.0:$PORT -t . router.php"
+cmd = "cd public && php -S 0.0.0.0:$PORT -t . index.php"

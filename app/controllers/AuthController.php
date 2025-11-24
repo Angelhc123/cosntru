@@ -20,11 +20,11 @@ class AuthController {
     }
 
     public function showLogin() {
-        if (isset($_SESSION['user_id'])) {
-            header("Location: dashboard.php");
-            exit();
-        }
-        include '../app/views/login.php';
+        require_once __DIR__ . '/../middleware/AuthMiddleware.php';
+        $authMiddleware = new AuthMiddleware();
+        $authMiddleware->requireGuest();
+        
+        include __DIR__ . '/../views/login.php';
     }
 
     public function login() {
@@ -111,14 +111,14 @@ class AuthController {
                 
                 // ✅ Redirigir según tipo de usuario
                 if ($this->user->tipo_usuario === 'administrativo') {
-                    header("Location: admin_dashboard.php");
+                    header("Location: /admin");
                 } else {
-                    header("Location: dashboard.php");
+                    header("Location: /dashboard");
                 }
                 exit();
             } else {
                 $_SESSION['error'] = "Usuario o contraseña incorrectos";
-                header("Location: login.php");
+                header("Location: /login");
                 exit();
             }
         }
@@ -126,24 +126,8 @@ class AuthController {
 
     public function logout() {
         session_destroy();
-        header("Location: login.php");
+        header("Location: /login");
         exit();
-    }
-
-    public function dashboard() {
-        if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
-            exit();
-        }
-        include '../app/views/dashboard.php';
-    }
-
-    public function academicoModule() {
-        if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
-            exit();
-        }
-        include '../app/views/academico.php';
     }
 
     private function createDemoUser() {
