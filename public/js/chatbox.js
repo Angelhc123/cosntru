@@ -553,6 +553,10 @@ class ChatboxWidget {
         const messageDiv = document.createElement('div');
         messageDiv.className = 'message bot-message';
         
+        // Convertir URLs en enlaces clickeables
+        let formattedMessage = this.escapeHtml(message);
+        formattedMessage = this.convertUrlsToLinks(formattedMessage);
+        
         let feedbackButtons = '';
         if (messageId) {
             feedbackButtons = `
@@ -568,7 +572,7 @@ class ChatboxWidget {
         }
         
         messageDiv.innerHTML = `
-            <div class="message-content">🤖 ${this.escapeHtml(message)}</div>
+            <div class="message-content">🤖 ${formattedMessage}</div>
             <div class="message-time">${new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}</div>
             ${feedbackButtons}
         `;
@@ -577,6 +581,15 @@ class ChatboxWidget {
         if (scroll) {
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
+    }
+
+    convertUrlsToLinks(text) {
+        // Regex para detectar URLs
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        return text.replace(urlRegex, (url) => {
+            // Mostrar el propio URL como texto clickeable y abrir en nueva pestaña
+            return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #007bff; text-decoration: underline; font-weight: 600;">${url}</a>`;
+        });
     }
 
     addSystemMessage(message) {

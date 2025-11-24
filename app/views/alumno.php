@@ -1463,11 +1463,42 @@
             tabs.forEach(tab => tab.classList.remove('active'));
 
             // Mostrar la sección seleccionada
-            document.getElementById(sectionName).classList.add('active');
+            const targetSection = document.getElementById(sectionName);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
 
             // Activar la tab correspondiente
-            event.target.classList.add('active');
+            if (event && event.target) {
+                event.target.classList.add('active');
+            } else {
+                // Si se llama programáticamente, buscar y activar la tab
+                tabs.forEach(tab => {
+                    if (tab.getAttribute('onclick').includes(sectionName)) {
+                        tab.classList.add('active');
+                    }
+                });
+            }
         }
+
+        // 🆕 DETECTAR PARÁMETRO URL Y ABRIR SECCIÓN AUTOMÁTICAMENTE
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const section = urlParams.get('section');
+            
+            if (section && ['horario', 'notas', 'asistencia'].includes(section)) {
+                console.log(`🎯 Abriendo sección: ${section}`);
+                showSection(section);
+                
+                // Scroll suave a la sección
+                setTimeout(() => {
+                    const sectionElement = document.getElementById(section);
+                    if (sectionElement) {
+                        sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 100);
+            }
+        });
 
         // Imprimir curso
         document.querySelectorAll('.print-icon').forEach(icon => {
