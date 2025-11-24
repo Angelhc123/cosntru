@@ -153,7 +153,7 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             
             logger.info("🔥 ENVIANDO RESPUESTA CON BOTÓN DE REDIRECCIÓN")
             return {
-                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|🔗 Ver Mi Horario|📅 Para ver tu horario de clases actualizado, haz clic en el botón:]",
+                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|🔗 IR|📅 **Consulta de Horario Académico**\n\n✅ Podrás ver:\n• Cursos del ciclo actual\n• Horarios por día y hora\n• Sección asignada\n• Códigos de curso]",
             }
         
         # ===================================================================
@@ -165,7 +165,7 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             
             logger.info("🔥 ENVIANDO RESPUESTA CON BOTÓN DE REDIRECCIÓN - NOTAS")
             return {
-                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|� Ver Mis Notas|📊 Para ver tus notas y calificaciones, haz clic en el botón:]",
+                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|📊 IR|📊 **Consulta de Notas y Calificaciones**\n\n✅ Podrás ver:\n• Notas de todos tus cursos\n• Promedios por asignatura\n• Estado de aprobación\n• Historial académico]",
             }
         
         # ===================================================================
@@ -177,7 +177,7 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             
             logger.info("🔥 ENVIANDO RESPUESTA CON BOTÓN DE REDIRECCIÓN - ASISTENCIA")
             return {
-                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|✅ Ver Mi Asistencia|✅ Para revisar tu registro de asistencia, haz clic en el botón:]",
+                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|✅ IR|✅ **Consulta de Asistencia**\n\n✅ Podrás ver:\n• Registro de asistencia por curso\n• Porcentaje de asistencia\n• Faltas y tardanzas\n• Estado por asignatura]",
             }
         
         # ===================================================================
