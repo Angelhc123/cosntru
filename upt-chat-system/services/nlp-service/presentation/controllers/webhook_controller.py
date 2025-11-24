@@ -151,9 +151,9 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             logger.info("📅 Intent de Consultar Horario detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=horario"
             
-            logger.info("🔥 ENVIANDO RESPUESTA CON MARCADOR PARA BOTÓN")
+            logger.info("🔥 ENVIANDO RESPUESTA CON BOTÓN DE REDIRECCIÓN")
             return {
-                "fulfillmentText": f"📅 **Consulta de Horario Académico**\n\nPara ver tu horario de clases actualizado:\n\n[BUTTON_CREATE|{intranet_url}|🔗 VER MI HORARIO]",
+                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|🔗 VER MI HORARIO|📅 Para consultar tu horario de clases actualizado, haz clic en el botón:]",
             }
         
         # ===================================================================
@@ -163,9 +163,9 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             logger.info("📊 Intent de Consultar Notas detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=notas"
             
-            logger.info("🔥 ENVIANDO RESPUESTA CON MARCADOR PARA BOTÓN - NOTAS")
+            logger.info("🔥 ENVIANDO RESPUESTA CON BOTÓN DE REDIRECCIÓN - NOTAS")
             return {
-                "fulfillmentText": f"📊 **Consulta de Notas y Calificaciones**\n\nPara ver tus notas académicas:\n\n[BUTTON_CREATE|{intranet_url}|🔗 VER MIS NOTAS]",
+                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|🔗 VER MIS NOTAS|📊 Para consultar tus calificaciones y notas académicas, haz clic en el botón:]",
             }
         
         # ===================================================================
@@ -174,20 +174,10 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
         if intent_name in ["Consultar Asistencia", "consultar_asistencia", "mi asistencia", "asistencias", "ver mi asistencia", "quiero ver mi asistencia", "ver asistencia"]:
             logger.info("✅ Intent de Consultar Asistencia detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=asistencia"
+            
+            logger.info("🔥 ENVIANDO RESPUESTA CON BOTÓN DE REDIRECCIÓN - ASISTENCIA")
             return {
-                "fulfillmentText": "✅ **Consulta de Asistencia**\n\nPara revisar tu registro de asistencia:",
-                "fulfillmentMessages": [
-                    {
-                        "text": {
-                            "text": ["✅ **Consulta de Asistencia**\n\nPara revisar tu registro de asistencia:"]
-                        }
-                    },
-                    {
-                        "text": {
-                            "text": [f'<div class="redirect-button-container"><button class="redirect-btn" onclick="window.open(\'{intranet_url}\', \'_blank\')">🔗 VER MI ASISTENCIA</button></div>']
-                        }
-                    }
-                ]
+                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|🔗 VER MI ASISTENCIA|✅ Para revisar tu registro de asistencia a clases, haz clic en el botón:]",
             }
         
         # ===================================================================
