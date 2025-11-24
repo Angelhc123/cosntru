@@ -150,20 +150,27 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
         if intent_name in ["Consultar Horario", "consultar_horario", "horario_alumno", "mi horario", "ver mi horario", "quiero ver mi horario", "ver horario"]:
             logger.info("📅 Intent de Consultar Horario detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=horario"
+            
+            # INSERTAR HTML DIRECTO EN EL MENSAJE
+            button_html = f'''
+            <div style="margin-top: 15px; text-align: center;">
+                <button onclick="window.open('{intranet_url}', '_blank')" 
+                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                               color: white; 
+                               border: none; 
+                               padding: 12px 20px; 
+                               border-radius: 8px; 
+                               font-weight: bold; 
+                               cursor: pointer; 
+                               font-size: 14px;">
+                    🔗 VER MI HORARIO
+                </button>
+            </div>
+            '''
+            
+            logger.info("🔥 ENVIANDO RESPUESTA CON BOTÓN HTML INTEGRADO")
             return {
-                "fulfillmentText": "📅 **Consulta de Horario Académico**\n\nPara ver tu horario de clases actualizado:",
-                "fulfillmentMessages": [
-                    {
-                        "text": {
-                            "text": ["📅 **Consulta de Horario Académico**\n\nPara ver tu horario de clases actualizado:"]
-                        }
-                    },
-                    {
-                        "text": {
-                            "text": [f'<div class="redirect-button-container"><button class="redirect-btn" onclick="window.open(\'{intranet_url}\', \'_blank\')">🔗 VER MI HORARIO</button></div>']
-                        }
-                    }
-                ]
+                "fulfillmentText": f"📅 **Consulta de Horario Académico**\n\nPara ver tu horario de clases actualizado:\n\n{button_html}",
             }
         
         # ===================================================================
@@ -172,20 +179,26 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
         if intent_name in ["Consultar Notas", "consultar_notas", "mis notas", "calificaciones", "ver mis notas", "quiero ver mis notas", "ver notas"]:
             logger.info("📊 Intent de Consultar Notas detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=notas"
+            
+            button_html = f'''
+            <div style="margin-top: 15px; text-align: center;">
+                <button onclick="window.open('{intranet_url}', '_blank')" 
+                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                               color: white; 
+                               border: none; 
+                               padding: 12px 20px; 
+                               border-radius: 8px; 
+                               font-weight: bold; 
+                               cursor: pointer; 
+                               font-size: 14px;">
+                    🔗 VER MIS NOTAS
+                </button>
+            </div>
+            '''
+            
+            logger.info("🔥 ENVIANDO RESPUESTA CON BOTÓN HTML INTEGRADO - NOTAS")
             return {
-                "fulfillmentText": "📊 **Consulta de Notas y Calificaciones**\n\nPara ver tus notas académicas:",
-                "fulfillmentMessages": [
-                    {
-                        "text": {
-                            "text": ["📊 **Consulta de Notas y Calificaciones**\n\nPara ver tus notas académicas:"]
-                        }
-                    },
-                    {
-                        "text": {
-                            "text": [f'<div class="redirect-button-container"><button class="redirect-btn" onclick="window.open(\'{intranet_url}\', \'_blank\')">🔗 VER MIS NOTAS</button></div>']
-                        }
-                    }
-                ]
+                "fulfillmentText": f"📊 **Consulta de Notas y Calificaciones**\n\nPara ver tus notas académicas:\n\n{button_html}",
             }
         
         # ===================================================================
