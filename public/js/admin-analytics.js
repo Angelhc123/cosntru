@@ -4,12 +4,61 @@
  */
 
 const ANALYTICS_API_URL = 'https://analytics-service-production-effe.up.railway.app/api/v1/analytics';
+const REQUEST_TIMEOUT = 45000; // 45 segundos - Railway puede tardar en despertar
 
 let chartsInstances = {};
 let currentDates = {
     start: null,
     end: null
 };
+
+/**
+ * Fetch con timeout y reintentos
+ */
+async function fetchWithTimeout(url, timeout = REQUEST_TIMEOUT, retries = 2) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            console.log(`🔄 Intento ${attempt}/${retries} - Fetching: ${url}`);
+            
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeout);
+            
+            const response = await fetch(url, { 
+                signal: controller.signal,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`❌ HTTP ${response.status}:`, errorText);
+                throw new Error(`HTTP ${response.status}: ${errorText}`);
+            }
+            
+            const data = await response.json();
+            console.log(`✅ Success:`, data.success);
+            return data;
+            
+        } catch (error) {
+            if (attempt === retries) {
+                console.error(`❌ Falló después de ${retries} intentos:`, error);
+                throw error;
+            }
+            
+            if (error.name === 'AbortError') {
+                console.warn(`⏱️ Timeout en intento ${attempt}, reintentando...`);
+            } else {
+                console.warn(`⚠️ Error en intento ${attempt}:`, error.message);
+            }
+            
+            // Esperar 2 segundos antes de reintentar
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+    }
+}
 
 /**
  * Inicializar dashboard al cargar la página
@@ -49,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
  */
 async function updateDashboard() {
     console.log('🔄 Actualizando dashboard...');
+    console.log('⚠️ Nota: Railway puede tardar ~30 segundos si el servicio estaba inactivo');
     
     // Calcular fechas según el período seleccionado
     const period = document.getElementById('period-select').value;
@@ -65,11 +115,39 @@ async function updateDashboard() {
     currentDates.start = startDate;
     currentDates.end = endDate;
     
-    // Mostrar loading
-    document.getElementById('loading').style.display = 'block';
+    // Mostrar loading con mensaje más informativo
+    const loadingEl = document.getElementById('loading');
+    loadingEl.innerHTML = `
+        <div style="text-align: center; padding: 40px;">
+            <div style="font-size: 48px; margin-bottom: 20px; animation: spin 2s linear infinite;">⏳</div>
+            <h3>Cargando datos desde Analytics Service...</h3>
+            <p style="color: #666; margin-top: 15px;">
+                Si el servicio estaba inactivo en Railway, puede tardar hasta 45 segundos en despertar.<br>
+                Por favor espera...
+            </p>
+            <div style="margin-top: 20px; color: #999; font-size: 14px;">
+                <div id="loading-progress">Conectando al servicio...</div>
+            </div>
+        </div>
+        <style>
+            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        </style>
+    `;
+    loadingEl.style.display = 'block';
     document.getElementById('content').style.display = 'none';
     
     try {
+        // Verificar health primero
+        document.getElementById('loading-progress').textContent = 'Verificando estado del servicio...';
+        
+        try {
+            await fetchWithTimeout(`${ANALYTICS_API_URL}/health`, 15000, 1);
+            document.getElementById('loading-progress').textContent = '✅ Servicio activo. Cargando datos...';
+        } catch {
+            document.getElementById('loading-progress').textContent = '⚠️ Despertando servicio en Railway (esto puede tardar ~30s)...';
+        }
+        
+        // Cargar todos los datos
         await Promise.all([
             loadDashboardStats(),
             loadQueriesChart(),
@@ -89,11 +167,57 @@ async function updateDashboard() {
         console.log('✅ Dashboard actualizado correctamente');
     } catch (error) {
         console.error('❌ Error al actualizar dashboard:', error);
-        document.getElementById('loading').innerHTML = `
-            <div style="color: #ff6b6b;">
-                ❌ Error al cargar datos<br>
-                <small>${error.message}</small><br><br>
-                <button class="btn" onclick="updateDashboard()">🔄 Reintentar</button>
+        
+        loadingEl.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #dc3545;">
+                <div style="font-size: 64px; margin-bottom: 20px;">⚠️</div>
+                <h3>Error al cargar datos del Analytics Service</h3>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px auto; max-width: 700px; text-align: left;">
+                    <strong>🔍 Detalles del error:</strong><br>
+                    <code style="display: block; margin-top: 10px; padding: 10px; background: white; border-radius: 5px; color: #dc3545;">
+                        ${error.message || error}
+                    </code>
+                    <br>
+                    <strong>🌐 URL del servicio:</strong><br>
+                    <code style="display: block; margin-top: 5px; padding: 10px; background: white; border-radius: 5px;">
+                        ${ANALYTICS_API_URL}
+                    </code>
+                    <br>
+                    <strong>💡 Posibles causas:</strong>
+                    <ul style="margin-top: 10px; text-align: left; color: #666;">
+                        <li>El servicio Analytics no está desplegado en Railway</li>
+                        <li>El servicio está en cold start y necesita más tiempo</li>
+                        <li>La base de datos MongoDB no está conectada</li>
+                        <li>Problemas de CORS en el servicio</li>
+                        <li>La URL del servicio cambió en Railway</li>
+                    </ul>
+                </div>
+                <div style="margin-top: 20px;">
+                    <button onclick="updateDashboard()" style="
+                        background: #667eea; 
+                        color: white; 
+                        border: none; 
+                        padding: 12px 24px; 
+                        border-radius: 5px; 
+                        cursor: pointer;
+                        font-size: 16px;
+                        font-weight: 600;
+                        margin-right: 10px;
+                    ">
+                        🔄 Reintentar Carga
+                    </button>
+                    <a href="/admin" style="
+                        display: inline-block;
+                        padding: 12px 24px;
+                        background: #6c757d;
+                        color: white;
+                        text-decoration: none;
+                        border-radius: 5px;
+                        font-weight: 600;
+                    ">
+                        ← Volver al Panel
+                    </a>
+                </div>
             </div>
         `;
     }
@@ -108,8 +232,7 @@ async function loadDashboardStats() {
         endDate: currentDates.end.toISOString()
     });
     
-    const response = await fetch(`${ANALYTICS_API_URL}/dashboard?${params}`);
-    const data = await response.json();
+    const data = await fetchWithTimeout(`${ANALYTICS_API_URL}/dashboard?${params}`);
     
     if (!data.success) {
         throw new Error('Error al cargar estadísticas generales');
@@ -156,8 +279,7 @@ async function loadQueriesChart() {
         granularity: 'day'
     });
     
-    const response = await fetch(`${ANALYTICS_API_URL}/queries?${params}`);
-    const data = await response.json();
+    const data = await fetchWithTimeout(`${ANALYTICS_API_URL}/queries?${params}`);
     
     if (!data.success) {
         throw new Error('Error al cargar consultas');
@@ -206,8 +328,7 @@ async function loadFeedbackChart() {
         endDate: currentDates.end.toISOString()
     });
     
-    const response = await fetch(`${ANALYTICS_API_URL}/feedback?${params}`);
-    const data = await response.json();
+    const data = await fetchWithTimeout(`${ANALYTICS_API_URL}/feedback?${params}`);
     
     if (!data.success) {
         throw new Error('Error al cargar feedback');
@@ -249,8 +370,7 @@ async function loadIntentsChart() {
         limit: '10'
     });
     
-    const response = await fetch(`${ANALYTICS_API_URL}/intents/top?${params}`);
-    const data = await response.json();
+    const data = await fetchWithTimeout(`${ANALYTICS_API_URL}/intents/top?${params}`);
     
     if (!data.success) {
         throw new Error('Error al cargar intents');
@@ -303,8 +423,7 @@ async function loadFaqsChart() {
         limit: '10'
     });
     
-    const response = await fetch(`${ANALYTICS_API_URL}/faqs/top?${params}`);
-    const data = await response.json();
+    const data = await fetchWithTimeout(`${ANALYTICS_API_URL}/faqs/top?${params}`);
     
     if (!data.success) {
         throw new Error('Error al cargar FAQs');
@@ -353,8 +472,7 @@ async function loadTicketsChart() {
         endDate: currentDates.end.toISOString()
     });
     
-    const response = await fetch(`${ANALYTICS_API_URL}/tickets/status?${params}`);
-    const data = await response.json();
+    const data = await fetchWithTimeout(`${ANALYTICS_API_URL}/tickets/status?${params}`);
     
     if (!data.success) {
         throw new Error('Error al cargar tickets');
@@ -402,8 +520,7 @@ async function loadUsagePatterns() {
         endDate: currentDates.end.toISOString()
     });
     
-    const response = await fetch(`${ANALYTICS_API_URL}/usage-patterns?${params}`);
-    const data = await response.json();
+    const data = await fetchWithTimeout(`${ANALYTICS_API_URL}/usage-patterns?${params}`);
     
     if (!data.success) {
         throw new Error('Error al cargar patrones de uso');
@@ -455,8 +572,7 @@ async function loadLowConfidenceChart() {
         threshold: '0.7'
     });
     
-    const response = await fetch(`${ANALYTICS_API_URL}/low-confidence?${params}`);
-    const data = await response.json();
+    const data = await fetchWithTimeout(`${ANALYTICS_API_URL}/low-confidence?${params}`);
     
     if (!data.success) {
         throw new Error('Error al cargar intents de baja confianza');
@@ -510,8 +626,7 @@ async function loadEscalationReasonsChart() {
         endDate: currentDates.end.toISOString()
     });
     
-    const response = await fetch(`${ANALYTICS_API_URL}/tickets/escalation-reasons?${params}`);
-    const data = await response.json();
+    const data = await fetchWithTimeout(`${ANALYTICS_API_URL}/tickets/escalation-reasons?${params}`);
     
     if (!data.success) {
         throw new Error('Error al cargar razones de escalación');
