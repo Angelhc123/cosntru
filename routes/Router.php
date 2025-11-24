@@ -45,10 +45,13 @@ class Router {
         // Eliminar parámetros de query string
         $path = strtok($path, '?');
 
-        // PRIMERO: Verificar si es un archivo físico (CSS, JS, etc.)
+        // PRIMERO: Verificar si es un archivo físico (CSS, JS, imágenes, etc.)
+        // En Railway con php -S, necesitamos servir estos archivos directamente
         $publicFile = __DIR__ . '/../public' . $path;
-        if (is_file($publicFile)) {
-            return false; // Dejar que PHP sirva el archivo directamente
+        if (is_file($publicFile) && preg_match('/\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|map)$/i', $path)) {
+            // Servir el archivo estático con el tipo MIME correcto
+            $this->serveStaticFile($publicFile, $path);
+            return;
         }
 
         // Manejar rutas API
@@ -64,6 +67,33 @@ class Router {
 
         // Manejar rutas de la aplicación
         $this->handleAppRoute($method, $path);
+    }
+
+    private function serveStaticFile($filePath, $requestPath) {
+        // Determinar tipo MIME
+        $extension = strtolower(pathinfo($requestPath, PATHINFO_EXTENSION));
+        $mimeTypes = [
+            'css' => 'text/css',
+            'js' => 'application/javascript',
+            'png' => 'image/png',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'gif' => 'image/gif',
+            'svg' => 'image/svg+xml',
+            'ico' => 'image/x-icon',
+            'woff' => 'font/woff',
+            'woff2' => 'font/woff2',
+            'ttf' => 'font/ttf',
+            'eot' => 'application/vnd.ms-fontobject',
+            'map' => 'application/json'
+        ];
+
+        $mimeType = $mimeTypes[$extension] ?? 'application/octet-stream';
+        
+        header('Content-Type: ' . $mimeType);
+        header('Content-Length: ' . filesize($filePath));
+        readfile($filePath);
+        exit;
     }
 
     private function handleApiRoute($path) {
