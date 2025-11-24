@@ -395,7 +395,6 @@
 </head>
 <body>
     <?php
-        session_start();
         $usuario = isset($_SESSION['usuario']) ? htmlspecialchars($_SESSION['usuario']) : 'Invitado';
         $nombreCompleto = isset($_SESSION['nombre_completo']) && $_SESSION['nombre_completo'] !== '' ? htmlspecialchars($_SESSION['nombre_completo']) : 'PAJA DE LA CRUZ, Piero Alexander';
         $codigo = '2020067576';

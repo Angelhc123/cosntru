@@ -333,7 +333,7 @@
                             <span class="card__icon">&#9998;</span>
                         </div>
                     </div>
-                    <a class="card__action" href="#">Ingresar &#10148;</a>
+                    <a class="card__action" href="#" onclick="mostrarActualizacionDatos(event)">Ingresar &#10148;</a>
                 </article>
 
                 <article class="card card--grey">
@@ -346,7 +346,7 @@
                             <span class="card__icon">&#128196;</span>
                         </div>
                     </div>
-                    <a class="card__action" href="#">Ingresar &#10148;</a>
+                    <a class="card__action" href="#" onclick="mostrarFutWeb(event)">Ingresar &#10148;</a>
                 </article>
 
                 <article class="card card--navy">
@@ -359,7 +359,7 @@
                             <span class="card__icon">&#128197;</span>
                         </div>
                     </div>
-                    <a class="card__action" href="#">Ingresar &#10148;</a>
+                    <a class="card__action" href="/alumno">Ingresar &#10148;</a>
                 </article>
 
                 <article class="card card--navy">
@@ -372,7 +372,7 @@
                             <span class="card__icon">&#128203;</span>
                         </div>
                     </div>
-                    <a class="card__action" href="#">Ingresar &#10148;</a>
+                    <a class="card__action" href="#" onclick="mostrarEncuestas(event)">Ingresar &#10148;</a>
                 </article>
 
                 <article class="card card--dark">
@@ -385,7 +385,7 @@
                             <span class="card__icon">&#128187;</span>
                         </div>
                     </div>
-                    <a class="card__action" href="#">Ingresar &#10148;</a>
+                    <a class="card__action" href="#" onclick="mostrarPracticas(event)">Ingresar &#10148;</a>
                 </article>
             </section>
 
@@ -394,5 +394,271 @@
             </footer>
         </main>
     </div>
+
+    <!-- Modal para formularios -->
+    <div id="modalAcademico" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; overflow:auto;">
+        <div style="max-width:800px; margin:50px auto; background:white; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+            <div style="background:linear-gradient(135deg, #0b2f66 0%, #0a2550 100%); color:white; padding:20px 30px; border-radius:8px 8px 0 0; display:flex; justify-content:space-between; align-items:center;">
+                <h2 id="modalTitle" style="margin:0; font-size:20px;">Título del Modal</h2>
+                <button onclick="cerrarModal()" style="background:none; border:none; color:white; font-size:28px; cursor:pointer; line-height:1;">&times;</button>
+            </div>
+            <div id="modalContent" style="padding:30px;">
+                Contenido del modal
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function cerrarModal() {
+            document.getElementById('modalAcademico').style.display = 'none';
+        }
+
+        function mostrarModal(titulo, contenido) {
+            document.getElementById('modalTitle').textContent = titulo;
+            document.getElementById('modalContent').innerHTML = contenido;
+            document.getElementById('modalAcademico').style.display = 'block';
+        }
+
+        function mostrarActualizacionDatos(e) {
+            e.preventDefault();
+            const contenido = `
+                <div style="display:flex; flex-direction:column; gap:20px;">
+                    <p style="color:#5c6b80; margin:0 0 10px;">Complete los siguientes datos personales:</p>
+                    
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                        <div>
+                            <label style="display:block; margin-bottom:6px; font-weight:600; color:#0b2f66;">Nombres:</label>
+                            <input type="text" value="Piero Alexander" style="width:100%; padding:10px; border:1px solid #d3d7e0; border-radius:4px;">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:6px; font-weight:600; color:#0b2f66;">Apellidos:</label>
+                            <input type="text" value="Paja De La Cruz" style="width:100%; padding:10px; border:1px solid #d3d7e0; border-radius:4px;">
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                        <div>
+                            <label style="display:block; margin-bottom:6px; font-weight:600; color:#0b2f66;">DNI:</label>
+                            <input type="text" value="75843621" style="width:100%; padding:10px; border:1px solid #d3d7e0; border-radius:4px;">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:6px; font-weight:600; color:#0b2f66;">Fecha de Nacimiento:</label>
+                            <input type="date" value="2002-05-15" style="width:100%; padding:10px; border:1px solid #d3d7e0; border-radius:4px;">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label style="display:block; margin-bottom:6px; font-weight:600; color:#0b2f66;">Dirección:</label>
+                        <input type="text" value="Av. Bolognesi 1234, Tacna" style="width:100%; padding:10px; border:1px solid #d3d7e0; border-radius:4px;">
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                        <div>
+                            <label style="display:block; margin-bottom:6px; font-weight:600; color:#0b2f66;">Teléfono:</label>
+                            <input type="tel" value="952847163" style="width:100%; padding:10px; border:1px solid #d3d7e0; border-radius:4px;">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:6px; font-weight:600; color:#0b2f66;">Email Personal:</label>
+                            <input type="email" value="piero.paja@gmail.com" style="width:100%; padding:10px; border:1px solid #d3d7e0; border-radius:4px;">
+                        </div>
+                    </div>
+
+                    <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:10px;">
+                        <button onclick="cerrarModal()" style="padding:10px 20px; background:#737987; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:600;">Cancelar</button>
+                        <button onclick="guardarDatos()" style="padding:10px 20px; background:#0b2f66; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:600;">Guardar Cambios</button>
+                    </div>
+                </div>
+            `;
+            mostrarModal('Actualización de Datos Personales', contenido);
+        }
+
+        function mostrarFutWeb(e) {
+            e.preventDefault();
+            const contenido = `
+                <div style="display:flex; flex-direction:column; gap:20px;">
+                    <div style="background:#fff3cd; border:1px solid #ffc107; padding:15px; border-radius:4px; color:#856404;">
+                        <strong>⚠️ Importante:</strong> Complete este formulario para solicitar trámites de matrícula.
+                    </div>
+
+                    <div>
+                        <label style="display:block; margin-bottom:6px; font-weight:600; color:#0b2f66;">Tipo de Trámite:</label>
+                        <select style="width:100%; padding:10px; border:1px solid #d3d7e0; border-radius:4px;">
+                            <option>Seleccione un tipo de trámite</option>
+                            <option>Rectificación de matrícula</option>
+                            <option>Reserva de matrícula</option>
+                            <option>Retiro de curso</option>
+                            <option>Licencia de estudios</option>
+                            <option>Matrícula extemporánea</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="display:block; margin-bottom:6px; font-weight:600; color:#0b2f66;">Semestre Académico:</label>
+                        <select style="width:100%; padding:10px; border:1px solid #d3d7e0; border-radius:4px;">
+                            <option>2025-II</option>
+                            <option>2025-I</option>
+                            <option>2024-II</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="display:block; margin-bottom:6px; font-weight:600; color:#0b2f66;">Motivo de la Solicitud:</label>
+                        <textarea rows="4" style="width:100%; padding:10px; border:1px solid #d3d7e0; border-radius:4px; font-family:Arial;" placeholder="Describa el motivo de su solicitud..."></textarea>
+                    </div>
+
+                    <div>
+                        <label style="display:block; margin-bottom:6px; font-weight:600; color:#0b2f66;">Adjuntar Documentos:</label>
+                        <input type="file" multiple style="width:100%; padding:10px; border:1px solid #d3d7e0; border-radius:4px;">
+                        <small style="color:#5c6b80;">Formatos permitidos: PDF, JPG, PNG (Máx. 5MB)</small>
+                    </div>
+
+                    <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:10px;">
+                        <button onclick="cerrarModal()" style="padding:10px 20px; background:#737987; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:600;">Cancelar</button>
+                        <button onclick="enviarFut()" style="padding:10px 20px; background:#aa134b; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:600;">Enviar Solicitud</button>
+                    </div>
+                </div>
+            `;
+            mostrarModal('Formulario Único de Trámite (FUT) Web', contenido);
+        }
+
+        function mostrarEncuestas(e) {
+            e.preventDefault();
+            const contenido = `
+                <div style="display:flex; flex-direction:column; gap:20px;">
+                    <p style="color:#5c6b80; margin:0;">Lista de encuestas disponibles para el semestre actual:</p>
+                    
+                    <div style="border:1px solid #d3d7e0; border-radius:4px; overflow:hidden;">
+                        <div style="background:#0b2f66; color:white; padding:12px 20px; font-weight:600;">
+                            Encuestas Pendientes
+                        </div>
+                        <div style="padding:20px; display:flex; flex-direction:column; gap:15px;">
+                            <div style="border-left:4px solid #28a745; padding:15px; background:#f8f9fa;">
+                                <div style="display:flex; justify-content:space-between; align-items:start;">
+                                    <div>
+                                        <strong style="color:#0b2f66;">Encuesta de Evaluación Docente 2025-II</strong>
+                                        <p style="margin:8px 0 0; color:#5c6b80; font-size:14px;">Evalúa el desempeño de tus docentes</p>
+                                        <small style="color:#28a745;">📅 Disponible hasta: 30/11/2025</small>
+                                    </div>
+                                    <button onclick="responderEncuesta('docente')" style="padding:8px 16px; background:#28a745; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:600; white-space:nowrap;">Responder</button>
+                                </div>
+                            </div>
+
+                            <div style="border-left:4px solid #ffc107; padding:15px; background:#f8f9fa;">
+                                <div style="display:flex; justify-content:space-between; align-items:start;">
+                                    <div>
+                                        <strong style="color:#0b2f66;">Encuesta de Servicios Universitarios</strong>
+                                        <p style="margin:8px 0 0; color:#5c6b80; font-size:14px;">Ayúdanos a mejorar nuestros servicios</p>
+                                        <small style="color:#856404;">📅 Disponible hasta: 28/11/2025</small>
+                                    </div>
+                                    <button onclick="responderEncuesta('servicios')" style="padding:8px 16px; background:#ffc107; color:#000; border:none; border-radius:4px; cursor:pointer; font-weight:600; white-space:nowrap;">Responder</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="border:1px solid #d3d7e0; border-radius:4px; overflow:hidden;">
+                        <div style="background:#737987; color:white; padding:12px 20px; font-weight:600;">
+                            Encuestas Completadas
+                        </div>
+                        <div style="padding:20px;">
+                            <div style="border-left:4px solid #6c757d; padding:15px; background:#f8f9fa;">
+                                <strong style="color:#0b2f66;">Encuesta de Infraestructura 2025-I</strong>
+                                <p style="margin:8px 0 0; color:#5c6b80; font-size:14px;">✓ Completada el 15/06/2025</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+                        <button onclick="cerrarModal()" style="padding:10px 20px; background:#0b2f66; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:600;">Cerrar</button>
+                    </div>
+                </div>
+            `;
+            mostrarModal('Gestión de Encuestas Académicas', contenido);
+        }
+
+        function mostrarPracticas(e) {
+            e.preventDefault();
+            const contenido = `
+                <div style="display:flex; flex-direction:column; gap:20px;">
+                    <div style="background:#e7f3ff; border:1px solid #0b2f66; padding:15px; border-radius:4px; color:#0b2f66;">
+                        <strong>ℹ️ Información:</strong> Busca y postula a oportunidades de prácticas pre-profesionales.
+                    </div>
+
+                    <div>
+                        <label style="display:block; margin-bottom:6px; font-weight:600; color:#0b2f66;">Buscar por Área:</label>
+                        <select style="width:100%; padding:10px; border:1px solid #d3d7e0; border-radius:4px;">
+                            <option>Todas las áreas</option>
+                            <option>Desarrollo de Software</option>
+                            <option>Redes y Sistemas</option>
+                            <option>Inteligencia Artificial</option>
+                            <option>Ciberseguridad</option>
+                            <option>Base de Datos</option>
+                        </select>
+                    </div>
+
+                    <div style="border:1px solid #d3d7e0; border-radius:4px; overflow:hidden;">
+                        <div style="background:#0b2f66; color:white; padding:12px 20px; font-weight:600;">
+                            Prácticas Disponibles
+                        </div>
+                        <div style="padding:20px; display:flex; flex-direction:column; gap:15px; max-height:300px; overflow-y:auto;">
+                            <div style="border:1px solid #d3d7e0; padding:15px; border-radius:4px;">
+                                <strong style="color:#0b2f66;">Practicante de Desarrollo Web</strong>
+                                <p style="margin:8px 0; color:#5c6b80; font-size:14px;">Empresa: TechSolutions SAC</p>
+                                <p style="margin:8px 0; color:#5c6b80; font-size:14px;">📍 Tacna | 💰 S/. 1,200 | ⏰ 6 horas/día</p>
+                                <button onclick="postularPractica('web')" style="margin-top:10px; padding:6px 14px; background:#28a745; color:white; border:none; border-radius:4px; cursor:pointer; font-size:13px;">Postular</button>
+                            </div>
+
+                            <div style="border:1px solid #d3d7e0; padding:15px; border-radius:4px;">
+                                <strong style="color:#0b2f66;">Practicante de Redes y Sistemas</strong>
+                                <p style="margin:8px 0; color:#5c6b80; font-size:14px;">Empresa: Sistemas Integrados EIRL</p>
+                                <p style="margin:8px 0; color:#5c6b80; font-size:14px;">📍 Tacna | 💰 S/. 1,000 | ⏰ 4 horas/día</p>
+                                <button onclick="postularPractica('redes')" style="margin-top:10px; padding:6px 14px; background:#28a745; color:white; border:none; border-radius:4px; cursor:pointer; font-size:13px;">Postular</button>
+                            </div>
+
+                            <div style="border:1px solid #d3d7e0; padding:15px; border-radius:4px;">
+                                <strong style="color:#0b2f66;">Practicante de Inteligencia Artificial</strong>
+                                <p style="margin:8px 0; color:#5c6b80; font-size:14px;">Empresa: AI Labs Perú</p>
+                                <p style="margin:8px 0; color:#5c6b80; font-size:14px;">📍 Remoto | 💰 S/. 1,500 | ⏰ 6 horas/día</p>
+                                <button onclick="postularPractica('ia')" style="margin-top:10px; padding:6px 14px; background:#28a745; color:white; border:none; border-radius:4px; cursor:pointer; font-size:13px;">Postular</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+                        <button onclick="cerrarModal()" style="padding:10px 20px; background:#737987; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:600;">Cerrar</button>
+                    </div>
+                </div>
+            `;
+            mostrarModal('Búsqueda de Prácticas Pre-Profesionales', contenido);
+        }
+
+        function guardarDatos() {
+            alert('✅ Datos actualizados correctamente');
+            cerrarModal();
+        }
+
+        function enviarFut() {
+            alert('✅ Solicitud FUT enviada correctamente. Recibirá una notificación en su correo institucional.');
+            cerrarModal();
+        }
+
+        function responderEncuesta(tipo) {
+            cerrarModal();
+            setTimeout(() => {
+                alert('📝 Redirigiendo a la encuesta de ' + (tipo === 'docente' ? 'Evaluación Docente' : 'Servicios Universitarios'));
+            }, 300);
+        }
+
+        function postularPractica(area) {
+            alert('✅ Tu postulación ha sido registrada. La empresa se pondrá en contacto contigo pronto.');
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('modalAcademico').addEventListener('click', function(e) {
+            if (e.target === this) {
+                cerrarModal();
+            }
+        });
+    </script>
 </body>
 </html>
