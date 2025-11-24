@@ -45,14 +45,20 @@ class Router {
         // Eliminar parámetros de query string
         $path = strtok($path, '?');
 
+        // PRIMERO: Verificar si es un archivo físico (CSS, JS, etc.)
+        $publicFile = __DIR__ . '/../public' . $path;
+        if (is_file($publicFile)) {
+            return false; // Dejar que PHP sirva el archivo directamente
+        }
+
         // Manejar rutas API
         if (strpos($path, '/api/') === 0) {
             $this->handleApiRoute($path);
             return;
         }
 
-        // Manejar archivos estáticos (CSS, JS, imágenes)
-        if ($this->handleStaticFile($path)) {
+        // Manejar rutas especiales (captcha, etc.)
+        if ($this->handleSpecialRoutes($path)) {
             return;
         }
 
@@ -74,7 +80,7 @@ class Router {
         echo json_encode(['error' => 'API endpoint not found']);
     }
 
-    private function handleStaticFile($path) {
+    private function handleSpecialRoutes($path) {
         // Rutas especiales para utilidades
         if ($path === '/captcha') {
             require_once __DIR__ . '/../app/utils/CaptchaUtil.php';
@@ -86,14 +92,10 @@ class Router {
             return true;
         }
 
-        // CSS, JS y otros assets
-        $publicFile = __DIR__ . '/../public' . $path;
-        if (is_file($publicFile)) {
-            return false; // Let PHP serve the file
-        }
-
         return false;
     }
+
+
 
     private function handleAppRoute($method, $path) {
         if (isset($this->routes[$method][$path])) {

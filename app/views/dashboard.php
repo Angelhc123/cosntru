@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Net.UPT.edu.pe - Dashboard</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/chatbox-with-history.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/chatbox-with-history.css">
     <style>
         :root{
             --navy:#0b2f66;
@@ -1132,10 +1132,10 @@
         </div>
     </div>
 
-    <script src="js/script.js"></script>
-    <script src="js/config.js"></script>
-    <script src="js/tickets-user.js"></script>
-    <script src="js/chatbox-with-history.js"></script>
+    <script src="/js/script.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/tickets-user.js"></script>
+    <script src="/js/chatbox-with-history.js"></script>
     <script>
         // Actualiza la hora del sistema en tiempo real cada segundo
         (function(){

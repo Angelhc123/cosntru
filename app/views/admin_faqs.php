@@ -250,7 +250,7 @@
         </div>
     </div>
 
-    <script src="js/config.js"></script>
+    <script src="/js/config.js"></script>
     <script>
         const API_URL = API_BASE_URL; // Usar configuración centralizada
         let editingRow = null;
@@ -430,8 +430,8 @@
     </script>
 
     <!-- CHATBOX WIDGET -->
-    <link rel="stylesheet" href="css/chatbox.css">
-    <script src="js/chatbox.js"></script>
+    <link rel="stylesheet" href="/css/chatbox.css">
+    <script src="/js/chatbox.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const chatbox = new ChatboxWidget();
