@@ -151,7 +151,7 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             logger.info("📅 Intent de Consultar Horario detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=horario"
             return {
-                "fulfillmentText": f"📅 **Consulta de Horario Académico**\n\nPara ver tu horario de clases actualizado:\n\n[REDIRECT_BUTTON|{intranet_url}|🔗 VER MI HORARIO]",
+                "fulfillmentText": f"📅 **Consulta de Horario Académico**\n\nPara ver tu horario de clases actualizado, haz clic en el botón de abajo:\n\n[REDIRECT_BUTTON|{intranet_url}|🔗 VER MI HORARIO]",
             }
         
         # ===================================================================
@@ -161,7 +161,7 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             logger.info("📊 Intent de Consultar Notas detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=notas"
             return {
-                "fulfillmentText": f"📊 **Consulta de Notas y Calificaciones**\n\nPara ver tus notas académicas:\n\n[REDIRECT_BUTTON|{intranet_url}|🔗 VER MIS NOTAS]",
+                "fulfillmentText": f"📊 **Consulta de Notas y Calificaciones**\n\nPara ver tus notas académicas, haz clic en el botón de abajo:\n\n[REDIRECT_BUTTON|{intranet_url}|🔗 VER MIS NOTAS]",
             }
         
         # ===================================================================
@@ -171,7 +171,7 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             logger.info("✅ Intent de Consultar Asistencia detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=asistencia"
             return {
-                "fulfillmentText": f"✅ **Consulta de Asistencia**\n\nPara revisar tu registro de asistencia:\n\n[REDIRECT_BUTTON|{intranet_url}|🔗 VER MI ASISTENCIA]",
+                "fulfillmentText": f"✅ **Consulta de Asistencia**\n\nPara revisar tu registro de asistencia, haz clic en el botón de abajo:\n\n[REDIRECT_BUTTON|{intranet_url}|🔗 VER MI ASISTENCIA]",
             }
         
         # ===================================================================
