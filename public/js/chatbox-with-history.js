@@ -498,18 +498,59 @@ class ChatboxWidgetWithHistory {
         if (sender === 'system') {
             // Mensaje del sistema (escalamiento, notificaciones, etc.)
             messageDiv.innerHTML = `<div class="system-notification">${text}</div>`;
-        } else if (sender === 'bot' && messageId) {
-            messageDiv.innerHTML = `
-                <div class="message-text">${text}</div>
-                <div class="feedback-buttons" data-message-id="${messageId}">
-                    <button class="feedback-btn positive" onclick="window.chatboxWidget.sendFeedback('${messageId}', 'positive')" title="Respuesta útil">
-                        👍
-                    </button>
-                    <button class="feedback-btn negative" onclick="window.chatboxWidget.sendFeedback('${messageId}', 'negative')" title="Respuesta no útil">
-                        👎
-                    </button>
-                </div>
-            `;
+        } else if (sender === 'bot') {
+            // Detectar patrón de botón de redirección [REDIRECT_BUTTON|URL|TEXTO|MENSAJE]
+            const redirectPattern = /\[REDIRECT_BUTTON\|([^\|]+)\|([^\|]+)\|([^\]]*)\]/;
+            const redirectMatch = text.match(redirectPattern);
+            
+            if (redirectMatch) {
+                const url = redirectMatch[1];
+                const buttonText = redirectMatch[2];
+                const messageText = redirectMatch[3].trim();
+                
+                // Solo agregar texto si existe
+                let textContent = '';
+                if (messageText && messageText.length > 0) {
+                    textContent = `<div class="message-text">${messageText}</div>`;
+                }
+                
+                messageDiv.innerHTML = `
+                    ${textContent}
+                    <div class="escalation-buttons" style="margin-top: ${messageText ? '10px' : '0'};">
+                        <button class="escalation-btn yes-btn" onclick="window.open('${url}', '_blank')" style="
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            color: white;
+                            border: none;
+                            padding: 12px 24px;
+                            border-radius: 8px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            font-size: 14px;
+                            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+                            transition: all 0.3s ease;
+                            width: 100%;
+                        ">
+                            ${buttonText}
+                        </button>
+                    </div>
+                `;
+            } else if (messageId) {
+                // Mensaje normal con feedback
+                messageDiv.innerHTML = `
+                    <div class="message-text">${text}</div>
+                    <div class="feedback-buttons" data-message-id="${messageId}">
+                        <button class="feedback-btn positive" onclick="window.chatboxWidget.sendFeedback('${messageId}', 'positive')" title="Respuesta útil">
+                            👍
+                        </button>
+                        <button class="feedback-btn negative" onclick="window.chatboxWidget.sendFeedback('${messageId}', 'negative')" title="Respuesta no útil">
+                            👎
+                        </button>
+                    </div>
+                `;
+            } else {
+                // Mensaje bot sin feedback
+                messageDiv.innerHTML = `<div class="message-text">${text}</div>`;
+            }
         } else {
             messageDiv.textContent = text;
         }
