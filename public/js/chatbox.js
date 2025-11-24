@@ -553,74 +553,47 @@ class ChatboxWidget {
         
         const messagesContainer = document.getElementById('chat-messages');
         
-        // Detectar patrón de botón [BUTTON_CREATE|URL|TEXTO]
-        const buttonPattern = /\[BUTTON_CREATE\|([^\|]+)\|([^\]]+)\]/;
-        const buttonMatch = message.match(buttonPattern);
+        // Detectar patrón de botón de redirección [REDIRECT_BUTTON|URL|TEXTO|MENSAJE]
+        const redirectPattern = /\[REDIRECT_BUTTON\|([^\|]+)\|([^\|]+)\|([^\]]+)\]/;
+        const redirectMatch = message.match(redirectPattern);
         
-        if (buttonMatch) {
-            console.log('✅ BOTÓN DETECTADO!');
-            const url = buttonMatch[1];
-            const buttonText = buttonMatch[2];
+        if (redirectMatch) {
+            console.log('✅ BOTÓN DE REDIRECCIÓN DETECTADO!');
+            const url = redirectMatch[1];
+            const buttonText = redirectMatch[2];
+            const messageText = redirectMatch[3];
             console.log('📍 URL:', url);
             console.log('📝 Texto del botón:', buttonText);
+            console.log('💬 Mensaje:', messageText);
             
-            // Remover el patrón del mensaje
-            const cleanMessage = message.replace(buttonPattern, '').trim();
-            
-            // Crear mensaje de texto sin el patrón
+            // Crear mensaje con botón estilo ticket
             const messageDiv = document.createElement('div');
-            messageDiv.className = 'message bot-message';
-            
-            let formattedMessage = this.escapeHtml(cleanMessage);
-            formattedMessage = this.convertUrlsToLinks(formattedMessage);
-            
-            let feedbackButtons = '';
-            if (messageId) {
-                feedbackButtons = `
-                    <div class="feedback-buttons" data-message-id="${messageId}">
-                        <button class="feedback-btn positive" onclick="window.chatboxWidget.sendFeedback('${messageId}', 'positive')" title="Respuesta útil">
-                            👍
-                        </button>
-                        <button class="feedback-btn negative" onclick="window.chatboxWidget.sendFeedback('${messageId}', 'negative')" title="Respuesta no útil">
-                            👎
+            messageDiv.className = 'message bot-message escalation-prompt';
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <p>${this.escapeHtml(messageText)}</p>
+                    <div class="escalation-buttons">
+                        <button class="escalation-btn yes-btn" onclick="window.open('${url}', '_blank')" style="
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            color: white;
+                            border: none;
+                            padding: 12px 24px;
+                            border-radius: 8px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            font-size: 14px;
+                            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+                            transition: all 0.3s ease;
+                            width: 100%;
+                        ">
+                            ${buttonText}
                         </button>
                     </div>
-                `;
-            }
-            
-            messageDiv.innerHTML = `
-                <div class="message-content">🤖 ${formattedMessage}</div>
+                </div>
                 <div class="message-time">${new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}</div>
-                ${feedbackButtons}
             `;
             messagesContainer.appendChild(messageDiv);
-            
-            // Crear div separado para el botón
-            const buttonDiv = document.createElement('div');
-            buttonDiv.className = 'message bot-message';
-            buttonDiv.style.marginTop = '8px';
-            buttonDiv.innerHTML = `
-                <div class="message-content" style="padding: 0;">
-                    <button onclick="window.open('${url}', '_blank')" style="
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        color: white;
-                        border: none;
-                        padding: 12px 24px;
-                        border-radius: 25px;
-                        font-weight: 600;
-                        cursor: pointer;
-                        font-size: 14px;
-                        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-                        transition: all 0.3s ease;
-                        width: 100%;
-                        text-align: center;
-                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.6)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(102, 126, 234, 0.4)';">
-                        ${buttonText}
-                    </button>
-                </div>
-            `;
-            messagesContainer.appendChild(buttonDiv);
-            console.log('✅ Botón creado y agregado al DOM');
+            console.log('✅ Botón de redirección creado');
             
         } else {
             // Mensaje normal sin botón
