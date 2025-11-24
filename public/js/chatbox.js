@@ -549,34 +549,108 @@ class ChatboxWidget {
     }
 
     addBotMessage(message, messageId = null, scroll = true) {
+        console.log('🔍 addBotMessage recibido:', message);
+        
         const messagesContainer = document.getElementById('chat-messages');
-        const messageDiv = document.createElement('div');
-        messageDiv.className = 'message bot-message';
         
-        // Convertir URLs en enlaces clickeables
-        let formattedMessage = this.escapeHtml(message);
-        formattedMessage = this.convertUrlsToLinks(formattedMessage);
+        // Detectar patrón de botón [BUTTON_CREATE|URL|TEXTO]
+        const buttonPattern = /\[BUTTON_CREATE\|([^\|]+)\|([^\]]+)\]/;
+        const buttonMatch = message.match(buttonPattern);
         
-        let feedbackButtons = '';
-        if (messageId) {
-            feedbackButtons = `
-                <div class="feedback-buttons" data-message-id="${messageId}">
-                    <button class="feedback-btn positive" onclick="window.chatboxWidget.sendFeedback('${messageId}', 'positive')" title="Respuesta útil">
-                        👍
-                    </button>
-                    <button class="feedback-btn negative" onclick="window.chatboxWidget.sendFeedback('${messageId}', 'negative')" title="Respuesta no útil">
-                        👎
+        if (buttonMatch) {
+            console.log('✅ BOTÓN DETECTADO!');
+            const url = buttonMatch[1];
+            const buttonText = buttonMatch[2];
+            console.log('📍 URL:', url);
+            console.log('📝 Texto del botón:', buttonText);
+            
+            // Remover el patrón del mensaje
+            const cleanMessage = message.replace(buttonPattern, '').trim();
+            
+            // Crear mensaje de texto sin el patrón
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot-message';
+            
+            let formattedMessage = this.escapeHtml(cleanMessage);
+            formattedMessage = this.convertUrlsToLinks(formattedMessage);
+            
+            let feedbackButtons = '';
+            if (messageId) {
+                feedbackButtons = `
+                    <div class="feedback-buttons" data-message-id="${messageId}">
+                        <button class="feedback-btn positive" onclick="window.chatboxWidget.sendFeedback('${messageId}', 'positive')" title="Respuesta útil">
+                            👍
+                        </button>
+                        <button class="feedback-btn negative" onclick="window.chatboxWidget.sendFeedback('${messageId}', 'negative')" title="Respuesta no útil">
+                            👎
+                        </button>
+                    </div>
+                `;
+            }
+            
+            messageDiv.innerHTML = `
+                <div class="message-content">🤖 ${formattedMessage}</div>
+                <div class="message-time">${new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}</div>
+                ${feedbackButtons}
+            `;
+            messagesContainer.appendChild(messageDiv);
+            
+            // Crear div separado para el botón
+            const buttonDiv = document.createElement('div');
+            buttonDiv.className = 'message bot-message';
+            buttonDiv.style.marginTop = '8px';
+            buttonDiv.innerHTML = `
+                <div class="message-content" style="padding: 0;">
+                    <button onclick="window.open('${url}', '_blank')" style="
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        border: none;
+                        padding: 12px 24px;
+                        border-radius: 25px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        font-size: 14px;
+                        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                        transition: all 0.3s ease;
+                        width: 100%;
+                        text-align: center;
+                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.6)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(102, 126, 234, 0.4)';">
+                        ${buttonText}
                     </button>
                 </div>
             `;
+            messagesContainer.appendChild(buttonDiv);
+            console.log('✅ Botón creado y agregado al DOM');
+            
+        } else {
+            // Mensaje normal sin botón
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot-message';
+            
+            let formattedMessage = this.escapeHtml(message);
+            formattedMessage = this.convertUrlsToLinks(formattedMessage);
+            
+            let feedbackButtons = '';
+            if (messageId) {
+                feedbackButtons = `
+                    <div class="feedback-buttons" data-message-id="${messageId}">
+                        <button class="feedback-btn positive" onclick="window.chatboxWidget.sendFeedback('${messageId}', 'positive')" title="Respuesta útil">
+                            👍
+                        </button>
+                        <button class="feedback-btn negative" onclick="window.chatboxWidget.sendFeedback('${messageId}', 'negative')" title="Respuesta no útil">
+                            👎
+                        </button>
+                    </div>
+                `;
+            }
+            
+            messageDiv.innerHTML = `
+                <div class="message-content">🤖 ${formattedMessage}</div>
+                <div class="message-time">${new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}</div>
+                ${feedbackButtons}
+            `;
+            messagesContainer.appendChild(messageDiv);
         }
-        
-        messageDiv.innerHTML = `
-            <div class="message-content">🤖 ${formattedMessage}</div>
-            <div class="message-time">${new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}</div>
-            ${feedbackButtons}
-        `;
-        messagesContainer.appendChild(messageDiv);
         
         if (scroll) {
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
