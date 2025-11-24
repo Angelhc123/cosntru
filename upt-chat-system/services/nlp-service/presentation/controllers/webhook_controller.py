@@ -147,31 +147,31 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
         # ===================================================================
         # CASO 5: Intent de Consultar Horario del Alumno
         # ===================================================================
-        if intent_name in ["Consultar Horario", "consultar_horario", "horario_alumno", "mi horario"]:
-            logger.info("� Intent de Consultar Horario detectado")
+        if intent_name in ["Consultar Horario", "consultar_horario", "horario_alumno", "mi horario", "ver mi horario", "quiero ver mi horario", "ver horario"]:
+            logger.info("📅 Intent de Consultar Horario detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=horario"
             return {
-                "fulfillmentText": f"📚 **Consulta de Horario Académico**\n\nPara ver tu horario de clases actualizado, ingresa aquí:\n👉 {intranet_url}\n\n✅ Podrás ver:\n• Cursos del ciclo actual\n• Horarios por día y hora\n• Sección asignada\n• Códigos de curso\n\n¿Necesitas ayuda con algo más?",
+                "fulfillmentText": f"� **Consulta de Horario**\n\nIngresa aquí:\n{intranet_url}",
             }
         
         # ===================================================================
         # CASO 6: Intent de Consultar Notas del Alumno
         # ===================================================================
-        if intent_name in ["Consultar Notas", "consultar_notas", "mis notas", "calificaciones"]:
-            logger.info("� Intent de Consultar Notas detectado")
+        if intent_name in ["Consultar Notas", "consultar_notas", "mis notas", "calificaciones", "ver mis notas", "quiero ver mis notas", "ver notas"]:
+            logger.info("📊 Intent de Consultar Notas detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=notas"
             return {
-                "fulfillmentText": f"� **Consulta de Notas y Calificaciones**\n\nPara ver tus notas académicas, ingresa aquí:\n👉 {intranet_url}\n\n✅ Podrás ver:\n• Notas por curso y unidad\n• Evaluaciones pendientes\n• Promedios parciales y finales\n• Peso de cada evaluación\n\n¿Necesitas ayuda con algo más?",
+                "fulfillmentText": f"📊 **Consulta de Notas**\n\nIngresa aquí:\n{intranet_url}",
             }
         
         # ===================================================================
         # CASO 7: Intent de Consultar Asistencia del Alumno
         # ===================================================================
-        if intent_name in ["Consultar Asistencia", "consultar_asistencia", "mi asistencia", "asistencias"]:
+        if intent_name in ["Consultar Asistencia", "consultar_asistencia", "mi asistencia", "asistencias", "ver mi asistencia", "quiero ver mi asistencia", "ver asistencia"]:
             logger.info("✅ Intent de Consultar Asistencia detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=asistencia"
             return {
-                "fulfillmentText": f"✅ **Consulta de Asistencia**\n\nPara ver tu registro de asistencias, ingresa aquí:\n👉 {intranet_url}\n\n✅ Podrás ver:\n• Asistencias por curso\n• Fechas y estados (Asiste/Falta/Tardanza)\n• Porcentaje de asistencia\n• Calendario de clases\n\n¿Necesitas ayuda con algo más?",
+                "fulfillmentText": f"✅ **Consulta de Asistencia**\n\nIngresa aquí:\n{intranet_url}",
             }
         
         # ===================================================================
@@ -209,21 +209,21 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
         # ===================================================================
         # ESCUELAS PROFESIONALES - FACULTAD DE INGENIERÍA
         # ===================================================================
-        if intent_name in ["Ingenieria Civil", "ingenieria_civil", "civil"]:
+        if intent_name in ["Ingenieria Civil", "ingenieria_civil", "civil", "Ingeniería Civil", "ingenieria civil"]:
             logger.info("🏗️ Intent Ingeniería Civil detectado")
             url = "https://www.upt.edu.pe/upt/web/facultad/index/186"
             return {
                 "fulfillmentText": f"🏗️ **Escuela Profesional de Ingeniería Civil**\n\nMás información aquí: {url}\n\n📚 Forma profesionales capaces de diseñar y construir infraestructura civil.\n\n¿Necesitas más información?",
             }
 
-        if intent_name in ["Ingenieria de Sistemas", "ingenieria_sistemas", "sistemas"]:
+        if intent_name in ["Ingenieria de Sistemas", "ingenieria_sistemas", "sistemas", "Ingeniería de Sistemas", "ingenieria de sistemas", "sistemas e informática", "computación"]:
             logger.info("💻 Intent Ingeniería de Sistemas detectado")
             url = "https://www.upt.edu.pe/upt/web/facultad/index/188"
             return {
-                "fulfillmentText": f"💻 **Escuela Profesional de Ingeniería de Sistemas**\n\nMás información aquí: {url}\n\n📚 Forma profesionales en desarrollo de software y tecnologías de información.\n\n¿Necesitas más información?",
+                "fulfillmentText": f"💻 **Ingeniería de Sistemas**\n\nMás información:\n{url}",
             }
 
-        if intent_name in ["Ingenieria Electronica", "ingenieria_electronica", "electronica"]:
+        if intent_name in ["Ingenieria Electronica", "ingenieria_electronica", "electronica", "Ingeniería Electrónica", "ingenieria electrónica", "electrónica"]:
             logger.info("⚡ Intent Ingeniería Electrónica detectado")
             url = "https://www.upt.edu.pe/upt/web/facultad/index/189"
             return {
