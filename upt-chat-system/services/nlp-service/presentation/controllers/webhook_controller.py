@@ -151,9 +151,9 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             logger.info("📅 Intent de Consultar Horario detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=horario"
             
-            logger.info("🔥 ENVIANDO RESPUESTA CON BOTÓN DE REDIRECCIÓN")
+            logger.info("🔥 ENVIANDO SOLO BOTÓN DE REDIRECCIÓN")
             return {
-                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|🔗 IR|📅 **Consulta de Horario Académico**\n\n✅ Podrás ver:\n• Cursos del ciclo actual\n• Horarios por día y hora\n• Sección asignada\n• Códigos de curso]",
+                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}| Ver Mi Horario|]",
             }
         
         # ===================================================================
@@ -163,9 +163,9 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             logger.info("📊 Intent de Consultar Notas detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=notas"
             
-            logger.info("🔥 ENVIANDO RESPUESTA CON BOTÓN DE REDIRECCIÓN - NOTAS")
+            logger.info("🔥 ENVIANDO SOLO BOTÓN DE REDIRECCIÓN - NOTAS")
             return {
-                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|📊 IR|📊 **Consulta de Notas y Calificaciones**\n\n✅ Podrás ver:\n• Notas de todos tus cursos\n• Promedios por asignatura\n• Estado de aprobación\n• Historial académico]",
+                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|📊 Ver Mis Notas|]",
             }
         
         # ===================================================================
@@ -175,9 +175,9 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             logger.info("✅ Intent de Consultar Asistencia detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=asistencia"
             
-            logger.info("🔥 ENVIANDO RESPUESTA CON BOTÓN DE REDIRECCIÓN - ASISTENCIA")
+            logger.info("🔥 ENVIANDO SOLO BOTÓN DE REDIRECCIÓN - ASISTENCIA")
             return {
-                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|✅ IR|✅ **Consulta de Asistencia**\n\n✅ Podrás ver:\n• Registro de asistencia por curso\n• Porcentaje de asistencia\n• Faltas y tardanzas\n• Estado por asignatura]",
+                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|✅ Ver Mi Asistencia|]",
             }
         
         # ===================================================================
