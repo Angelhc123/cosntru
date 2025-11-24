@@ -174,7 +174,7 @@ class DialogFlowService:
         # Diccionario de respuestas por intent con información de escalación
         intent_config = {
             "Saludos": {
-                "response": "¡Hola! Soy el Asistente Virtual de la UPT. ¿En qué puedo ayudarte hoy? Puedo asistirte con:\n\n• Recuperación de contraseña\n• Información sobre horarios\n• Consultas generales\n\n¿Qué necesitas?",
+                "response": "¡Hola! Soy el Asistente Virtual de la UPT. ¿En qué puedo ayudarte hoy? Puedo asistirte con:\n\n• Recuperación de contraseña\n• Consultar horario\n• Ver notas\n• Revisar asistencia\n\n¿Qué necesitas?",
                 "escalate": False
             },
             "Contraseña Institucional": {
@@ -182,8 +182,16 @@ class DialogFlowService:
                 "escalate": True,
                 "category": "Contraseña Institucional"
             },
-            "Horarios de Atención": {
-                "response": "Los horarios de atención de la Universidad Privada de Tacna son:\n\n📅 **Lunes a Viernes:** 8:00 AM - 8:00 PM\n📅 **Sábados:** 9:00 AM - 1:00 PM\n📅 **Domingos:** Cerrado\n\n¿Necesitas información sobre alguna oficina específica?",
+            "Consultar Horario": {
+                "response": "📅 **Consulta de Horario Académico**\n\nPara ver tu horario de clases actualizado, ingresa aquí:\n👉 https://fronted-php-production.up.railway.app/alumno?section=horario\n\n✅ Podrás ver:\n• Cursos del ciclo actual\n• Horarios por día y hora\n• Sección asignada\n• Códigos de curso",
+                "escalate": False
+            },
+            "Consultar Notas": {
+                "response": "� **Consulta de Notas y Calificaciones**\n\nPara ver tus notas académicas, ingresa aquí:\n� https://fronted-php-production.up.railway.app/alumno?section=notas\n\n✅ Podrás ver:\n• Notas por curso y unidad\n• Evaluaciones pendientes\n• Promedios parciales y finales\n• Peso de cada evaluación",
+                "escalate": False
+            },
+            "Consultar Asistencia": {
+                "response": "✅ **Consulta de Asistencia**\n\nPara ver tu registro de asistencias, ingresa aquí:\n👉 https://fronted-php-production.up.railway.app/alumno?section=asistencia\n\n✅ Podrás ver:\n• Asistencias por curso\n• Fechas y estados (Asiste/Falta/Tardanza)\n• Porcentaje de asistencia\n• Calendario de clases",
                 "escalate": False
             },
             "Información de Matrícula": {

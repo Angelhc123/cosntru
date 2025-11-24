@@ -145,17 +145,215 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             }
         
         # ===================================================================
-        # CASO 5: Intent de Horarios de Atención
+        # CASO 5: Intent de Consultar Horario del Alumno
         # ===================================================================
-        if intent_name in ["Horarios de Atencion", "horarios"]:
-            logger.info("🕐 Intent de Horarios detectado")
+        if intent_name in ["Consultar Horario", "consultar_horario", "horario_alumno", "mi horario"]:
+            logger.info("� Intent de Consultar Horario detectado")
+            intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=horario"
             return {
-                "fulfillmentText": "Los horarios de atención de la Universidad Privada de Tacna son:\n\n📅 Lunes a Viernes: 8:00 AM - 8:00 PM\n📅 Sábados: 9:00 AM - 1:00 PM\n📅 Domingos: Cerrado\n\n¿Necesitas información sobre alguna oficina específica?",
+                "fulfillmentText": f"📚 **Consulta de Horario Académico**\n\nPara ver tu horario de clases actualizado, ingresa aquí:\n👉 {intranet_url}\n\n✅ Podrás ver:\n• Cursos del ciclo actual\n• Horarios por día y hora\n• Sección asignada\n• Códigos de curso\n\n¿Necesitas ayuda con algo más?",
             }
         
         # ===================================================================
-        # CASO 6: Intent de Problemas Técnicos
+        # CASO 6: Intent de Consultar Notas del Alumno
         # ===================================================================
+        if intent_name in ["Consultar Notas", "consultar_notas", "mis notas", "calificaciones"]:
+            logger.info("� Intent de Consultar Notas detectado")
+            intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=notas"
+            return {
+                "fulfillmentText": f"� **Consulta de Notas y Calificaciones**\n\nPara ver tus notas académicas, ingresa aquí:\n👉 {intranet_url}\n\n✅ Podrás ver:\n• Notas por curso y unidad\n• Evaluaciones pendientes\n• Promedios parciales y finales\n• Peso de cada evaluación\n\n¿Necesitas ayuda con algo más?",
+            }
+        
+        # ===================================================================
+        # CASO 7: Intent de Consultar Asistencia del Alumno
+        # ===================================================================
+        if intent_name in ["Consultar Asistencia", "consultar_asistencia", "mi asistencia", "asistencias"]:
+            logger.info("✅ Intent de Consultar Asistencia detectado")
+            intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=asistencia"
+            return {
+                "fulfillmentText": f"✅ **Consulta de Asistencia**\n\nPara ver tu registro de asistencias, ingresa aquí:\n👉 {intranet_url}\n\n✅ Podrás ver:\n• Asistencias por curso\n• Fechas y estados (Asiste/Falta/Tardanza)\n• Porcentaje de asistencia\n• Calendario de clases\n\n¿Necesitas ayuda con algo más?",
+            }
+        
+        # ===================================================================
+        # CASO 8: Intent de Problemas Técnicos
+        # ===================================================================
+        # ===================================================================
+        # CASO X: Aula Virtual / Biblioteca Virtual (enlaces externos)
+        # ===================================================================
+        if intent_name in [
+            "Aula Virtual Pregrado", "aula_virtual_pregrado", "aula pregrado", "aulavirtual pregrado",
+            "Aula Virtual", "aula_virtual", "aulavirtual"
+        ]:
+            logger.info("📚 Intent Aula Virtual (Pregrado) detectado")
+            url = "https://aulavirtual.upt.edu.pe/"
+            return {
+                "fulfillmentText": f"🔗 Aula Virtual - Pregrado:\n\nAccede aquí: {url}\n\n¿Deseas que te envíe más información sobre cómo ingresar?",
+            }
+
+        if intent_name in [
+            "Aula Virtual Postgrado", "aula_virtual_postgrado", "aula postgrado", "aulaespg", "aula_espg"
+        ]:
+            logger.info("📚 Intent Aula Virtual (Postgrado) detectado")
+            url = "https://aulaespg.upt.edu.pe/"
+            return {
+                "fulfillmentText": f"🔗 Aula Virtual - Postgrado:\n\nAccede aquí: {url}\n\n¿Deseas que te envíe más información sobre cómo ingresar?",
+            }
+
+        if intent_name in ["Biblioteca Virtual", "biblioteca", "biblioteca_virtual"]:
+            logger.info("📚 Intent Biblioteca Virtual detectado")
+            url = "https://biblioteca.upt.edu.pe/net/portada/"
+            return {
+                "fulfillmentText": f"🔗 Biblioteca Virtual:\n\nAccede aquí: {url}\n\n¿Deseas que te ayude a buscar un título o autor?",
+            }
+
+        # ===================================================================
+        # ESCUELAS PROFESIONALES - FACULTAD DE INGENIERÍA
+        # ===================================================================
+        if intent_name in ["Ingenieria Civil", "ingenieria_civil", "civil"]:
+            logger.info("🏗️ Intent Ingeniería Civil detectado")
+            url = "https://www.upt.edu.pe/upt/web/facultad/index/186"
+            return {
+                "fulfillmentText": f"🏗️ **Escuela Profesional de Ingeniería Civil**\n\nMás información aquí: {url}\n\n📚 Forma profesionales capaces de diseñar y construir infraestructura civil.\n\n¿Necesitas más información?",
+            }
+
+        if intent_name in ["Ingenieria de Sistemas", "ingenieria_sistemas", "sistemas"]:
+            logger.info("💻 Intent Ingeniería de Sistemas detectado")
+            url = "https://www.upt.edu.pe/upt/web/facultad/index/188"
+            return {
+                "fulfillmentText": f"💻 **Escuela Profesional de Ingeniería de Sistemas**\n\nMás información aquí: {url}\n\n📚 Forma profesionales en desarrollo de software y tecnologías de información.\n\n¿Necesitas más información?",
+            }
+
+        if intent_name in ["Ingenieria Electronica", "ingenieria_electronica", "electronica"]:
+            logger.info("⚡ Intent Ingeniería Electrónica detectado")
+            url = "https://www.upt.edu.pe/upt/web/facultad/index/189"
+            return {
+                "fulfillmentText": f"⚡ **Escuela Profesional de Ingeniería Electrónica**\n\nMás información aquí: {url}\n\n📚 Forma profesionales en sistemas electrónicos y telecomunicaciones.\n\n¿Necesitas más información?",
+            }
+
+        if intent_name in ["Ingenieria Agroindustrial", "ingenieria_agroindustrial", "agroindustrial"]:
+            logger.info("🌾 Intent Ingeniería Agroindustrial detectado")
+            url = "https://www.upt.edu.pe/upt/web/facultad/index/190"
+            return {
+                "fulfillmentText": f"🌾 **Escuela Profesional de Ingeniería Agroindustrial**\n\nMás información aquí: {url}\n\n📚 Forma profesionales en procesamiento y transformación de productos agrícolas.\n\n¿Necesitas más información?",
+            }
+
+        if intent_name in ["Ingenieria Ambiental", "ingenieria_ambiental", "ambiental"]:
+            logger.info("🌍 Intent Ingeniería Ambiental detectado")
+            url = "https://www.upt.edu.pe/upt/web/facultad/index/191"
+            return {
+                "fulfillmentText": f"🌍 **Escuela Profesional de Ingeniería Ambiental**\n\nMás información aquí: {url}\n\n📚 Forma profesionales en gestión ambiental y desarrollo sostenible.\n\n¿Necesitas más información?",
+            }
+
+        if intent_name in ["Ingenieria Industrial", "ingenieria_industrial", "industrial"]:
+            logger.info("⚙️ Intent Ingeniería Industrial detectado")
+            url = "https://www.upt.edu.pe/upt/web/facultad/index/248"
+            return {
+                "fulfillmentText": f"⚙️ **Escuela Profesional de Ingeniería Industrial**\n\nMás información aquí: {url}\n\n📚 Forma profesionales en optimización de procesos productivos.\n\n¿Necesitas más información?",
+            }
+
+        # ===================================================================
+        # ESCUELAS PROFESIONALES - FACULTAD DE EDUCACIÓN Y HUMANIDADES
+        # ===================================================================
+        if intent_name in ["Educacion", "educacion", "ciencias_educacion"]:
+            logger.info("📖 Intent Educación detectado")
+            url = "https://www.upt.edu.pe/upt/web/facultad/index/170"
+            return {
+                "fulfillmentText": f"📖 **Escuela Profesional de Educación**\n\nMás información aquí: {url}\n\n📚 Forma profesionales en ciencias de la educación.\n\n¿Necesitas más información?",
+            }
+
+        if intent_name in ["Ciencias de la Comunicacion", "comunicacion", "ciencias_comunicacion"]:
+            logger.info("📢 Intent Ciencias de la Comunicación detectado")
+            url = "https://www.upt.edu.pe/upt/web/facultad/index/176"
+            return {
+                "fulfillmentText": f"📢 **Escuela Profesional de Ciencias de la Comunicación**\n\nMás información aquí: {url}\n\n📚 Forma profesionales en comunicación social y periodismo.\n\n¿Necesitas más información?",
+            }
+
+        if intent_name in ["Psicologia", "psicologia", "humanidades_psicologia"]:
+            logger.info("🧠 Intent Psicología detectado")
+            url = "https://www.upt.edu.pe/upt/web/facultad/index/178"
+            return {
+                "fulfillmentText": f"🧠 **Escuela Profesional de Humanidades - Psicología**\n\nMás información aquí: {url}\n\n📚 Forma profesionales en psicología y ciencias del comportamiento.\n\n¿Necesitas más información?",
+            }
+
+        # ===================================================================
+        # ESCUELAS PROFESIONALES - FACULTAD DE DERECHO
+        # ===================================================================
+        if intent_name in ["Derecho", "derecho", "ciencias_juridicas"]:
+            logger.info("⚖️ Intent Derecho detectado")
+            url = "https://www.upt.edu.pe/upt/web/facultad/index/165"
+            return {
+                "fulfillmentText": f"⚖️ **Escuela Profesional de Derecho**\n\nMás información aquí: {url}\n\n📚 Forma profesionales en ciencias jurídicas y derecho.\n\n¿Necesitas más información?",
+            }
+
+        # ===================================================================
+        # ESCUELAS PROFESIONALES - FACULTAD DE CIENCIAS DE LA SALUD
+        # ===================================================================
+        if intent_name in ["Medicina Humana", "medicina", "medicina_humana"]:
+            logger.info("🩺 Intent Medicina Humana detectado")
+            url = "https://www.upt.edu.pe/upt/web/facultad/index/198"
+            return {
+                "fulfillmentText": f"🩺 **Escuela Profesional de Medicina Humana**\n\nMás información aquí: {url}\n\n📚 Forma profesionales médicos con sólida formación científica.\n\n¿Necesitas más información?",
+            }
+
+        if intent_name in ["Odontologia", "odontologia", "estomatologia"]:
+            logger.info("🦷 Intent Odontología detectado")
+            url = "https://www.upt.edu.pe/upt/web/facultad/index/199"
+            return {
+                "fulfillmentText": f"🦷 **Escuela Profesional de Odontología**\n\nMás información aquí: {url}\n\n📚 Forma profesionales en salud bucal y dental.\n\n¿Necesitas más información?",
+            }
+
+        if intent_name in ["Tecnologia Medica", "tecnologia_medica", "tec_medica"]:
+            logger.info("🔬 Intent Tecnología Médica detectado")
+            url = "https://www.upt.edu.pe/upt/web/facultad/index/200"
+            return {
+                "fulfillmentText": f"🔬 **Escuela Profesional de Tecnología Médica**\n\nMás información aquí: {url}\n\n📚 Forma profesionales en tecnología y laboratorio clínico.\n\n¿Necesitas más información?",
+            }
+
+        # ===================================================================
+        # ESCUELAS PROFESIONALES - FACULTAD DE CIENCIAS EMPRESARIALES
+        # ===================================================================
+        if intent_name in ["Contabilidad", "contabilidad", "ciencias_contables"]:
+            logger.info("💰 Intent Ciencias Contables detectado")
+            url = "https://www.upt.edu.pe/upt/web/facultad/index/218"
+            return {
+                "fulfillmentText": f"💰 **Escuela Profesional de Ciencias Contables y Financieras**\n\nMás información aquí: {url}\n\n📚 Forma profesionales en contabilidad y finanzas.\n\n¿Necesitas más información?",
+            }
+
+        if intent_name in ["Ingenieria Comercial", "ingenieria_comercial", "comercial"]:
+            logger.info("📊 Intent Ingeniería Comercial detectado")
+            url = "https://www.upt.edu.pe/upt/web/facultad/index/217"
+            return {
+                "fulfillmentText": f"📊 **Escuela Profesional de Ingeniería Comercial**\n\nMás información aquí: {url}\n\n📚 Forma profesionales en gestión comercial y marketing.\n\n¿Necesitas más información?",
+            }
+
+        if intent_name in ["Economia", "economia", "microfinanzas"]:
+            logger.info("📈 Intent Economía detectado")
+            url = "https://www.upt.edu.pe/upt/web/facultad/index/221"
+            return {
+                "fulfillmentText": f"📈 **Escuela Profesional de Economía y Microfinanzas**\n\nMás información aquí: {url}\n\n📚 Forma profesionales en economía y finanzas.\n\n¿Necesitas más información?",
+            }
+
+        if intent_name in ["Administracion", "administracion", "admin"]:
+            logger.info("💼 Intent Administración detectado")
+            url = "https://www.upt.edu.pe/upt/web/facultad/index/2828"
+            return {
+                "fulfillmentText": f"💼 **Escuela Profesional de Administración**\n\nMás información aquí: {url}\n\n📚 Forma profesionales en gestión y administración de empresas.\n\n¿Necesitas más información?",
+            }
+
+        if intent_name in ["Turismo", "turismo", "hotelera", "turismo_hotelera"]:
+            logger.info("✈️ Intent Turismo y Hotelería detectado")
+            url = "https://www.upt.edu.pe/upt/web/facultad/index/216"
+            return {
+                "fulfillmentText": f"✈️ **Escuela Profesional de Administración Turístico-Hotelera**\n\nMás información aquí: {url}\n\n📚 Forma profesionales en turismo y gestión hotelera.\n\n¿Necesitas más información?",
+            }
+
+        if intent_name in ["Negocios Internacionales", "negocios_internacionales", "comercio_internacional"]:
+            logger.info("🌐 Intent Negocios Internacionales detectado")
+            url = "https://www.upt.edu.pe/upt/web/facultad/index/219"
+            return {
+                "fulfillmentText": f"🌐 **Escuela Profesional de Administración de Negocios Internacionales**\n\nMás información aquí: {url}\n\n📚 Forma profesionales en comercio exterior y negocios globales.\n\n¿Necesitas más información?",
+            }
+
         if intent_name in ["Problemas Técnicos", "problemas_tecnicos", "technical_issues"]:
             logger.info("🔧 Intent de Problemas Técnicos detectado")
             return {
@@ -163,7 +361,7 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             }
         
         # ===================================================================
-        # CASO 7: Detectar email sin contexto explícito
+        # CASO 9: Detectar email sin contexto explícito
         # Si el mensaje contiene un email válido, procesarlo
         # ===================================================================
         email = extract_email_from_text(query_text, parameters)
@@ -173,11 +371,11 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             return await handle_password_recovery_with_email(email, session)
         
         # ===================================================================
-        # CASO 8: Intent por defecto - Cualquier otro mensaje
+        # CASO 10: Intent por defecto - Cualquier otro mensaje
         # ===================================================================
         logger.warning(f"⚠️ Intent '{intent_name}' no tiene handler específico")
         return {
-            "fulfillmentText": "Entiendo que necesitas ayuda. ¿Podrías ser más específico sobre lo que buscas? Puedo ayudarte con recuperación de contraseña, información de matrícula, horarios y más.",
+            "fulfillmentText": "Entiendo que necesitas ayuda. ¿Podrías ser más específico sobre lo que buscas? Puedo ayudarte con:\n\n• 📅 Consultar tu horario\n• 📊 Ver tus notas\n• ✅ Revisar tu asistencia\n• 🔑 Recuperar tu contraseña\n• 📚 Información general\n\n¿Qué necesitas?",
         }
         
     except Exception as e:

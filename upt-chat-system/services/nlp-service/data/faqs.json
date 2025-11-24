@@ -1,6 +1,33 @@
 {
   "faqs": [
     {
+      "id": "faq_alumno_001",
+      "intent_id": "alumno.horario",
+      "question": "¿Cómo puedo ver mi horario de clases?",
+      "answer": "📅 **Consulta de Horario Académico**\n\nPara ver tu horario de clases actualizado, ingresa aquí:\n👉 https://fronted-php-production.up.railway.app/alumno?section=horario\n\n✅ Podrás ver:\n• Cursos del ciclo actual\n• Horarios por día y hora\n• Sección asignada\n• Códigos de curso",
+      "keywords": ["horario", "mi horario", "clases", "ver horario", "horario academico"],
+      "priority": 10,
+      "metadata": {"category": "alumno", "redirect": true}
+    },
+    {
+      "id": "faq_alumno_002",
+      "intent_id": "alumno.notas",
+      "question": "¿Dónde puedo ver mis notas?",
+      "answer": "📊 **Consulta de Notas y Calificaciones**\n\nPara ver tus notas académicas, ingresa aquí:\n👉 https://fronted-php-production.up.railway.app/alumno?section=notas\n\n✅ Podrás ver:\n• Notas por curso y unidad\n• Evaluaciones pendientes\n• Promedios parciales y finales\n• Peso de cada evaluación",
+      "keywords": ["notas", "calificaciones", "mis notas", "ver notas", "promedio"],
+      "priority": 10,
+      "metadata": {"category": "alumno", "redirect": true}
+    },
+    {
+      "id": "faq_alumno_003",
+      "intent_id": "alumno.asistencia",
+      "question": "¿Cómo consulto mi asistencia?",
+      "answer": "✅ **Consulta de Asistencia**\n\nPara ver tu registro de asistencias, ingresa aquí:\n👉 https://fronted-php-production.up.railway.app/alumno?section=asistencia\n\n✅ Podrás ver:\n• Asistencias por curso\n• Fechas y estados (Asiste/Falta/Tardanza)\n• Porcentaje de asistencia\n• Calendario de clases",
+      "keywords": ["asistencia", "asistencias", "faltas", "ver asistencia", "tardanzas"],
+      "priority": 10,
+      "metadata": {"category": "alumno", "redirect": true}
+    },
+    {
       "id": "faq_001",
       "intent_id": "inscripciones.fechas",
       "question": "¿Cuándo son las inscripciones para el semestre 2025-II?",
@@ -359,6 +386,204 @@
       "keywords": ["extemporanea", "tardia", "inscripcion", "retraso"],
       "priority": 7,
       "metadata": {"category": "inscripciones", "extra_cost": 100}
+    },
+    {
+      "id": "faq_041",
+      "intent_id": "aula_virtual.pregrado",
+      "question": "¿Cómo ingreso al Aula Virtual de Pregrado?",
+      "answer": "🔗 **Aula Virtual - Pregrado**\n\nAccede aquí: https://aulavirtual.upt.edu.pe/\n\nIngresa con:\n• Usuario: Tu código universitario\n• Contraseña: La que creaste al registrarte\n\n¿Olvidaste tu contraseña? Puedo ayudarte a recuperarla.",
+      "keywords": ["aula virtual", "pregrado", "aulavirtual", "plataforma", "moodle"],
+      "priority": 10,
+      "metadata": {"category": "plataformas", "redirect": true}
+    },
+    {
+      "id": "faq_042",
+      "intent_id": "aula_virtual.postgrado",
+      "question": "¿Cómo ingreso al Aula Virtual de Postgrado?",
+      "answer": "🔗 **Aula Virtual - Postgrado**\n\nAccede aquí: https://aulaespg.upt.edu.pe/\n\nIngresa con:\n• Usuario: Tu código de maestría/doctorado\n• Contraseña: La que creaste al registrarte\n\n¿Necesitas ayuda con el acceso?",
+      "keywords": ["aula virtual postgrado", "maestria", "doctorado", "espg", "aulaespg"],
+      "priority": 10,
+      "metadata": {"category": "plataformas", "redirect": true}
+    },
+    {
+      "id": "faq_043",
+      "intent_id": "biblioteca.virtual",
+      "question": "¿Cómo accedo a la Biblioteca Virtual?",
+      "answer": "🔗 **Biblioteca Virtual**\n\nAccede aquí: https://biblioteca.upt.edu.pe/net/portada/\n\n📚 Recursos disponibles:\n• Libros digitales\n• Bases de datos académicas\n• Tesis y trabajos de investigación\n• Revistas científicas\n\nIngresa con tu código universitario.",
+      "keywords": ["biblioteca", "biblioteca virtual", "libros", "recursos", "tesis"],
+      "priority": 10,
+      "metadata": {"category": "plataformas", "redirect": true}
+    },
+    {
+      "id": "faq_044",
+      "intent_id": "escuela.ingenieria_civil",
+      "question": "Información sobre Ingeniería Civil",
+      "answer": "🏗️ **Escuela Profesional de Ingeniería Civil**\n\nMás información: https://www.upt.edu.pe/upt/web/facultad/index/186\n\n📚 Forma profesionales capaces de diseñar y construir infraestructura civil.",
+      "keywords": ["ingenieria civil", "civil", "construccion"],
+      "priority": 8,
+      "metadata": {"category": "escuelas", "redirect": true}
+    },
+    {
+      "id": "faq_045",
+      "intent_id": "escuela.ingenieria_sistemas",
+      "question": "Información sobre Ingeniería de Sistemas",
+      "answer": "💻 **Escuela Profesional de Ingeniería de Sistemas**\n\nMás información: https://www.upt.edu.pe/upt/web/facultad/index/188\n\n📚 Forma profesionales en desarrollo de software y tecnologías de información.",
+      "keywords": ["ingenieria sistemas", "sistemas", "software"],
+      "priority": 8,
+      "metadata": {"category": "escuelas", "redirect": true}
+    },
+    {
+      "id": "faq_046",
+      "intent_id": "escuela.ingenieria_electronica",
+      "question": "Información sobre Ingeniería Electrónica",
+      "answer": "⚡ **Escuela Profesional de Ingeniería Electrónica**\n\nMás información: https://www.upt.edu.pe/upt/web/facultad/index/189\n\n📚 Forma profesionales en sistemas electrónicos y telecomunicaciones.",
+      "keywords": ["ingenieria electronica", "electronica"],
+      "priority": 8,
+      "metadata": {"category": "escuelas", "redirect": true}
+    },
+    {
+      "id": "faq_047",
+      "intent_id": "escuela.ingenieria_agroindustrial",
+      "question": "Información sobre Ingeniería Agroindustrial",
+      "answer": "🌾 **Escuela Profesional de Ingeniería Agroindustrial**\n\nMás información: https://www.upt.edu.pe/upt/web/facultad/index/190\n\n📚 Forma profesionales en procesamiento y transformación de productos agrícolas.",
+      "keywords": ["ingenieria agroindustrial", "agroindustrial"],
+      "priority": 8,
+      "metadata": {"category": "escuelas", "redirect": true}
+    },
+    {
+      "id": "faq_048",
+      "intent_id": "escuela.ingenieria_ambiental",
+      "question": "Información sobre Ingeniería Ambiental",
+      "answer": "🌍 **Escuela Profesional de Ingeniería Ambiental**\n\nMás información: https://www.upt.edu.pe/upt/web/facultad/index/191\n\n📚 Forma profesionales en gestión ambiental y desarrollo sostenible.",
+      "keywords": ["ingenieria ambiental", "ambiental"],
+      "priority": 8,
+      "metadata": {"category": "escuelas", "redirect": true}
+    },
+    {
+      "id": "faq_049",
+      "intent_id": "escuela.ingenieria_industrial",
+      "question": "Información sobre Ingeniería Industrial",
+      "answer": "⚙️ **Escuela Profesional de Ingeniería Industrial**\n\nMás información: https://www.upt.edu.pe/upt/web/facultad/index/248\n\n📚 Forma profesionales en optimización de procesos productivos.",
+      "keywords": ["ingenieria industrial", "industrial"],
+      "priority": 8,
+      "metadata": {"category": "escuelas", "redirect": true}
+    },
+    {
+      "id": "faq_050",
+      "intent_id": "escuela.educacion",
+      "question": "Información sobre Educación",
+      "answer": "📖 **Escuela Profesional de Educación**\n\nMás información: https://www.upt.edu.pe/upt/web/facultad/index/170\n\n📚 Forma profesionales en ciencias de la educación.",
+      "keywords": ["educacion", "pedagogia"],
+      "priority": 8,
+      "metadata": {"category": "escuelas", "redirect": true}
+    },
+    {
+      "id": "faq_051",
+      "intent_id": "escuela.comunicacion",
+      "question": "Información sobre Ciencias de la Comunicación",
+      "answer": "📢 **Escuela Profesional de Ciencias de la Comunicación**\n\nMás información: https://www.upt.edu.pe/upt/web/facultad/index/176\n\n📚 Forma profesionales en comunicación social y periodismo.",
+      "keywords": ["comunicacion", "periodismo"],
+      "priority": 8,
+      "metadata": {"category": "escuelas", "redirect": true}
+    },
+    {
+      "id": "faq_052",
+      "intent_id": "escuela.psicologia",
+      "question": "Información sobre Psicología",
+      "answer": "🧠 **Escuela Profesional de Humanidades - Psicología**\n\nMás información: https://www.upt.edu.pe/upt/web/facultad/index/178\n\n📚 Forma profesionales en psicología y ciencias del comportamiento.",
+      "keywords": ["psicologia", "humanidades"],
+      "priority": 8,
+      "metadata": {"category": "escuelas", "redirect": true}
+    },
+    {
+      "id": "faq_053",
+      "intent_id": "escuela.derecho",
+      "question": "Información sobre Derecho",
+      "answer": "⚖️ **Escuela Profesional de Derecho**\n\nMás información: https://www.upt.edu.pe/upt/web/facultad/index/165\n\n📚 Forma profesionales en ciencias jurídicas y derecho.",
+      "keywords": ["derecho", "leyes"],
+      "priority": 8,
+      "metadata": {"category": "escuelas", "redirect": true}
+    },
+    {
+      "id": "faq_054",
+      "intent_id": "escuela.medicina",
+      "question": "Información sobre Medicina Humana",
+      "answer": "🩺 **Escuela Profesional de Medicina Humana**\n\nMás información: https://www.upt.edu.pe/upt/web/facultad/index/198\n\n📚 Forma profesionales médicos con sólida formación científica.",
+      "keywords": ["medicina", "medicina humana"],
+      "priority": 8,
+      "metadata": {"category": "escuelas", "redirect": true}
+    },
+    {
+      "id": "faq_055",
+      "intent_id": "escuela.odontologia",
+      "question": "Información sobre Odontología",
+      "answer": "🦷 **Escuela Profesional de Odontología**\n\nMás información: https://www.upt.edu.pe/upt/web/facultad/index/199\n\n📚 Forma profesionales en salud bucal y dental.",
+      "keywords": ["odontologia", "dental"],
+      "priority": 8,
+      "metadata": {"category": "escuelas", "redirect": true}
+    },
+    {
+      "id": "faq_056",
+      "intent_id": "escuela.tecnologia_medica",
+      "question": "Información sobre Tecnología Médica",
+      "answer": "🔬 **Escuela Profesional de Tecnología Médica**\n\nMás información: https://www.upt.edu.pe/upt/web/facultad/index/200\n\n📚 Forma profesionales en tecnología y laboratorio clínico.",
+      "keywords": ["tecnologia medica", "laboratorio"],
+      "priority": 8,
+      "metadata": {"category": "escuelas", "redirect": true}
+    },
+    {
+      "id": "faq_057",
+      "intent_id": "escuela.contabilidad",
+      "question": "Información sobre Ciencias Contables",
+      "answer": "💰 **Escuela Profesional de Ciencias Contables y Financieras**\n\nMás información: https://www.upt.edu.pe/upt/web/facultad/index/218\n\n📚 Forma profesionales en contabilidad y finanzas.",
+      "keywords": ["contabilidad", "ciencias contables"],
+      "priority": 8,
+      "metadata": {"category": "escuelas", "redirect": true}
+    },
+    {
+      "id": "faq_058",
+      "intent_id": "escuela.ingenieria_comercial",
+      "question": "Información sobre Ingeniería Comercial",
+      "answer": "📊 **Escuela Profesional de Ingeniería Comercial**\n\nMás información: https://www.upt.edu.pe/upt/web/facultad/index/217\n\n📚 Forma profesionales en gestión comercial y marketing.",
+      "keywords": ["ingenieria comercial", "comercial"],
+      "priority": 8,
+      "metadata": {"category": "escuelas", "redirect": true}
+    },
+    {
+      "id": "faq_059",
+      "intent_id": "escuela.economia",
+      "question": "Información sobre Economía",
+      "answer": "📈 **Escuela Profesional de Economía y Microfinanzas**\n\nMás información: https://www.upt.edu.pe/upt/web/facultad/index/221\n\n📚 Forma profesionales en economía y finanzas.",
+      "keywords": ["economia", "microfinanzas"],
+      "priority": 8,
+      "metadata": {"category": "escuelas", "redirect": true}
+    },
+    {
+      "id": "faq_060",
+      "intent_id": "escuela.administracion",
+      "question": "Información sobre Administración",
+      "answer": "💼 **Escuela Profesional de Administración**\n\nMás información: https://www.upt.edu.pe/upt/web/facultad/index/2828\n\n📚 Forma profesionales en gestión y administración de empresas.",
+      "keywords": ["administracion", "gestion"],
+      "priority": 8,
+      "metadata": {"category": "escuelas", "redirect": true}
+    },
+    {
+      "id": "faq_061",
+      "intent_id": "escuela.turismo",
+      "question": "Información sobre Turismo",
+      "answer": "✈️ **Escuela Profesional de Administración Turístico-Hotelera**\n\nMás información: https://www.upt.edu.pe/upt/web/facultad/index/216\n\n📚 Forma profesionales en turismo y gestión hotelera.",
+      "keywords": ["turismo", "hotelera"],
+      "priority": 8,
+      "metadata": {"category": "escuelas", "redirect": true}
+    },
+    {
+      "id": "faq_062",
+      "intent_id": "escuela.negocios_internacionales",
+      "question": "Información sobre Negocios Internacionales",
+      "answer": "🌐 **Escuela Profesional de Administración de Negocios Internacionales**\n\nMás información: https://www.upt.edu.pe/upt/web/facultad/index/219\n\n📚 Forma profesionales en comercio exterior y negocios globales.",
+      "keywords": ["negocios internacionales", "comercio internacional"],
+      "priority": 8,
+      "metadata": {"category": "escuelas", "redirect": true}
     }
   ]
 }

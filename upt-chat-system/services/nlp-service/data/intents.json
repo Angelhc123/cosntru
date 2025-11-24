@@ -30,6 +30,63 @@
       "requires_context": false
     },
     {
+      "id": "alumno.horario",
+      "name": "Consultar horario del alumno",
+      "display_name": "Consultar Horario",
+      "keywords": ["horario", "mi horario", "ver horario", "horario de clases", "horarios", "clases", "cursos"],
+      "examples": [
+        "¿Cuál es mi horario?",
+        "Quiero ver mi horario de clases",
+        "¿Dónde veo mi horario?",
+        "Muéstrame mi horario",
+        "¿Cómo puedo consultar mi horario?",
+        "Necesito saber mi horario",
+        "¿Qué clases tengo hoy?",
+        "Mi horario académico"
+      ],
+      "category": "alumno",
+      "priority": 10,
+      "requires_context": false
+    },
+    {
+      "id": "alumno.notas",
+      "name": "Consultar notas del alumno",
+      "display_name": "Consultar Notas",
+      "keywords": ["notas", "mis notas", "calificaciones", "ver notas", "promedio", "evaluaciones"],
+      "examples": [
+        "¿Cuáles son mis notas?",
+        "Quiero ver mis calificaciones",
+        "¿Dónde veo mis notas?",
+        "Muéstrame mis notas",
+        "¿Cómo consulto mis calificaciones?",
+        "Necesito saber mis notas",
+        "Mi record académico",
+        "Ver mis calificaciones"
+      ],
+      "category": "alumno",
+      "priority": 10,
+      "requires_context": false
+    },
+    {
+      "id": "alumno.asistencia",
+      "name": "Consultar asistencia del alumno",
+      "display_name": "Consultar Asistencia",
+      "keywords": ["asistencia", "mi asistencia", "asistencias", "faltas", "tardanzas", "ver asistencia"],
+      "examples": [
+        "¿Cuántas asistencias tengo?",
+        "Quiero ver mi asistencia",
+        "¿Dónde veo mis asistencias?",
+        "Muéstrame mi asistencia",
+        "¿Cómo consulto mi asistencia?",
+        "Necesito ver mis faltas",
+        "Mi registro de asistencias",
+        "¿Tengo tardanzas?"
+      ],
+      "category": "alumno",
+      "priority": 10,
+      "requires_context": false
+    },
+    {
       "id": "inscripciones.fechas",
       "name": "Consultar fechas de inscripción",
       "display_name": "Consultar Fechas de Inscripción",
@@ -265,6 +322,317 @@
       ],
       "category": "contacto",
       "priority": 7,
+      "requires_context": false
+    },
+    {
+      "id": "aula_virtual.pregrado",
+      "name": "Aula Virtual Pregrado",
+      "display_name": "Aula Virtual Pregrado",
+      "keywords": ["aula virtual", "aulavirtual", "pregrado", "plataforma", "moodle", "campus virtual"],
+      "examples": [
+        "Aula virtual pregrado",
+        "¿Cómo ingreso al aula virtual?",
+        "Link del aula virtual",
+        "Plataforma virtual pregrado"
+      ],
+      "category": "plataformas",
+      "priority": 9,
+      "requires_context": false
+    },
+    {
+      "id": "aula_virtual.postgrado",
+      "name": "Aula Virtual Postgrado",
+      "display_name": "Aula Virtual Postgrado",
+      "keywords": ["aula virtual postgrado", "postgrado", "maestria", "doctorado", "espg", "aulaespg"],
+      "examples": [
+        "Aula virtual postgrado",
+        "Link aula virtual maestría",
+        "¿Cómo ingreso al aula de postgrado?",
+        "Plataforma postgrado"
+      ],
+      "category": "plataformas",
+      "priority": 9,
+      "requires_context": false
+    },
+    {
+      "id": "biblioteca.virtual",
+      "name": "Biblioteca Virtual",
+      "display_name": "Biblioteca Virtual",
+      "keywords": ["biblioteca", "biblioteca virtual", "libros", "recursos", "base datos", "tesis"],
+      "examples": [
+        "Biblioteca virtual",
+        "¿Cómo accedo a la biblioteca?",
+        "Buscar libros en línea",
+        "Recursos bibliográficos"
+      ],
+      "category": "plataformas",
+      "priority": 9,
+      "requires_context": false
+    },
+    {
+      "id": "escuela.ingenieria_civil",
+      "name": "Ingeniería Civil",
+      "display_name": "Ingenieria Civil",
+      "keywords": ["ingenieria civil", "civil", "construccion", "obras"],
+      "examples": [
+        "Ingeniería Civil",
+        "Información sobre civil",
+        "Carrera de ingeniería civil"
+      ],
+      "category": "escuelas",
+      "priority": 8,
+      "requires_context": false
+    },
+    {
+      "id": "escuela.ingenieria_sistemas",
+      "name": "Ingeniería de Sistemas",
+      "display_name": "Ingenieria de Sistemas",
+      "keywords": ["ingenieria sistemas", "sistemas", "software", "programacion"],
+      "examples": [
+        "Ingeniería de Sistemas",
+        "Información sobre sistemas",
+        "Carrera de sistemas"
+      ],
+      "category": "escuelas",
+      "priority": 8,
+      "requires_context": false
+    },
+    {
+      "id": "escuela.ingenieria_electronica",
+      "name": "Ingeniería Electrónica",
+      "display_name": "Ingenieria Electronica",
+      "keywords": ["ingenieria electronica", "electronica", "telecomunicaciones"],
+      "examples": [
+        "Ingeniería Electrónica",
+        "Información sobre electrónica",
+        "Carrera de electrónica"
+      ],
+      "category": "escuelas",
+      "priority": 8,
+      "requires_context": false
+    },
+    {
+      "id": "escuela.ingenieria_agroindustrial",
+      "name": "Ingeniería Agroindustrial",
+      "display_name": "Ingenieria Agroindustrial",
+      "keywords": ["ingenieria agroindustrial", "agroindustrial", "alimentos"],
+      "examples": [
+        "Ingeniería Agroindustrial",
+        "Información sobre agroindustrial",
+        "Carrera de agroindustrial"
+      ],
+      "category": "escuelas",
+      "priority": 8,
+      "requires_context": false
+    },
+    {
+      "id": "escuela.ingenieria_ambiental",
+      "name": "Ingeniería Ambiental",
+      "display_name": "Ingenieria Ambiental",
+      "keywords": ["ingenieria ambiental", "ambiental", "medio ambiente"],
+      "examples": [
+        "Ingeniería Ambiental",
+        "Información sobre ambiental",
+        "Carrera de ingeniería ambiental"
+      ],
+      "category": "escuelas",
+      "priority": 8,
+      "requires_context": false
+    },
+    {
+      "id": "escuela.ingenieria_industrial",
+      "name": "Ingeniería Industrial",
+      "display_name": "Ingenieria Industrial",
+      "keywords": ["ingenieria industrial", "industrial", "produccion"],
+      "examples": [
+        "Ingeniería Industrial",
+        "Información sobre industrial",
+        "Carrera de ingeniería industrial"
+      ],
+      "category": "escuelas",
+      "priority": 8,
+      "requires_context": false
+    },
+    {
+      "id": "escuela.educacion",
+      "name": "Educación",
+      "display_name": "Educacion",
+      "keywords": ["educacion", "pedagogia", "docencia"],
+      "examples": [
+        "Educación",
+        "Información sobre educación",
+        "Carrera de educación"
+      ],
+      "category": "escuelas",
+      "priority": 8,
+      "requires_context": false
+    },
+    {
+      "id": "escuela.comunicacion",
+      "name": "Ciencias de la Comunicación",
+      "display_name": "Ciencias de la Comunicacion",
+      "keywords": ["comunicacion", "periodismo", "ciencias comunicacion"],
+      "examples": [
+        "Ciencias de la Comunicación",
+        "Información sobre comunicación",
+        "Carrera de comunicación"
+      ],
+      "category": "escuelas",
+      "priority": 8,
+      "requires_context": false
+    },
+    {
+      "id": "escuela.psicologia",
+      "name": "Psicología",
+      "display_name": "Psicologia",
+      "keywords": ["psicologia", "humanidades", "salud mental"],
+      "examples": [
+        "Psicología",
+        "Información sobre psicología",
+        "Carrera de psicología"
+      ],
+      "category": "escuelas",
+      "priority": 8,
+      "requires_context": false
+    },
+    {
+      "id": "escuela.derecho",
+      "name": "Derecho",
+      "display_name": "Derecho",
+      "keywords": ["derecho", "leyes", "juridica"],
+      "examples": [
+        "Derecho",
+        "Información sobre derecho",
+        "Carrera de derecho"
+      ],
+      "category": "escuelas",
+      "priority": 8,
+      "requires_context": false
+    },
+    {
+      "id": "escuela.medicina",
+      "name": "Medicina Humana",
+      "display_name": "Medicina Humana",
+      "keywords": ["medicina", "medicina humana", "doctor", "medico"],
+      "examples": [
+        "Medicina Humana",
+        "Información sobre medicina",
+        "Carrera de medicina"
+      ],
+      "category": "escuelas",
+      "priority": 8,
+      "requires_context": false
+    },
+    {
+      "id": "escuela.odontologia",
+      "name": "Odontología",
+      "display_name": "Odontologia",
+      "keywords": ["odontologia", "dental", "dientes"],
+      "examples": [
+        "Odontología",
+        "Información sobre odontología",
+        "Carrera de odontología"
+      ],
+      "category": "escuelas",
+      "priority": 8,
+      "requires_context": false
+    },
+    {
+      "id": "escuela.tecnologia_medica",
+      "name": "Tecnología Médica",
+      "display_name": "Tecnologia Medica",
+      "keywords": ["tecnologia medica", "laboratorio", "analisis clinico"],
+      "examples": [
+        "Tecnología Médica",
+        "Información sobre tecnología médica",
+        "Carrera de tecnología médica"
+      ],
+      "category": "escuelas",
+      "priority": 8,
+      "requires_context": false
+    },
+    {
+      "id": "escuela.contabilidad",
+      "name": "Ciencias Contables",
+      "display_name": "Contabilidad",
+      "keywords": ["contabilidad", "ciencias contables", "finanzas", "contador"],
+      "examples": [
+        "Ciencias Contables",
+        "Información sobre contabilidad",
+        "Carrera de contabilidad"
+      ],
+      "category": "escuelas",
+      "priority": 8,
+      "requires_context": false
+    },
+    {
+      "id": "escuela.ingenieria_comercial",
+      "name": "Ingeniería Comercial",
+      "display_name": "Ingenieria Comercial",
+      "keywords": ["ingenieria comercial", "comercial", "marketing"],
+      "examples": [
+        "Ingeniería Comercial",
+        "Información sobre ingeniería comercial",
+        "Carrera de ingeniería comercial"
+      ],
+      "category": "escuelas",
+      "priority": 8,
+      "requires_context": false
+    },
+    {
+      "id": "escuela.economia",
+      "name": "Economía y Microfinanzas",
+      "display_name": "Economia",
+      "keywords": ["economia", "microfinanzas", "economista"],
+      "examples": [
+        "Economía",
+        "Información sobre economía",
+        "Carrera de economía"
+      ],
+      "category": "escuelas",
+      "priority": 8,
+      "requires_context": false
+    },
+    {
+      "id": "escuela.administracion",
+      "name": "Administración",
+      "display_name": "Administracion",
+      "keywords": ["administracion", "gestion", "empresas"],
+      "examples": [
+        "Administración",
+        "Información sobre administración",
+        "Carrera de administración"
+      ],
+      "category": "escuelas",
+      "priority": 8,
+      "requires_context": false
+    },
+    {
+      "id": "escuela.turismo",
+      "name": "Administración Turístico-Hotelera",
+      "display_name": "Turismo",
+      "keywords": ["turismo", "hotelera", "administracion turistica"],
+      "examples": [
+        "Turismo",
+        "Información sobre turismo",
+        "Carrera de turismo"
+      ],
+      "category": "escuelas",
+      "priority": 8,
+      "requires_context": false
+    },
+    {
+      "id": "escuela.negocios_internacionales",
+      "name": "Negocios Internacionales",
+      "display_name": "Negocios Internacionales",
+      "keywords": ["negocios internacionales", "comercio internacional", "exportacion"],
+      "examples": [
+        "Negocios Internacionales",
+        "Información sobre negocios internacionales",
+        "Carrera de negocios internacionales"
+      ],
+      "category": "escuelas",
+      "priority": 8,
       "requires_context": false
     }
   ]
