@@ -554,14 +554,14 @@ class ChatboxWidget {
         const messagesContainer = document.getElementById('chat-messages');
         
         // Detectar patrón de botón de redirección [REDIRECT_BUTTON|URL|TEXTO|MENSAJE]
-        const redirectPattern = /\[REDIRECT_BUTTON\|([^\|]+)\|([^\|]+)\|([^\]]+)\]/;
+        const redirectPattern = /\[REDIRECT_BUTTON\|([^\|]+)\|([^\|]+)\|([^\]]*)\]/;
         const redirectMatch = message.match(redirectPattern);
         
         if (redirectMatch) {
             console.log('✅ BOTÓN DE REDIRECCIÓN DETECTADO!');
             const url = redirectMatch[1];
             const buttonText = redirectMatch[2];
-            const messageText = redirectMatch[3];
+            const messageText = redirectMatch[3].trim();
             console.log('📍 URL:', url);
             console.log('📝 Texto del botón:', buttonText);
             console.log('💬 Mensaje:', messageText);
@@ -569,9 +569,16 @@ class ChatboxWidget {
             // Crear mensaje con botón estilo ticket
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message bot-message escalation-prompt';
+            
+            // Solo agregar texto si existe
+            let textContent = '';
+            if (messageText && messageText.length > 0) {
+                textContent = `<p>${this.escapeHtml(messageText)}</p>`;
+            }
+            
             messageDiv.innerHTML = `
                 <div class="message-content">
-                    <p>${this.escapeHtml(messageText)}</p>
+                    ${textContent}
                     <div class="escalation-buttons">
                         <button class="escalation-btn yes-btn" onclick="window.open('${url}', '_blank')" style="
                             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
