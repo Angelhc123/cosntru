@@ -290,7 +290,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
             </div>
         </div>
 
-        <a href="admin_dashboard.php" class="back-button">← Volver al Panel de Administración</a>
+        <a href="/admin" class="back-button">← Volver al Panel de Administración</a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>

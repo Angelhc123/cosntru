@@ -199,6 +199,22 @@
             color:#f5d88b;
         }
 
+        .menu-item--white{
+            color:#ffffff;
+        }
+
+        .menu-item--white::before{
+            color:#ffffff;
+        }
+
+        .menu-item--white:hover{
+            color:#f5d88b;
+        }
+
+        .menu-item--white:hover::before{
+            color:#f5d88b;
+        }
+
         .menu-item--uppercase{
             text-transform:uppercase;
             letter-spacing:0.25px;
@@ -856,7 +872,7 @@
         </div>
         <div class="top-strip__right">
             <a href="#"><span class="icon" aria-hidden="true">?</span>Ayuda</a>
-            <a href="logout.php"><span class="icon" aria-hidden="true">⏻</span>Finalizar</a>
+            <a href="/logout"><span class="icon" aria-hidden="true">⏻</span>Finalizar</a>
             <div class="top-strip__clock">
                 <span class="icon" aria-hidden="true">🕒</span>
                 <span>Hora del sistema:</span>
@@ -868,17 +884,17 @@
     <div class="page">
         <aside class="sidebar">
             <ul class="menu">
-                <li><a class="menu-item menu-item--highlight" href="#">Inicio</a></li>
-                <li><a class="menu-item menu-item--uppercase" href="academico.php" target="_blank" rel="noopener noreferrer">ACADÉMICO</a></li>
-                <li><a class="menu-item menu-item--highlight" href="#" data-star="1" id="workspace-link" data-modal-target="workspace-modal">Google Workspace</a></li>
+                <li><a class="menu-item menu-item--white" href="#">Inicio</a></li>
+                <li><a class="menu-item menu-item--uppercase" href="/academico" target="_blank" rel="noopener noreferrer">ACADÉMICO</a></li>
+                <li><a class="menu-item menu-item--white" href="#" data-star="1" id="workspace-link" data-modal-target="workspace-modal">Google Workspace</a></li>
                 <li><a class="menu-item" href="#">Office365@Edu</a></li>
                 <li><a class="menu-item" href="https://azure.microsoft.com/es-es/get-started/azure-portal/" target="_blank" rel="noopener noreferrer">Convenio Microsoft</a></li>
                 <li class="menu-separator"></li>
-                <li><a class="menu-item menu-item--highlight menu-item--uppercase" href="#">ELECCIONES</a></li>
-                <li><a class="menu-item menu-item--highlight menu-item--uppercase" href="#">PASARELA</a></li>
+                <li><a class="menu-item menu-item--white menu-item--uppercase" href="#">ELECCIONES</a></li>
+                <li><a class="menu-item menu-item--white menu-item--uppercase" href="#">PASARELA</a></li>
                 <li><a class="menu-item" href="#">Alumno</a></li>
                 <li><a class="menu-item" href="https://aulavirtual.upt.edu.pe/" target="_blank" rel="noopener noreferrer">Aula Virtual</a></li>
-                <li><a class="menu-item menu-item--highlight menu-item--uppercase" href="academico.php" target="_blank" rel="noopener noreferrer">GPS ALUMNI</a></li>
+                <li><a class="menu-item menu-item--white menu-item--uppercase" href="/academico" target="_blank" rel="noopener noreferrer">GPS ALUMNI</a></li>
                 <li><a class="menu-item" href="#">Comprobantes Electrónicos</a></li>
                 <li><a class="menu-item" href="#">Biblioteca</a></li>
                 <li><a class="menu-item" href="#" data-modal-target="modal-seguro">Seguro Estudiantil</a></li>
@@ -887,7 +903,7 @@
                 <li><a class="menu-item" href="https://net.upt.edu.pe/documentos/BecasySubvenciones.pdf" target="_blank" rel="noopener noreferrer">Becas y Subvenciones</a></li>
                 <li><a class="menu-item" href="#" id="tickets-link" data-modal-target="tickets-modal">Mis Tickets de Soporte</a></li>
                 <li class="menu-separator"></li>
-                <li><span class="menu-item menu-item--highlight menu-item--label menu-item--uppercase">ANUNCIOS</span></li>
+                <li><span class="menu-item menu-item--white menu-item--label menu-item--uppercase">ANUNCIOS</span></li>
                 <li><a class="menu-item" href="#">Guía Estudiante</a></li>
                 <li><a class="menu-item" href="#">¿Office365@Edu?</a></li>
                 <li><a class="menu-item" href="#">C. Institucional</a></li>

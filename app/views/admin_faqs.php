@@ -217,7 +217,7 @@
                     Administra las respuestas rápidas del chatbot
                 </div>
             </div>
-            <a href="admin_dashboard.php" class="btn-back">← Volver al Panel</a>
+            <a href="/admin" class="btn-back">← Volver al Panel</a>
         </div>
 
         <div class="content-card">

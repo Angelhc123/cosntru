@@ -138,12 +138,12 @@
             <div class="user-info">
                 <span class="badge-admin">ADMINISTRATIVO</span>
                 <span><strong><?php echo $_SESSION['nombre_completo']; ?></strong></span>
-                <a href="logout.php" class="btn-logout">Cerrar Sesión</a>
+                <a href="/logout" class="btn-logout">Cerrar Sesión</a>
             </div>
         </div>
 
         <div class="cards-grid">
-            <a href="admin_faqs.php" class="card card-faq">
+            <a href="/admin/faqs" class="card card-faq">
                 <div class="card-icon">📋</div>
                 <div class="card-title">Gestión de FAQs</div>
                 <div class="card-description">
@@ -152,7 +152,7 @@
                 </div>
             </a>
 
-            <a href="admin_tickets.php" class="card" style="border-left: 4px solid #f39c12;">
+            <a href="/admin/tickets" class="card" style="border-left: 4px solid #f39c12;">
                 <div class="card-icon">🎫</div>
                 <div class="card-title">Tickets de Soporte</div>
                 <div class="card-description">
@@ -161,7 +161,7 @@
                 </div>
             </a>
 
-            <a href="admin_analytics.php" class="card" style="border-left: 4px solid #6610f2;">
+            <a href="/admin/analytics" class="card" style="border-left: 4px solid #6610f2;">
                 <div class="card-icon">📊</div>
                 <div class="card-title">Dashboard de Métricas</div>
                 <div class="card-description">
