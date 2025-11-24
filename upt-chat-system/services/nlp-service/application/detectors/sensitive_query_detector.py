@@ -22,18 +22,8 @@ class SensitiveQueryDetector:
         r"no\s+(me\s+)?acuerdo\s+(de\s+)?(mi\s+)?contrase[ñn]a",
         r"perdi\s+(mi\s+)?contrase[ñn]a",
         
-        # Notas/Calificaciones
-        r"mis\s+notas",
-        r"mis\s+calificaciones",
-        r"consultar\s+notas",
-        r"ver\s+(mis\s+)?notas",
-        r"qu[eé]\s+notas\s+tengo",
-        
-        # Información académica personal
-        r"mi\s+horario",
-        r"mis\s+cursos",
-        r"mi\s+record\s+acad[eé]mico",
-        r"mi\s+historial\s+acad[eé]mico",
+        # NOTA: Horario, Notas y Asistencia YA NO requieren validación
+        # Ahora simplemente redirigen a la intranet
         
         # Pagos personales
         r"mis\s+pagos",
@@ -95,27 +85,27 @@ class SensitiveQueryDetector:
             if re.search(pattern, message_lower):
                 return 'password'
         
-        # Notas/Calificaciones
-        grades_patterns = [
-            r"mis\s+notas",
-            r"mis\s+calificaciones",
-            r"consultar\s+notas",
-            r"ver\s+(mis\s+)?notas",
-        ]
-        for pattern in grades_patterns:
-            if re.search(pattern, message_lower):
-                return 'grades'
+        # Notas/Calificaciones - DESACTIVADO: ahora solo redirige
+        # grades_patterns = [
+        #     r"mis\s+notas",
+        #     r"mis\s+calificaciones",
+        #     r"consultar\s+notas",
+        #     r"ver\s+(mis\s+)?notas",
+        # ]
+        # for pattern in grades_patterns:
+        #     if re.search(pattern, message_lower):
+        #         return 'grades'
         
-        # Información académica
-        academic_patterns = [
-            r"mi\s+horario",
-            r"mis\s+cursos",
-            r"mi\s+record\s+acad[eé]mico",
-            r"mi\s+historial\s+acad[eé]mico",
-        ]
-        for pattern in academic_patterns:
-            if re.search(pattern, message_lower):
-                return 'academic'
+        # Información académica - DESACTIVADO: ahora solo redirige
+        # academic_patterns = [
+        #     r"mi\s+horario",
+        #     r"mis\s+cursos",
+        #     r"mi\s+record\s+acad[eé]mico",
+        #     r"mi\s+historial\s+acad[eé]mico",
+        # ]
+        # for pattern in academic_patterns:
+        #     if re.search(pattern, message_lower):
+        #         return 'academic'
         
         # Pagos
         payments_patterns = [
