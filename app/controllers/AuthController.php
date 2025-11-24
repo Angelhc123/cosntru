@@ -37,7 +37,7 @@ class AuthController {
                 // Comprobar valor guardado en sesión (case-insensitive)
                 if (empty($_SESSION['simple_captcha']) || strcasecmp($simpleCaptcha, $_SESSION['simple_captcha']) !== 0) {
                     $_SESSION['error'] = "Captcha incorrecto. Intente nuevamente.";
-                    header("Location: login.php");
+                    header("Location: /login");
                     exit();
                 }
                 // Consumir el captcha para que no pueda reutilizarse
@@ -54,13 +54,13 @@ class AuthController {
                 if (!recaptcha_is_configured()) {
                     // Si no está configurado, denegar por seguridad
                     $_SESSION['error'] = "Captcha no configurado. Contacte al administrador.";
-                    header("Location: login.php");
+                    header("Location: /login");
                     exit();
                 }
 
                 if (empty($recaptchaResponse)) {
                     $_SESSION['error'] = "Por favor complete el captcha de Google.";
-                    header("Location: login.php");
+                    header("Location: /login");
                     exit();
                 }
 
@@ -91,7 +91,7 @@ class AuthController {
                 $responseData = json_decode($verifyResponse, true);
                 if (!isset($responseData['success']) || $responseData['success'] !== true) {
                     $_SESSION['error'] = "Captcha inválido. Intente nuevamente.";
-                    header("Location: login.php");
+                    header("Location: /login");
                     exit();
                 }
             }
