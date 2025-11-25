@@ -224,13 +224,13 @@ class DialogFlowService:
             
             logger.info(f"🔧 TEMPORAL FIX: Using configured response for {intent_name} intent")
         
-        logger.info(f"📋 FINAL RESPONSE: intent='{intent_name}', text='{webhook_response_text[:50]}...'")
+        logger.info(f"📋 FINAL RESPONSE: intent='{intent_name}', text='{webhook_response_text[:500]}...'")
         
-        # Log de debugging
+        # Log de debugging - MOSTRAR TEXTO COMPLETO
         logger.info(f"📋 DIALOGFLOW RESULT:")
         logger.info(f"   - Intent: {query_result.intent.display_name if query_result.intent.display_name else 'Default Fallback Intent'}")
         logger.info(f"   - Confidence: {query_result.intent_detection_confidence:.3f}")
-        logger.info(f"   - Fulfillment: '{webhook_response_text[:100]}...'")
+        logger.info(f"   - Fulfillment COMPLETO: '{webhook_response_text}'")  # SIN TRUNCAR
         logger.info(f"   - Action: {query_result.action}")
         logger.info(f"📋 Parámetros: {dict(query_result.parameters)}")
         logger.info(f"🔄 Contexts: {[c.name.split('/')[-1] for c in query_result.output_contexts]}")
