@@ -187,11 +187,11 @@ class DialogFlowService:
                 "escalate": False
             },
             "Consultar Notas": {
-                "response": "� **Consulta de Notas y Calificaciones**\n\nPara ver tus notas académicas, ingresa aquí:\n� https://fronted-php-production.up.railway.app/alumno?section=notas\n\n✅ Podrás ver:\n• Notas por curso y unidad\n• Evaluaciones pendientes\n• Promedios parciales y finales\n• Peso de cada evaluación",
+                "response": "[REDIRECT_BUTTON|https://fronted-php-production.up.railway.app/alumno?section=notas|📊 Ver Mis Notas|📊 **Notas:**\n\nPara consultar tus notas desde el intranet:\n\n1️⃣ Ingresa al portal Net.UPT\n2️⃣ Haz clic en 'Alumno' en el menú lateral\n3️⃣ Selecciona 'Notas' en las opciones\n4️⃣ Verás tus calificaciones por curso\n\n]",
                 "escalate": False
             },
             "Consultar Asistencia": {
-                "response": "✅ **Consulta de Asistencia**\n\nPara ver tu registro de asistencias, ingresa aquí:\n👉 https://fronted-php-production.up.railway.app/alumno?section=asistencia\n\n✅ Podrás ver:\n• Asistencias por curso\n• Fechas y estados (Asiste/Falta/Tardanza)\n• Porcentaje de asistencia\n• Calendario de clases",
+                "response": "[REDIRECT_BUTTON|https://fronted-php-production.up.railway.app/alumno?section=asistencia|✅ Ver Mi Asistencia|✅ **Asistencia:**\n\nPara consultar tu asistencia desde el intranet:\n\n1️⃣ Ingresa al portal Net.UPT\n2️⃣ Haz clic en 'Alumno' en el menú lateral\n3️⃣ Selecciona 'Asistencia' en las opciones\n4️⃣ Verás tu registro de asistencia por curso\n\n]",
                 "escalate": False
             },
             "Información de Matrícula": {

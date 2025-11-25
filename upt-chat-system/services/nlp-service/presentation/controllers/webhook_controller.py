@@ -177,9 +177,18 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             logger.info("📊 Intent de Consultar Notas detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=notas"
             
-            logger.info("🔥 ENVIANDO SOLO BOTÓN DE REDIRECCIÓN - NOTAS")
+            mensaje_pasos = (
+                "📊 **Notas:**\n\n"
+                "Para consultar tus notas desde el intranet:\n\n"
+                "1️⃣ Ingresa al portal Net.UPT\n"
+                "2️⃣ Haz clic en 'Alumno' en el menú lateral\n"
+                "3️⃣ Selecciona 'Notas' en las opciones\n"
+                "4️⃣ Verás tus calificaciones por curso\n\n"
+            )
+            
+            logger.info("🔥 ENVIANDO PASOS + BOTÓN DE REDIRECCIÓN - NOTAS")
             return {
-                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|📊 Ver Mis Notas|]",
+                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|📊 Ver Mis Notas|{mensaje_pasos}]",
             }
         
         # ===================================================================
@@ -189,9 +198,18 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             logger.info("✅ Intent de Consultar Asistencia detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=asistencia"
             
-            logger.info("🔥 ENVIANDO SOLO BOTÓN DE REDIRECCIÓN - ASISTENCIA")
+            mensaje_pasos = (
+                "✅ **Asistencia:**\n\n"
+                "Para consultar tu asistencia desde el intranet:\n\n"
+                "1️⃣ Ingresa al portal Net.UPT\n"
+                "2️⃣ Haz clic en 'Alumno' en el menú lateral\n"
+                "3️⃣ Selecciona 'Asistencia' en las opciones\n"
+                "4️⃣ Verás tu registro de asistencia por curso\n\n"
+            )
+            
+            logger.info("🔥 ENVIANDO PASOS + BOTÓN DE REDIRECCIÓN - ASISTENCIA")
             return {
-                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|✅ Ver Mi Asistencia|]",
+                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|✅ Ver Mi Asistencia|{mensaje_pasos}]",
             }
         
         # ===================================================================
