@@ -223,9 +223,19 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             "Aula Virtual", "aula_virtual", "aulavirtual"
         ]:
             logger.info("📚 Intent Aula Virtual (Pregrado) detectado")
-            url = "https://aulavirtual.upt.edu.pe/"
+            url = "https://www.upt.edu.pe/upt/web/index.php"
+            
+            mensaje = (
+                "🎓 **Aula Virtual - Pregrado:**\n\n"
+                "Accede a tu aula virtual de pregrado para:\n"
+                "• Ver tus cursos matriculados\n"
+                "• Revisar materiales de clase\n"
+                "• Entregar trabajos y tareas\n"
+                "• Participar en foros y actividades\n\n"
+            )
+            
             return {
-                "fulfillmentText": f"🔗 Aula Virtual - Pregrado:\n\nAccede aquí: {url}\n\n¿Deseas que te envíe más información sobre cómo ingresar?",
+                "fulfillmentText": f"[REDIRECT_BUTTON|{url}|🎓 Ir al Aula Virtual Pregrado|{mensaje}]",
             }
 
         if intent_name in [
@@ -233,15 +243,35 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
         ]:
             logger.info("📚 Intent Aula Virtual (Postgrado) detectado")
             url = "https://aulaespg.upt.edu.pe/"
+            
+            mensaje = (
+                "🎓 **Aula Virtual - Postgrado:**\n\n"
+                "Accede a tu aula virtual de postgrado para:\n"
+                "• Ver tus cursos de especialización\n"
+                "• Revisar materiales académicos\n"
+                "• Entregar trabajos de investigación\n"
+                "• Participar en sesiones virtuales\n\n"
+            )
+            
             return {
-                "fulfillmentText": f"🔗 Aula Virtual - Postgrado:\n\nAccede aquí: {url}\n\n¿Deseas que te envíe más información sobre cómo ingresar?",
+                "fulfillmentText": f"[REDIRECT_BUTTON|{url}|🎓 Ir al Aula Virtual Postgrado|{mensaje}]",
             }
 
         if intent_name in ["Biblioteca Virtual", "biblioteca", "biblioteca_virtual"]:
             logger.info("📚 Intent Biblioteca Virtual detectado")
             url = "https://biblioteca.upt.edu.pe/net/portada/"
+            
+            mensaje = (
+                "� **Biblioteca Virtual:**\n\n"
+                "Accede a la biblioteca virtual para:\n"
+                "• Buscar libros y revistas digitales\n"
+                "• Consultar bases de datos académicas\n"
+                "• Descargar recursos bibliográficos\n"
+                "• Renovar préstamos de libros\n\n"
+            )
+            
             return {
-                "fulfillmentText": f"🔗 Biblioteca Virtual:\n\nAccede aquí: {url}\n\n¿Deseas que te ayude a buscar un título o autor?",
+                "fulfillmentText": f"[REDIRECT_BUTTON|{url}|📚 Ir a Biblioteca Virtual|{mensaje}]",
             }
 
         # ===================================================================
