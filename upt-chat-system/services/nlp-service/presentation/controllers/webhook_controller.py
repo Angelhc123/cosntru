@@ -234,9 +234,11 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
                 "• Participar en foros y actividades\n\n"
             )
             
-            return {
+            response_payload = {
                 "fulfillmentText": f"[REDIRECT_BUTTON|{url}|🎓 Ir al Aula Virtual Pregrado|{mensaje}]",
             }
+            logger.info(f"🔥 WEBHOOK RETURNING FOR AULA PREGRADO: {response_payload}")
+            return response_payload
 
         if intent_name in [
             "Aula Virtual Postgrado", "aula_virtual_postgrado", "aula postgrado", "aulaespg", "aula_espg"
@@ -253,16 +255,18 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
                 "• Participar en sesiones virtuales\n\n"
             )
             
-            return {
+            response_payload = {
                 "fulfillmentText": f"[REDIRECT_BUTTON|{url}|🎓 Ir al Aula Virtual Postgrado|{mensaje}]",
             }
+            logger.info(f"🔥 WEBHOOK RETURNING FOR AULA POSTGRADO: {response_payload}")
+            return response_payload
 
         if intent_name in ["Biblioteca Virtual", "biblioteca", "biblioteca_virtual"]:
             logger.info("📚 Intent Biblioteca Virtual detectado")
             url = "https://biblioteca.upt.edu.pe/net/portada/"
             
             mensaje = (
-                "� **Biblioteca Virtual:**\n\n"
+                "📚 **Biblioteca Virtual:**\n\n"
                 "Accede a la biblioteca virtual para:\n"
                 "• Buscar libros y revistas digitales\n"
                 "• Consultar bases de datos académicas\n"
@@ -270,9 +274,11 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
                 "• Renovar préstamos de libros\n\n"
             )
             
-            return {
+            response_payload = {
                 "fulfillmentText": f"[REDIRECT_BUTTON|{url}|📚 Ir a Biblioteca Virtual|{mensaje}]",
             }
+            logger.info(f"🔥 WEBHOOK RETURNING FOR BIBLIOTECA: {response_payload}")
+            return response_payload
 
         # ===================================================================
         # ESCUELAS PROFESIONALES - FACULTAD DE INGENIERÍA
