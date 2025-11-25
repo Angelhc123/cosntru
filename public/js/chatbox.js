@@ -558,7 +558,7 @@ class ChatboxWidget {
         const redirectMatch = message.match(redirectPattern);
         
         if (redirectMatch) {
-            console.log('✅ BOTÓN DE REDIRECCIÓN DETECTADO!');
+            console.log('✅ BOTÓN DE REDIRECCIÓN DETECTADO EN WIDGET PÚBLICO!');
             const url = redirectMatch[1];
             const buttonText = redirectMatch[2];
             const messageText = redirectMatch[3].trim();
@@ -566,41 +566,19 @@ class ChatboxWidget {
             console.log('📝 Texto del botón:', buttonText);
             console.log('💬 Mensaje:', messageText);
             
-            // Crear mensaje con botón estilo ticket
+            // WIDGET PÚBLICO: Mostrar pasos + mensaje de login requerido
             const messageDiv = document.createElement('div');
-            messageDiv.className = 'message bot-message escalation-prompt';
+            messageDiv.className = 'message bot-message';
             
-            // Solo agregar texto si existe
-            let textContent = '';
-            if (messageText && messageText.length > 0) {
-                textContent = `<p>${this.escapeHtml(messageText)}</p>`;
-            }
+            let formattedMessage = messageText || '';
+            formattedMessage += '\n\n🔒 **Para ver tu horario es necesario iniciar sesión en el portal Net.UPT**';
             
             messageDiv.innerHTML = `
-                <div class="message-content">
-                    ${textContent}
-                    <div class="escalation-buttons">
-                        <button class="escalation-btn yes-btn" onclick="window.open('${url}', '_blank')" style="
-                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                            color: white;
-                            border: none;
-                            padding: 12px 24px;
-                            border-radius: 8px;
-                            font-weight: 600;
-                            cursor: pointer;
-                            font-size: 14px;
-                            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-                            transition: all 0.3s ease;
-                            width: 100%;
-                        ">
-                            ${buttonText}
-                        </button>
-                    </div>
-                </div>
+                <div class="message-content">🤖 ${this.escapeHtml(formattedMessage)}</div>
                 <div class="message-time">${new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}</div>
             `;
             messagesContainer.appendChild(messageDiv);
-            console.log('✅ Botón de redirección creado');
+            console.log('✅ Mensaje de login requerido mostrado');
             
         } else {
             // Mensaje normal sin botón
