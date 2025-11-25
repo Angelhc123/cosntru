@@ -222,20 +222,11 @@ class HybridNLPService:
     
     def _get_fulfillment_text(self, intent_name: str) -> str:
         """
-        Obtiene texto de respuesta por defecto
-        NOTA: Estos son fallbacks cuando DialogFlow no responde
+        Obtiene texto de respuesta SOLO para fallback
+        IMPORTANTE: DialogFlow debe manejar TODAS las respuestas
         """
-        responses = {
-            "matricula": "Te puedo ayudar con información sobre matrícula. ¿Qué específicamente necesitas saber? [RESPUESTA DADA POR PYTHON]",
-            "pagos": "Información sobre pagos y pensiones está disponible en tesorería. [RESPUESTA DADA POR PYTHON]",
-            "biblioteca": "La biblioteca ofrece varios servicios. ¿Qué necesitas? [RESPUESTA DADA POR PYTHON]",
-            "tramites": "Hay varios trámites disponibles. ¿Cuál necesitas realizar? [RESPUESTA DADA POR PYTHON]",
-            "contacto": "Puedo proporcionarte información de contacto de diferentes áreas. [RESPUESTA DADA POR PYTHON]",
-            "campus_virtual": "Para acceder al campus virtual necesitas tus credenciales UPT. [RESPUESTA DADA POR PYTHON]",
-            "consulta_general": "Entiendo que necesitas ayuda. ¿Podrías ser más específico sobre lo que buscas? [RESPUESTA DADA POR PYTHON]"
-        }
-        
-        return responses.get(intent_name, "Te puedo ayudar. ¿Podrías darme más detalles? [RESPUESTA DADA POR PYTHON]")
+        # SOLO respuesta genérica de fallback
+        return "Te puedo ayudar. ¿Podrías darme más detalles sobre lo que necesitas?"
     
     def _get_fallback_response(
         self,
