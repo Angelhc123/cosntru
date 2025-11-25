@@ -156,9 +156,9 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             logger.info("📅 Intent de Consultar Horario detectado")
             intranet_url = "https://fronted-php-production.up.railway.app/alumno?section=horario"
             
-            logger.info("🔥 ENVIANDO SOLO BOTÓN DE REDIRECCIÓN")
+            logger.info("🔥 ENVIANDO SOLO TEXTO 'Horarios:'")
             return {
-                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|📅 Ver Mi Horario|]",
+                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|📅 Ver Mi Horario|Horarios:]",
             }
         
         # ===================================================================
