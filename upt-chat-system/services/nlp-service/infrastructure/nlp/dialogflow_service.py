@@ -183,7 +183,7 @@ class DialogFlowService:
                 "category": "Contraseña Institucional"
             },
             "Consultar Horario": {
-                "response": "📅 **Consulta de Horario Académico**\n\nPara ver tu horario de clases actualizado, ingresa aquí:\n👉 https://fronted-php-production.up.railway.app/alumno?section=horario\n\n✅ Podrás ver:\n• Cursos del ciclo actual\n• Horarios por día y hora\n• Sección asignada\n• Códigos de curso",
+                "response": "[REDIRECT_BUTTON|https://fronted-php-production.up.railway.app/alumno?section=horario|📅 Ver Mi Horario|Horarios:]",
                 "escalate": False
             },
             "Consultar Notas": {
