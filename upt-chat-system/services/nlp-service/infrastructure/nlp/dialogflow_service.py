@@ -195,6 +195,18 @@ class DialogFlowService:
                 "response": "[REDIRECT_BUTTON|https://fronted-php-production.up.railway.app/alumno?section=asistencia|✅ Ver Mi Asistencia|✅ **Asistencia:**\n\nPara consultar tu asistencia desde el intranet:\n\n1️⃣ Ingresa al portal Net.UPT\n2️⃣ Haz clic en 'Alumno' en el menú lateral\n3️⃣ Selecciona 'Asistencia' en las opciones\n4️⃣ Verás tu registro de asistencia por curso\n\n]",
                 "escalate": False
             },
+            "Biblioteca Virtual": {
+                "response": "[REDIRECT_BUTTON|https://biblioteca.upt.edu.pe/net/portada/|📚 Ir a Biblioteca Virtual|📚 **Biblioteca Virtual:**\n\nAccede a la biblioteca virtual para:\n• Buscar libros y revistas digitales\n• Consultar bases de datos académicas\n• Descargar recursos bibliográficos\n• Renovar préstamos de libros\n\n]",
+                "escalate": False
+            },
+            "Aula Virtual Pregrado": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/index.php|🎓 Ir al Aula Virtual Pregrado|🎓 **Aula Virtual - Pregrado:**\n\nAccede a tu aula virtual de pregrado para:\n• Ver tus cursos matriculados\n• Revisar materiales de clase\n• Entregar trabajos y tareas\n• Participar en foros y actividades\n\n]",
+                "escalate": False
+            },
+            "Aula Virtual Postgrado": {
+                "response": "[REDIRECT_BUTTON|https://aulaespg.upt.edu.pe/|🎓 Ir al Aula Virtual Postgrado|🎓 **Aula Virtual - Postgrado:**\n\nAccede a tu aula virtual de postgrado para:\n• Ver tus cursos de especialización\n• Revisar materiales académicos\n• Entregar trabajos de investigación\n• Participar en sesiones virtuales\n\n]",
+                "escalate": False
+            },
             "Información de Matrícula": {
                 "response": "Para información sobre matrícula, te puedo ayudar con:\n\n📚 **Fechas de matrícula**\n📚 **Requisitos necesarios**\n📚 **Proceso de inscripción**\n📚 **Costos y pagos**\n\n¿Qué información específica necesitas sobre la matrícula?",
                 "escalate": False
