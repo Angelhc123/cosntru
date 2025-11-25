@@ -54,6 +54,11 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
         logger.info(f"📨 Webhook recibido de DialogFlow")
         logger.debug(f"Body completo: {body}")
         
+        # Extraer info básica para logging
+        query_text = body.get("queryResult", {}).get("queryText", "")
+        intent_name = body.get("queryResult", {}).get("intent", {}).get("displayName", "")
+        logger.info(f"🚨🚨🚨 INTENT: '{intent_name}' - QUERY: '{query_text}' 🚨🚨🚨")
+        
         # Extraer información del request de DialogFlow
         query_result = body.get("queryResult", {})
         intent_name = query_result.get("intent", {}).get("displayName", "")
@@ -153,7 +158,7 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             
             logger.info("🔥 ENVIANDO SOLO BOTÓN DE REDIRECCIÓN")
             return {
-                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}| Ver Mi Horario|]",
+                "fulfillmentText": f"[REDIRECT_BUTTON|{intranet_url}|📅 Ver Mi Horario|]",
             }
         
         # ===================================================================
