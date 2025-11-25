@@ -205,7 +205,16 @@ class DialogFlowService:
             }
         }
         
-        if intent_name in intent_config and (not webhook_response_text or webhook_response_text.strip() == ''):
+        # PRIORIDAD 1: Si hay fulfillment messages del webhook, usar esa respuesta
+        if query_result.fulfillment_messages:
+            for message in query_result.fulfillment_messages:
+                if hasattr(message, 'text') and message.text and message.text.text:
+                    webhook_response_text = message.text.text[0]
+                    logger.info(f"✅ Webhook response extracted from fulfillment_messages")
+                    break
+        
+        # PRIORIDAD 2: Si el webhook no devolvió nada, usar respuestas hardcoded
+        if (not webhook_response_text or webhook_response_text.strip() == '') and intent_name in intent_config:
             config = intent_config[intent_name]
             webhook_response_text = config["response"]
             
@@ -214,14 +223,6 @@ class DialogFlowService:
                 logger.info(f"🎫 INTENT REQUIRES ESCALATION: {intent_name} - API Gateway will handle ticket creation")
             
             logger.info(f"🔧 TEMPORAL FIX: Using configured response for {intent_name} intent")
-        
-        # Si hay fulfillment messages, usar el primero (respuesta del webhook)
-        elif query_result.fulfillment_messages:
-            for message in query_result.fulfillment_messages:
-                if hasattr(message, 'text') and message.text and message.text.text:
-                    webhook_response_text = message.text.text[0]
-                    logger.info(f"✅ Webhook response extracted from fulfillment_messages")
-                    break
         
         logger.info(f"📋 FINAL RESPONSE: intent='{intent_name}', text='{webhook_response_text[:50]}...'")
         
