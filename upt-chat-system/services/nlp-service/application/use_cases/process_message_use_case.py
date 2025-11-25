@@ -220,6 +220,10 @@ class ProcessMessageUseCase:
             # Si es de Dialogflow, usar su respuesta directamente
             if intent.category == 'dialogflow' and hybrid_result:
                 # DialogFlow webhook devuelve "fulfillmentText" (con T mayúscula)
+                logger.info(f"🔍 DEBUG hybrid_result keys: {list(hybrid_result.keys())}")
+                logger.info(f"🔍 DEBUG fulfillmentText value: '{hybrid_result.get('fulfillmentText', 'NOT_FOUND')[:200]}'")
+                logger.info(f"🔍 DEBUG fulfillment_text value: '{hybrid_result.get('fulfillment_text', 'NOT_FOUND')[:200]}'")
+                
                 response_text = (
                     hybrid_result.get('fulfillmentText') or 
                     hybrid_result.get('fulfillment_text') or 
