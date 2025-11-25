@@ -221,7 +221,15 @@ class DialogFlowService:
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/186|🏗️ Ver Ingeniería Civil]",
                 "escalate": False
             },
+            "Escuela de Ingenieria Civil": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/186|🏗️ Ver Ingeniería Civil]",
+                "escalate": False
+            },
             "Ingenieria de Sistemas": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/188|💻 Ver Ingeniería de Sistemas]",
+                "escalate": False
+            },
+            "Escuela de Ingenieria de Sistemas": {
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/188|💻 Ver Ingeniería de Sistemas]",
                 "escalate": False
             },
@@ -229,7 +237,15 @@ class DialogFlowService:
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/189|⚡ Ver Ingeniería Electrónica]",
                 "escalate": False
             },
+            "Escuela de Ingenieria Electronica": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/189|⚡ Ver Ingeniería Electrónica]",
+                "escalate": False
+            },
             "Ingenieria Agroindustrial": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/190|🌾 Ver Ingeniería Agroindustrial]",
+                "escalate": False
+            },
+            "Escuela de Ingenieria Agroindustrial": {
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/190|🌾 Ver Ingeniería Agroindustrial]",
                 "escalate": False
             },
@@ -237,7 +253,15 @@ class DialogFlowService:
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/191|🌍 Ver Ingeniería Ambiental]",
                 "escalate": False
             },
+            "Escuela de Ingenieria Ambiental": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/191|🌍 Ver Ingeniería Ambiental]",
+                "escalate": False
+            },
             "Ingenieria Industrial": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/248|🏭 Ver Ingeniería Industrial]",
+                "escalate": False
+            },
+            "Escuela de Ingenieria Industrial": {
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/248|🏭 Ver Ingeniería Industrial]",
                 "escalate": False
             },
@@ -246,11 +270,23 @@ class DialogFlowService:
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/170|👨‍🏫 Ver Educación]",
                 "escalate": False
             },
+            "Escuela de Educacion": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/170|👨‍🏫 Ver Educación]",
+                "escalate": False
+            },
             "Ciencias de la Comunicacion": {
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/176|📱 Ver Ciencias de la Comunicación]",
                 "escalate": False
             },
+            "Escuela de Ciencias de la Comunicacion": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/176|📱 Ver Ciencias de la Comunicación]",
+                "escalate": False
+            },
             "Psicologia": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/178|🧠 Ver Psicología]",
+                "escalate": False
+            },
+            "Escuela de Psicologia": {
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/178|🧠 Ver Psicología]",
                 "escalate": False
             },
@@ -259,8 +295,16 @@ class DialogFlowService:
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/165|⚖️ Ver Derecho]",
                 "escalate": False
             },
+            "Escuela de Derecho": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/165|⚖️ Ver Derecho]",
+                "escalate": False
+            },
             # ESCUELAS PROFESIONALES - FACULTAD DE CIENCIAS DE LA SALUD
             "Medicina Humana": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/198|🩺 Ver Medicina Humana]",
+                "escalate": False
+            },
+            "Escuela de Medicina Humana": {
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/198|🩺 Ver Medicina Humana]",
                 "escalate": False
             },
@@ -268,7 +312,15 @@ class DialogFlowService:
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/199|🦷 Ver Odontología]",
                 "escalate": False
             },
+            "Escuela de Odontologia": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/199|🦷 Ver Odontología]",
+                "escalate": False
+            },
             "Tecnologia Medica": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/200|🔬 Ver Tecnología Médica]",
+                "escalate": False
+            },
+            "Escuela de Tecnologia Medica": {
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/200|🔬 Ver Tecnología Médica]",
                 "escalate": False
             },
@@ -277,7 +329,15 @@ class DialogFlowService:
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/218|💰 Ver Ciencias Contables]",
                 "escalate": False
             },
+            "Escuela de Contabilidad": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/218|💰 Ver Ciencias Contables]",
+                "escalate": False
+            },
             "Ingenieria Comercial": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/217|📊 Ver Ingeniería Comercial]",
+                "escalate": False
+            },
+            "Escuela de Ingenieria Comercial": {
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/217|📊 Ver Ingeniería Comercial]",
                 "escalate": False
             },
@@ -285,7 +345,15 @@ class DialogFlowService:
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/221|📈 Ver Economía]",
                 "escalate": False
             },
+            "Escuela de Economia": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/221|📈 Ver Economía]",
+                "escalate": False
+            },
             "Administracion": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/2828|💼 Ver Administración]",
+                "escalate": False
+            },
+            "Escuela de Administracion": {
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/2828|💼 Ver Administración]",
                 "escalate": False
             },
@@ -293,12 +361,24 @@ class DialogFlowService:
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/216|✈️ Ver Turismo y Hotelería]",
                 "escalate": False
             },
+            "Escuela de Turismo": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/216|✈️ Ver Turismo y Hotelería]",
+                "escalate": False
+            },
             "Negocios Internacionales": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/219|🌐 Ver Negocios Internacionales]",
+                "escalate": False
+            },
+            "Escuela de Negocios Internacionales": {
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/219|🌐 Ver Negocios Internacionales]",
                 "escalate": False
             },
             # ESCUELAS PROFESIONALES - FACULTAD DE ARQUITECTURA
             "Arquitectura": {
+                "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/231|🏛️ Ver Arquitectura]",
+                "escalate": False
+            },
+            "Escuela de Arquitectura": {
                 "response": "[BUTTON_CREATE|https://www.upt.edu.pe/upt/web/facultad/index/231|🏛️ Ver Arquitectura]",
                 "escalate": False
             }
