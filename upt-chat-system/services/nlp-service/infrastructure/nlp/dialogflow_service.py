@@ -183,7 +183,7 @@ class DialogFlowService:
                 "category": "Contraseña Institucional"
             },
             "Consultar Horario": {
-                "response": "[REDIRECT_BUTTON|https://fronted-php-production.up.railway.app/alumno?section=horario|📅 Ver Mi Horario|Horarios:]",
+                "response": "[REDIRECT_BUTTON|https://fronted-php-production.up.railway.app/alumno?section=horario|📅 Ver Mi Horario|📅 **Horarios:**\n\nPara consultar tu horario desde el intranet:\n\n1️⃣ Ingresa al portal Net.UPT\n2️⃣ Haz clic en 'Alumno' en el menú lateral\n3️⃣ Selecciona 'Horario' en las opciones\n4️⃣ Verás tu horario completo del ciclo actual\n\n]",
                 "escalate": False
             },
             "Consultar Notas": {
