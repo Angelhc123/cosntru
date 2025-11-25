@@ -200,7 +200,7 @@ class DialogFlowService:
                 "escalate": False
             },
             "Aula Virtual Pregrado": {
-                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/index.php|🎓 Ir al Aula Virtual Pregrado|🎓 **Aula Virtual - Pregrado:**\n\nAccede a tu aula virtual de pregrado para:\n• Ver tus cursos matriculados\n• Revisar materiales de clase\n• Entregar trabajos y tareas\n• Participar en foros y actividades\n\n]",
+                "response": "[REDIRECT_BUTTON|https://aulavirtual.upt.edu.pe/|🎓 Ir al Aula Virtual Pregrado|🎓 **Aula Virtual - Pregrado:**\n\nAccede a tu aula virtual de pregrado para:\n• Ver tus cursos matriculados\n• Revisar materiales de clase\n• Entregar trabajos y tareas\n• Participar en foros y actividades\n\n]",
                 "escalate": False
             },
             "Aula Virtual Postgrado": {
@@ -215,6 +215,92 @@ class DialogFlowService:
                 "response": "Lamento que tengas problemas técnicos. Ahora te atenderá un especialista.",
                 "escalate": True,
                 "category": "Problemas Técnicos"
+            },
+            # ESCUELAS PROFESIONALES - FACULTAD DE INGENIERÍA
+            "Ingenieria Civil": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/186|🏗️ Ver Ingeniería Civil|🏗️ **Escuela Profesional de Ingeniería Civil**\n\nForma profesionales capaces de diseñar, construir y gestionar proyectos de infraestructura.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
+            },
+            "Ingenieria de Sistemas": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/188|💻 Ver Ingeniería de Sistemas|💻 **Escuela Profesional de Ingeniería de Sistemas**\n\nForma profesionales en desarrollo de software, sistemas de información y tecnologías emergentes.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
+            },
+            "Ingenieria Electronica": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/189|⚡ Ver Ingeniería Electrónica|⚡ **Escuela Profesional de Ingeniería Electrónica**\n\nForma profesionales en sistemas electrónicos, automatización y telecomunicaciones.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
+            },
+            "Ingenieria Agroindustrial": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/190|🌾 Ver Ingeniería Agroindustrial|🌾 **Escuela Profesional de Ingeniería Agroindustrial**\n\nForma profesionales en procesamiento, transformación y comercialización de productos agrícolas.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
+            },
+            "Ingenieria Ambiental": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/191|🌍 Ver Ingeniería Ambiental|🌍 **Escuela Profesional de Ingeniería Ambiental**\n\nForma profesionales en gestión ambiental, conservación y desarrollo sostenible.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
+            },
+            "Ingenieria Industrial": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/248|🏭 Ver Ingeniería Industrial|🏭 **Escuela Profesional de Ingeniería Industrial**\n\nForma profesionales en optimización de procesos, producción y gestión industrial.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
+            },
+            # ESCUELAS PROFESIONALES - FACULTAD DE EDUCACIÓN Y HUMANIDADES
+            "Educacion": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/170|👨‍🏫 Ver Educación|👨‍🏫 **Escuela Profesional de Educación**\n\nForma profesionales en docencia y gestión educativa.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
+            },
+            "Ciencias de la Comunicacion": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/176|📱 Ver Ciencias de la Comunicación|📱 **Escuela Profesional de Ciencias de la Comunicación**\n\nForma profesionales en periodismo, comunicación audiovisual y relaciones públicas.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
+            },
+            "Psicologia": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/178|🧠 Ver Psicología|🧠 **Escuela Profesional de Humanidades - Psicología**\n\nForma profesionales en psicología clínica, educativa y organizacional.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
+            },
+            # ESCUELAS PROFESIONALES - FACULTAD DE DERECHO
+            "Derecho": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/165|⚖️ Ver Derecho|⚖️ **Escuela Profesional de Derecho**\n\nForma profesionales en ciencias jurídicas y defensa legal.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
+            },
+            # ESCUELAS PROFESIONALES - FACULTAD DE CIENCIAS DE LA SALUD
+            "Medicina Humana": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/198|🩺 Ver Medicina Humana|🩺 **Escuela Profesional de Medicina Humana**\n\nForma profesionales médicos con sólida formación científica y humanística.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
+            },
+            "Odontologia": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/199|🦷 Ver Odontología|🦷 **Escuela Profesional de Odontología**\n\nForma profesionales en salud bucal y dental.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
+            },
+            "Tecnologia Medica": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/200|🔬 Ver Tecnología Médica|🔬 **Escuela Profesional de Tecnología Médica**\n\nForma profesionales en tecnología y laboratorio clínico.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
+            },
+            # ESCUELAS PROFESIONALES - FACULTAD DE CIENCIAS EMPRESARIALES
+            "Contabilidad": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/218|💰 Ver Ciencias Contables|💰 **Escuela Profesional de Ciencias Contables y Financieras**\n\nForma profesionales en contabilidad, auditoría y finanzas.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
+            },
+            "Ingenieria Comercial": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/217|📊 Ver Ingeniería Comercial|📊 **Escuela Profesional de Ingeniería Comercial**\n\nForma profesionales en gestión comercial y marketing.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
+            },
+            "Economia": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/221|📈 Ver Economía|📈 **Escuela Profesional de Economía y Microfinanzas**\n\nForma profesionales en economía y gestión financiera.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
+            },
+            "Administracion": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/2828|💼 Ver Administración|💼 **Escuela Profesional de Administración**\n\nForma profesionales en gestión y administración de empresas.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
+            },
+            "Turismo": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/216|✈️ Ver Turismo y Hotelería|✈️ **Escuela Profesional de Administración Turístico-Hotelera**\n\nForma profesionales en turismo y gestión hotelera.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
+            },
+            "Negocios Internacionales": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/219|🌐 Ver Negocios Internacionales|🌐 **Escuela Profesional de Administración de Negocios Internacionales**\n\nForma profesionales en comercio exterior y negocios globales.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
+            },
+            # ESCUELAS PROFESIONALES - FACULTAD DE ARQUITECTURA
+            "Arquitectura": {
+                "response": "[REDIRECT_BUTTON|https://www.upt.edu.pe/upt/web/facultad/index/231|🏛️ Ver Arquitectura|🏛️ **Escuela Profesional de Arquitectura**\n\nForma profesionales en diseño arquitectónico y urbanístico.\n\n¿Deseas más información sobre la carrera?]",
+                "escalate": False
             }
         }
         
