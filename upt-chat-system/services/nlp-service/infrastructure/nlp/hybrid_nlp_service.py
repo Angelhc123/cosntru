@@ -222,11 +222,21 @@ class HybridNLPService:
     
     def _get_fulfillment_text(self, intent_name: str) -> str:
         """
-        Obtiene texto de respuesta SOLO para fallback
-        IMPORTANTE: DialogFlow debe manejar TODAS las respuestas
+        Obtiene texto de respuesta para Local NLP cuando DialogFlow falla
+        Incluye respuestas con botones de redirección para horario, notas y asistencia
         """
-        # SOLO respuesta genérica de fallback
-        return "Te puedo ayudar. ¿Podrías darme más detalles sobre lo que necesitas?"
+        # Respuestas con botones de redirección
+        intent_responses = {
+            "horarios": "[REDIRECT_BUTTON|https://net.upt.edu.pe/Alumno/ConsultaHorarioAlumno.aspx|📅 Ver Mi Horario|📅 **Horarios:**\n\n1️⃣ Ingresa al portal Net.UPT\n2️⃣ Haz clic en 'Alumno'\n3️⃣ Selecciona 'Consulta de Horario'\n4️⃣ Elige tu ciclo actual\n5️⃣ ¡Listo! Podrás ver tu horario completo]",
+            "notas": "[REDIRECT_BUTTON|https://net.upt.edu.pe/Alumno/ConsultaNotaAlumno.aspx|📊 Ver Mis Notas|📊 **Notas:**\n\n1️⃣ Ingresa al portal Net.UPT\n2️⃣ Haz clic en 'Alumno'\n3️⃣ Selecciona 'Consulta de Notas'\n4️⃣ Elige el ciclo que deseas consultar\n5️⃣ ¡Listo! Verás tus calificaciones]",
+            "asistencia": "[REDIRECT_BUTTON|https://net.upt.edu.pe/Alumno/ConsultaAsistenciaAlumno.aspx|📋 Ver Mi Asistencia|📋 **Asistencia:**\n\n1️⃣ Ingresa al portal Net.UPT\n2️⃣ Haz clic en 'Alumno'\n3️⃣ Selecciona 'Consulta de Asistencia'\n4️⃣ Elige el ciclo y curso\n5️⃣ ¡Listo! Podrás revisar tus asistencias]"
+        }
+        
+        # Devolver respuesta específica o fallback genérico
+        return intent_responses.get(
+            intent_name,
+            "Te puedo ayudar. ¿Podrías darme más detalles sobre lo que necesitas?"
+        )
     
     def _get_fallback_response(
         self,
