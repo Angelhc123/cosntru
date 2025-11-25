@@ -167,6 +167,7 @@ class DialogFlowService:
         
         # IMPORTANT: Respuestas hardcoded para todos los intents hasta que se arregle el webhook
         webhook_response_text = query_result.fulfillment_text
+        logger.info(f"🔍 WEBHOOK RESPONSE FROM QUERY_RESULT.FULFILLMENT_TEXT: '{webhook_response_text}'")
         
         # TEMPORAL FIX: Respuestas hardcoded para todos los intents
         intent_name = query_result.intent.display_name if query_result.intent.display_name else "Default Fallback Intent"
