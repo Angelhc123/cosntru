@@ -1,0 +1,6 @@
+# Ignorar carpeta front
+front/
+
+# Ignorar archivo de configuración temporal
+asd.txt
+
