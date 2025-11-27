@@ -17,11 +17,12 @@ class Database {
 
     public function __construct() {
         // Cargar desde variables de entorno o usar valores por defecto
-        $this->host = getenv('MYSQL_ADDON_HOST') ?: 'localhost';
-        $this->db_name = getenv('MYSQL_ADDON_DB') ?: 'proyectotest';
-        $this->username = getenv('MYSQL_ADDON_USER') ?: 'root';
-        $this->password = getenv('MYSQL_ADDON_PASSWORD') ?: '';
-        $this->port = getenv('MYSQL_ADDON_PORT') ?: 3306;
+        // Railway usa MYSQLHOST, MYSQLDATABASE, etc.
+        $this->host = getenv('MYSQLHOST') ?: getenv('MYSQL_ADDON_HOST') ?: 'localhost';
+        $this->db_name = getenv('MYSQLDATABASE') ?: getenv('MYSQL_ADDON_DB') ?: 'proyectotest';
+        $this->username = getenv('MYSQLUSER') ?: getenv('MYSQL_ADDON_USER') ?: 'root';
+        $this->password = getenv('MYSQLPASSWORD') ?: getenv('MYSQL_ADDON_PASSWORD') ?: '';
+        $this->port = getenv('MYSQLPORT') ?: getenv('MYSQL_ADDON_PORT') ?: 3306;
     }
 
     public function getConnection() {

@@ -16,21 +16,21 @@ try {
     $user->createTable();
     echo "✅ Tabla usuarios verificada/creada\n\n";
     
-    // Usuario principal de prueba - Alexander Piero
-    $user->usuario = '2018123456';
+    // Usuario principal de prueba - Angel Hernandez (usando el email correcto de la BD)
+    $user->usuario = '2020068376';
     $user->password = 'password123'; // Se hasheará automáticamente
-    $user->nombre_completo = 'Alexander Piero';
-    $user->email = '2018123456@upt.edu.pe';
-    $user->email_personal = 'alexanderpiero218@gmail.com';
+    $user->nombre_completo = 'Juan Carlos Pérez Mamani';
+    $user->email = 'alexanderpiero218@gmail.com';
+    $user->email_personal = 'angelhernandez3@gmail.com';
     $user->tipo_usuario = 'estudiante';
-    $user->codigo_universitario = '2018123456';
+    $user->codigo_universitario = '2020068376';
     $user->carrera = 'Ingeniería de Sistemas';
     $user->estado = 'activo';
     
     if ($user->create()) {
-        echo "✅ Usuario creado: Alexander Piero (alexanderpiero218@gmail.com)\n";
+        echo "✅ Usuario creado: Juan Carlos Pérez Mamani (angelhernandez3@gmail.com)\n";
     } else {
-        echo "⚠️  Usuario Alexander Piero ya existe o error al crear\n";
+        echo "⚠️  Usuario Juan Carlos Pérez Mamani ya existe o error al crear\n";
     }
     
     // Usuario 2 - Juan Pérez
@@ -71,9 +71,9 @@ try {
     
     echo "\n✅ Proceso completado\n";
     echo "Los usuarios pueden iniciar sesión con:\n";
-    echo "  - Usuario: 2018123456 | Contraseña: password123 | Email: alexanderpiero218@gmail.com\n";
-    echo "  - Usuario: 2019001234 | Contraseña: password123 | Email: juan.perez@gmail.com\n";
-    echo "  - Usuario: 2020005678 | Contraseña: password123 | Email: maria.gonzalez@gmail.com\n";
+    echo "  - Usuario: 2020068376 | Contraseña: password123 | Email Personal: angelhernandez3@gmail.com\n";
+    echo "  - Usuario: 2019001234 | Contraseña: password123 | Email Personal: juan.perez@gmail.com\n";
+    echo "  - Usuario: 2020005678 | Contraseña: password123 | Email Personal: maria.gonzalez@gmail.com\n";
     
 } catch (Exception $e) {
     echo "❌ Error: " . $e->getMessage() . "\n";
