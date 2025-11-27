@@ -55,7 +55,7 @@ export class MySQLConnectionService implements OnModuleInit, OnModuleDestroy {
       this.logger.log(`🔍 Verificando email personal: ${emailPersonal}`);
       
       const response = await axios.post(
-        `${this.phpApiBaseUrl}/api_verify_email.php`,
+        `${this.phpApiBaseUrl}/api/auth/verify-email.php`,
         { email_personal: emailPersonal },
         {
           headers: { 'Content-Type': 'application/json' },
@@ -97,7 +97,7 @@ export class MySQLConnectionService implements OnModuleInit, OnModuleDestroy {
       this.logger.log(`🔄 Actualizando contraseña para usuario: ${usuario}`);
       
       const response = await axios.post(
-        `${this.phpApiBaseUrl}/api_update_password.php`,
+        `${this.phpApiBaseUrl}/api/auth/update-password.php`,
         {
           usuario: usuario,
           new_password: newPassword,
