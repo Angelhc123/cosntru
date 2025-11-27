@@ -4,7 +4,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "cd public && php -S 0.0.0.0:$PORT -t . index.php",
+    "startCommand": "cd public && php -S 0.0.0.0:$PORT -t .",
     "healthcheckPath": "/api/v1/health",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
