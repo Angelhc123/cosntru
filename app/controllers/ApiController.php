@@ -96,11 +96,76 @@ class ApiController {
     }
 
     public function verifyEmail() {
-        // Similar implementación para verificar email
-        echo json_encode([
-            'success' => true,
-            'message' => 'Endpoint en desarrollo'
-        ]);
+        // Manejar preflight request
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            http_response_code(200);
+            exit();
+        }
+
+        // Solo permitir POST
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Método no permitido. Use POST.'
+            ]);
+            exit();
+        }
+
+        try {
+            // Obtener datos del request
+            $input = json_decode(file_get_contents('php://input'), true);
+            
+            if (!isset($input['email_personal']) || empty($input['email_personal'])) {
+                http_response_code(400);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'El campo email_personal es requerido'
+                ]);
+                exit();
+            }
+
+            $emailPersonal = $input['email_personal'];
+
+            // Validar formato del email
+            if (!filter_var($emailPersonal, FILTER_VALIDATE_EMAIL)) {
+                http_response_code(400);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Formato de email inválido'
+                ]);
+                exit();
+            }
+
+            // Verificar si el email existe
+            $result = $this->user->verifyEmailPersonal($emailPersonal);
+            
+            if ($result['exists']) {
+                echo json_encode([
+                    'success' => true,
+                    'data' => [
+                        'usuario' => $result['usuario'],
+                        'nombre_completo' => $result['nombre_completo'],
+                        'email' => $result['email'],
+                        'codigo_universitario' => $result['usuario']
+                    ]
+                ]);
+            } else {
+                http_response_code(404);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Email no encontrado en el sistema'
+                ]);
+            }
+
+        } catch (Exception $e) {
+            error_log("Error en verifyEmail: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error interno del servidor'
+            ]);
+        }
     }
 
     public function getUserEmail() {
