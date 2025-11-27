@@ -109,6 +109,7 @@ export class NlpService {
                         userId: userId || 'anonymous',
                         userName: 'Usuario del Chat',
                         userEmail: '2022081567@upt.edu.pe', // Email genérico para escalaciones automáticas
+                        subject: `${intentName} - Escalamiento Automático`,
                         originalQuery: text,
                         botResponse: botResponse || 'Intent detectado automáticamente',
                         confidence: confidence
