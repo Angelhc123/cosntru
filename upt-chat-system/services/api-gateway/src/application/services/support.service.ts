@@ -16,6 +16,7 @@ export class SupportService {
         userId: string;
         userName: string;
         userEmail: string;
+        subject: string;
         originalQuery: string;
         botResponse: string;
         confidence: number;
