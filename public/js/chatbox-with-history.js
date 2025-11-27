@@ -938,10 +938,11 @@ class ChatboxWidgetWithHistory {
     async sendTranscriptionEmail(messages) {
         try {
             
-            // Obtener datos del usuario desde la BD de PHP
-            const userResponse = await fetch(`/get_user_email.php?user_id=${this.userId}`);
+            // Obtener datos del usuario desde el API Gateway
+            const userResponse = await fetch(`${this.apiGatewayUrl}/users/profile/${this.userId}`);
             
-            const userData = await userResponse.json();
+            const userDataResponse = await userResponse.json();
+            const userData = userDataResponse.data || userDataResponse;
 
             if (!userData.email) {
                 console.error('❌ NO HAY EMAIL EN LA RESPUESTA');
@@ -1059,8 +1060,9 @@ class ChatboxWidgetWithHistory {
     async createEscalationTicket(userMessage, botResponse, nlpData) {
         try {
             // Obtener información del usuario
-            const userResponse = await fetch(`/get_user_email.php?user_id=${this.userId}`);
-            const userData = await userResponse.json();
+            const userResponse = await fetch(`${this.apiGatewayUrl}/users/profile/${this.userId}`);
+            const userDataResponse = await userResponse.json();
+            const userData = userDataResponse.data || userDataResponse;
             
             if (!userData.email) {
                 console.error('❌ No se pudo obtener email del usuario para crear ticket');
