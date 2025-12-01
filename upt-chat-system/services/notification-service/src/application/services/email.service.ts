@@ -66,14 +66,20 @@ export class EmailService {
         ]
       });
 
+      // Log detallado de la respuesta de Mailjet
+      const messageData = result.body.Messages[0];
+      const toData = messageData.To[0];
+      
       this.logger.log(`✅ Email de confirmación enviado a ${to}`);
+      this.logger.log(`📧 Mailjet Response - Status: ${messageData.Status}, MessageID: ${toData.MessageID}, MessageUUID: ${toData.MessageUUID}`);
       
       return {
         success: true,
-        messageId: result.body.Messages[0].To[0].MessageID,
+        messageId: toData.MessageID,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando email de confirmación a ${to}:`, error);
+      this.logger.error(`❌ Mailjet Error Details:`, error.response?.body || error.message);
       return {
         success: false,
         error: error.message,
@@ -109,14 +115,20 @@ export class EmailService {
         ]
       });
 
+      // Log detallado de la respuesta de Mailjet
+      const messageData = result.body.Messages[0];
+      const toData = messageData.To[0];
+      
       this.logger.log(`✅ Nueva contraseña enviada a ${to}`);
+      this.logger.log(`📧 Mailjet Response - Status: ${messageData.Status}, MessageID: ${toData.MessageID}, MessageUUID: ${toData.MessageUUID}`);
       
       return {
         success: true,
-        messageId: result.body.Messages[0].To[0].MessageID,
+        messageId: toData.MessageID,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando nueva contraseña a ${to}:`, error);
+      this.logger.error(`❌ Mailjet Error Details:`, error.response?.body || error.message);
       return {
         success: false,
         error: error.message,
