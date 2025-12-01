@@ -25,32 +25,43 @@ export class EmailService {
     const gmailUser = this.configService.get<string>('GMAIL_USER');
     const gmailPassword = this.configService.get<string>('GMAIL_APP_PASSWORD');
     
-    this.logger.error('🚨🚨🚨 DEBUGGING EMAIL CONFIGURATION');
+    const clientId = this.configService.get<string>('GOOGLE_CLIENT_ID');
+    const clientSecret = this.configService.get<string>('GOOGLE_CLIENT_SECRET');
+    const refreshToken = this.configService.get<string>('GMAIL_REFRESH_TOKEN');
+    
+    this.logger.error('🚨🚨🚨 SWITCHING TO GMAIL API (Railway blocks SMTP)');
     this.logger.error(`📧 GMAIL_USER: ${gmailUser ? gmailUser : '❌ UNDEFINED'}`);
-    this.logger.error(`🔑 GMAIL_APP_PASSWORD: ${gmailPassword ? '✅ PRESENT' : '❌ UNDEFINED'}`);
+    this.logger.error(`🔑 CLIENT_ID: ${clientId ? '✅ PRESENT' : '❌ UNDEFINED'}`);
+    this.logger.error(`🔑 CLIENT_SECRET: ${clientSecret ? '✅ PRESENT' : '❌ UNDEFINED'}`);
+    this.logger.error(`🔑 REFRESH_TOKEN: ${refreshToken ? '✅ PRESENT' : '❌ UNDEFINED'}`);
     
     // IMPORTANTE: Usar GMAIL_USER como fromEmail para autenticación correcta
     this.fromEmail = gmailUser || 'dragonfaita@gmail.com';
     this.fromName = this.configService.get<string>('FROM_NAME') || 'Sistema UPT Chat';
 
-    if (!gmailUser || !gmailPassword) {
-      this.logger.error('❌ Gmail SMTP credentials missing');
-      throw new Error('Gmail SMTP credentials required');
+    if (!gmailUser || !clientId || !clientSecret || !refreshToken) {
+      this.logger.error('❌ Gmail OAuth2 credentials missing');
+      this.logger.error(`Missing: ${!gmailUser ? 'GMAIL_USER ' : ''}${!clientId ? 'CLIENT_ID ' : ''}${!clientSecret ? 'CLIENT_SECRET ' : ''}${!refreshToken ? 'REFRESH_TOKEN ' : ''}`);
+      throw new Error('Gmail OAuth2 credentials required');
     }
 
-    // Configurar transporter - Usar 587 STARTTLS en caso Railway bloquee 465
+    // Railway bloquea SMTP - Usar Gmail API OAuth2 en su lugar
     this.transporter = nodemailer.createTransport({
-      service: 'gmail', // Usar service para evitar problemas de Railway
+      service: 'gmail',
       auth: {
+        type: 'OAuth2',
         user: gmailUser,
-        pass: gmailPassword,
+        clientId: this.configService.get<string>('GOOGLE_CLIENT_ID'),
+        clientSecret: this.configService.get<string>('GOOGLE_CLIENT_SECRET'),
+        refreshToken: this.configService.get<string>('GMAIL_REFRESH_TOKEN'),
       },
       debug: true,
       logger: true
     });
     
-    this.logger.error(`🚨 USANDO GMAIL_USER COMO FROM: ${this.fromEmail}`);
-    this.logger.error(`🚨 CONFIGURACIÓN: service=gmail, user=${gmailUser}`);
+    this.logger.error(`🚨 USING GMAIL API OAuth2 (Railway blocks SMTP)`);
+    this.logger.error(`🚨 FROM EMAIL: ${this.fromEmail}`);
+    this.logger.error(`🚨 OAUTH2 CONFIG: user=${gmailUser}`);
 
     this.logger.error(`🚨🚨🚨 GMAIL SMTP CONFIGURADO CON: ${this.fromEmail}`);
     this.logger.error(`✅✅✅ SISTEMA LISTO - VERIFICANDO CONEXIÓN...`);
