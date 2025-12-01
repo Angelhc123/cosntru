@@ -25,35 +25,25 @@ export class EmailService {
     const gmailUser = this.configService.get<string>('GMAIL_USER');
     const gmailPassword = this.configService.get<string>('GMAIL_APP_PASSWORD');
     
-    const clientId = this.configService.get<string>('GOOGLE_CLIENT_ID');
-    const clientSecret = this.configService.get<string>('GOOGLE_CLIENT_SECRET');
-    const refreshToken = this.configService.get<string>('GMAIL_REFRESH_TOKEN');
-    
-    this.logger.error('🚨🚨🚨 SWITCHING TO GMAIL API (Railway blocks SMTP)');
+    this.logger.error('🚨🚨🚨 GMAIL SMTP SIMPLE - VERIFICAR CREDENCIALES');
     this.logger.error(`📧 GMAIL_USER: ${gmailUser ? gmailUser : '❌ UNDEFINED'}`);
-    this.logger.error(`🔑 CLIENT_ID: ${clientId ? '✅ PRESENT' : '❌ UNDEFINED'}`);
-    this.logger.error(`🔑 CLIENT_SECRET: ${clientSecret ? '✅ PRESENT' : '❌ UNDEFINED'}`);
-    this.logger.error(`🔑 REFRESH_TOKEN: ${refreshToken ? '✅ PRESENT' : '❌ UNDEFINED'}`);
+    this.logger.error(`🔑 GMAIL_APP_PASSWORD: ${gmailPassword ? `✅ ${gmailPassword}` : '❌ UNDEFINED'}`);
     
     // IMPORTANTE: Usar GMAIL_USER como fromEmail para autenticación correcta
     this.fromEmail = gmailUser || 'dragonfaita@gmail.com';
     this.fromName = this.configService.get<string>('FROM_NAME') || 'Sistema UPT Chat';
 
-    if (!gmailUser || !clientId || !clientSecret || !refreshToken) {
-      this.logger.error('❌ Gmail OAuth2 credentials missing');
-      this.logger.error(`Missing: ${!gmailUser ? 'GMAIL_USER ' : ''}${!clientId ? 'CLIENT_ID ' : ''}${!clientSecret ? 'CLIENT_SECRET ' : ''}${!refreshToken ? 'REFRESH_TOKEN ' : ''}`);
-      throw new Error('Gmail OAuth2 credentials required');
+    if (!gmailUser || !gmailPassword) {
+      this.logger.error('❌ Gmail SMTP credentials missing');
+      throw new Error('Gmail SMTP credentials required');
     }
 
-    // Railway bloquea SMTP - Usar Gmail API OAuth2 en su lugar
+    // VOLVER A SMTP SIMPLE - Mi error, Railway NO bloquea SMTP
     this.transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        type: 'OAuth2',
         user: gmailUser,
-        clientId: this.configService.get<string>('GOOGLE_CLIENT_ID'),
-        clientSecret: this.configService.get<string>('GOOGLE_CLIENT_SECRET'),
-        refreshToken: this.configService.get<string>('GMAIL_REFRESH_TOKEN'),
+        pass: gmailPassword,
       },
       debug: true,
       logger: true
