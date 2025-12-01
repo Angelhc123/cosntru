@@ -5,35 +5,40 @@
  */
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Resend } from 'resend';
+import Mailjet from 'node-mailjet';
 
 @Injectable()
 export class EmailService {
-  private resend: Resend;
+  private mailjet: Mailjet.Client;
   private readonly logger = new Logger(EmailService.name);
   private fromEmail: string;
   private fromName: string;
 
   constructor(private configService: ConfigService) {
-    this.initializeResend();
+    this.initializeMailjet();
   }
 
   /**
-   * Inicializa el cliente de Resend
+   * Inicializa el cliente de Mailjet
    */
-  private initializeResend() {
-    const resendApiKey = this.configService.get<string>('RESEND_API_KEY');
-    this.fromEmail = this.configService.get<string>('FROM_EMAIL') || 'onboarding@resend.dev';
+  private initializeMailjet() {
+    const apiKey = this.configService.get<string>('MAILJET_API_KEY');
+    const secretKey = this.configService.get<string>('MAILJET_SECRET_KEY');
+    this.fromEmail = this.configService.get<string>('FROM_EMAIL') || 'noreply@mailjet.com';
     this.fromName = this.configService.get<string>('FROM_NAME') || 'UPT Chat System';
 
-    if (!resendApiKey) {
-      this.logger.error('❌ RESEND_API_KEY no configurada');
-      throw new Error('RESEND_API_KEY es requerida');
+    if (!apiKey || !secretKey) {
+      this.logger.error('❌ MAILJET_API_KEY y MAILJET_SECRET_KEY son requeridas');
+      throw new Error('MAILJET_API_KEY y MAILJET_SECRET_KEY son requeridas');
     }
 
-    this.resend = new Resend(resendApiKey);
-    this.logger.log(`📧 Resend configurado: ${this.fromEmail}`);
-    this.logger.log(`✅ Email service listo con Resend API`);
+    this.mailjet = new Mailjet.Client({
+      apiKey: apiKey,
+      apiSecret: secretKey
+    });
+
+    this.logger.log(`📧 Mailjet configurado: ${this.fromEmail}`);
+    this.logger.log(`✅ Email service listo con Mailjet API`);
   }
 
   /**
@@ -45,22 +50,30 @@ export class EmailService {
     confirmationUrl: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const { data, error } = await this.resend.emails.send({
-        from: `${this.fromName} <${this.fromEmail}>`,
-        to: [to],
-        subject: 'Confirmación de Recuperación de Contraseña - UPT',
-        html: this.getPasswordResetConfirmationTemplate(userName, confirmationUrl),
+      const result = await this.mailjet.post('send', { version: 'v3.1' }).request({
+        Messages: [
+          {
+            From: {
+              Email: this.fromEmail,
+              Name: this.fromName
+            },
+            To: [
+              {
+                Email: to,
+                Name: userName
+              }
+            ],
+            Subject: 'Confirmación de Recuperación de Contraseña - UPT',
+            HTMLPart: this.getPasswordResetConfirmationTemplate(userName, confirmationUrl)
+          }
+        ]
       });
 
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      this.logger.log(`✅ Email de confirmación enviado a ${to}: ${data.id}`);
+      this.logger.log(`✅ Email de confirmación enviado a ${to}`);
       
       return {
         success: true,
-        messageId: data.id,
+        messageId: result.body.Messages[0].To[0].MessageID,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando email de confirmación a ${to}:`, error);
@@ -80,22 +93,30 @@ export class EmailService {
     newPassword: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const { data, error } = await this.resend.emails.send({
-        from: `${this.fromName} <${this.fromEmail}>`,
-        to: [to],
-        subject: 'Tu Nueva Contraseña - UPT',
-        html: this.getNewPasswordTemplate(userName, newPassword),
+      const result = await this.mailjet.post('send', { version: 'v3.1' }).request({
+        Messages: [
+          {
+            From: {
+              Email: this.fromEmail,
+              Name: this.fromName
+            },
+            To: [
+              {
+                Email: to,
+                Name: userName
+              }
+            ],
+            Subject: 'Tu Nueva Contraseña - UPT',
+            HTMLPart: this.getNewPasswordTemplate(userName, newPassword)
+          }
+        ]
       });
 
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      this.logger.log(`✅ Nueva contraseña enviada a ${to}: ${data.id}`);
+      this.logger.log(`✅ Nueva contraseña enviada a ${to}`);
       
       return {
         success: true,
-        messageId: data.id,
+        messageId: result.body.Messages[0].To[0].MessageID,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando nueva contraseña a ${to}:`, error);
@@ -235,22 +256,29 @@ export class EmailService {
     htmlContent: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const { data, error } = await this.resend.emails.send({
-        from: `${this.fromName} <${this.fromEmail}>`,
-        to: [to],
-        subject: subject,
-        html: htmlContent,
+      const result = await this.mailjet.post('send', { version: 'v3.1' }).request({
+        Messages: [
+          {
+            From: {
+              Email: this.fromEmail,
+              Name: this.fromName
+            },
+            To: [
+              {
+                Email: to
+              }
+            ],
+            Subject: subject,
+            HTMLPart: htmlContent
+          }
+        ]
       });
 
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      this.logger.log(`✅ Email enviado a ${to}: ${data.id}`);
+      this.logger.log(`✅ Email enviado a ${to}`);
       
       return {
         success: true,
-        messageId: data.id,
+        messageId: result.body.Messages[0].To[0].MessageID,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando email a ${to}:`, error);
@@ -272,22 +300,30 @@ export class EmailService {
     sessionId?: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const { data, error } = await this.resend.emails.send({
-        from: `${this.fromName} <${this.fromEmail}>`,
-        to: [to],
-        subject: 'Transcripción de tu Conversación con el Asistente Virtual UPT',
-        html: this.getChatTranscriptionTemplate(userName, messages, sessionEndTime, sessionId),
+      const result = await this.mailjet.post('send', { version: 'v3.1' }).request({
+        Messages: [
+          {
+            From: {
+              Email: this.fromEmail,
+              Name: this.fromName
+            },
+            To: [
+              {
+                Email: to,
+                Name: userName
+              }
+            ],
+            Subject: 'Transcripción de tu Conversación con el Asistente Virtual UPT',
+            HTMLPart: this.getChatTranscriptionTemplate(userName, messages, sessionEndTime, sessionId)
+          }
+        ]
       });
 
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      this.logger.log(`✅ Transcripción enviada a ${to}: ${data.id}`);
+      this.logger.log(`✅ Transcripción enviada a ${to}`);
       
       return {
         success: true,
-        messageId: data.id,
+        messageId: result.body.Messages[0].To[0].MessageID,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando transcripción a ${to}:`, error);
