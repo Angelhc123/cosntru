@@ -5,35 +5,76 @@
  */
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import axios from 'axios';
+import { google } from 'googleapis';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class EmailService {
-  private apiKey: string;
+  private transporter: nodemailer.Transporter;
   private readonly logger = new Logger(EmailService.name);
   private fromEmail: string;
   private fromName: string;
-  private readonly apiUrl = 'https://api.elasticemail.com/v2/email/send';
+  private oauth2Client: any;
 
   constructor(private configService: ConfigService) {
-    this.initializeElasticEmail();
+    this.initializeGmailOAuth2();
   }
 
   /**
-   * Inicializa el cliente de Elastic Email
+   * Inicializa Gmail OAuth2
    */
-  private initializeElasticEmail() {
-    this.apiKey = this.configService.get<string>('ELASTIC_API_KEY');
-    this.fromEmail = this.configService.get<string>('FROM_EMAIL') || 'angelxhernandezxcruz@gmail.com';
+  private async initializeGmailOAuth2() {
+    this.fromEmail = this.configService.get<string>('FROM_EMAIL') || 'dragonfaita@gmail.com';
     this.fromName = this.configService.get<string>('FROM_NAME') || 'Sistema UPT Chat';
 
-    if (!this.apiKey) {
-      this.logger.error('❌ ELASTIC_API_KEY es requerida');
-      throw new Error('ELASTIC_API_KEY es requerida');
+    const clientId = this.configService.get<string>('GOOGLE_CLIENT_ID');
+    const clientSecret = this.configService.get<string>('GOOGLE_CLIENT_SECRET');
+    const refreshToken = this.configService.get<string>('GMAIL_REFRESH_TOKEN');
+
+    if (!clientId || !clientSecret) {
+      this.logger.error('❌ Gmail OAuth2 credentials missing');
+      throw new Error('Gmail OAuth2 credentials required');
     }
 
-    this.logger.log(`📧 Elastic Email configurado: ${this.fromEmail}`);
-    this.logger.log(`✅ Sistema de emails listo con Elastic Email (100 emails/día gratis)`);
+    // Configurar OAuth2
+    this.oauth2Client = new google.auth.OAuth2(
+      clientId,
+      clientSecret,
+      'https://developers.google.com/oauthplayground'
+    );
+
+    if (refreshToken) {
+      this.oauth2Client.setCredentials({ refresh_token: refreshToken });
+    }
+
+    // Configurar transporter
+    this.transporter = nodemailer.createTransporter({
+      service: 'gmail',
+      auth: {
+        type: 'OAuth2',
+        user: this.fromEmail,
+        clientId: clientId,
+        clientSecret: clientSecret,
+        refreshToken: refreshToken,
+        accessToken: await this.getAccessToken(),
+      },
+    });
+
+    this.logger.log(`📧 Gmail OAuth2 configurado: ${this.fromEmail}`);
+    this.logger.log(`✅ Sistema de emails listo con Gmail API`);
+  }
+
+  /**
+   * Obtiene access token usando refresh token
+   */
+  private async getAccessToken(): Promise<string> {
+    try {
+      const { credentials } = await this.oauth2Client.refreshAccessToken();
+      return credentials.access_token;
+    } catch (error) {
+      this.logger.error('❌ Error obteniendo access token:', error.message);
+      throw error;
+    }
   }
 
   /**
@@ -45,31 +86,31 @@ export class EmailService {
     confirmationUrl: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const params = new URLSearchParams();
-      params.append('apikey', this.apiKey);
-      params.append('from', this.fromEmail);
-      params.append('fromName', this.fromName);
-      params.append('to', to);
-      params.append('subject', 'Confirmación de Recuperación de Contraseña - UPT');
-      params.append('bodyHtml', this.getPasswordResetConfirmationTemplate(userName, confirmationUrl));
-      params.append('isTransactional', 'true');
+      // Renovar access token si es necesario
+      const accessToken = await this.getAccessToken();
+      this.transporter.options.auth.accessToken = accessToken;
 
-      const response = await axios.post(this.apiUrl, params, {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      });
+      const mailOptions = {
+        from: `${this.fromName} <${this.fromEmail}>`,
+        to: to,
+        subject: 'Confirmación de Recuperación de Contraseña - UPT',
+        html: this.getPasswordResetConfirmationTemplate(userName, confirmationUrl),
+      };
+
+      const result = await this.transporter.sendMail(mailOptions);
       
       this.logger.log(`✅ Email de confirmación enviado a ${to}`);
-      this.logger.log(`📧 Elastic Email Response - TransactionID: ${response.data.data?.transactionid || 'success'}`);
+      this.logger.log(`📧 Gmail Response - MessageID: ${result.messageId}`);
       
       return {
         success: true,
-        messageId: response.data.data?.transactionid || response.data.success,
+        messageId: result.messageId,
       };
     } catch (error) {
-      this.logger.error(`❌ Error enviando email de confirmación a ${to}:`, error.response?.data || error.message);
+      this.logger.error(`❌ Error enviando email de confirmación a ${to}:`, error.message);
       return {
         success: false,
-        error: error.response?.data?.error || error.message,
+        error: error.message,
       };
     }
   }
@@ -83,31 +124,31 @@ export class EmailService {
     newPassword: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const params = new URLSearchParams();
-      params.append('apikey', this.apiKey);
-      params.append('from', this.fromEmail);
-      params.append('fromName', this.fromName);
-      params.append('to', to);
-      params.append('subject', 'Tu Nueva Contraseña - UPT');
-      params.append('bodyHtml', this.getNewPasswordTemplate(userName, newPassword));
-      params.append('isTransactional', 'true');
+      // Renovar access token si es necesario
+      const accessToken = await this.getAccessToken();
+      this.transporter.options.auth.accessToken = accessToken;
 
-      const response = await axios.post(this.apiUrl, params, {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      });
+      const mailOptions = {
+        from: `${this.fromName} <${this.fromEmail}>`,
+        to: to,
+        subject: 'Tu Nueva Contraseña - UPT',
+        html: this.getNewPasswordTemplate(userName, newPassword),
+      };
+
+      const result = await this.transporter.sendMail(mailOptions);
       
       this.logger.log(`✅ Nueva contraseña enviada a ${to}`);
-      this.logger.log(`📧 Elastic Email Response - TransactionID: ${response.data.data?.transactionid || 'success'}`);
+      this.logger.log(`📧 Gmail Response - MessageID: ${result.messageId}`);
       
       return {
         success: true,
-        messageId: response.data.data?.transactionid || response.data.success,
+        messageId: result.messageId,
       };
     } catch (error) {
-      this.logger.error(`❌ Error enviando nueva contraseña a ${to}:`, error.response?.data || error.message);
+      this.logger.error(`❌ Error enviando nueva contraseña a ${to}:`, error.message);
       return {
         success: false,
-        error: error.response?.data?.error || error.message,
+        error: error.message,
       };
     }
   }
@@ -241,30 +282,30 @@ export class EmailService {
     htmlContent: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const params = new URLSearchParams();
-      params.append('apikey', this.apiKey);
-      params.append('from', this.fromEmail);
-      params.append('fromName', this.fromName);
-      params.append('to', to);
-      params.append('subject', subject);
-      params.append('bodyHtml', htmlContent);
-      params.append('isTransactional', 'true');
+      // Renovar access token si es necesario
+      const accessToken = await this.getAccessToken();
+      this.transporter.options.auth.accessToken = accessToken;
 
-      const response = await axios.post(this.apiUrl, params, {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      });
+      const mailOptions = {
+        from: `${this.fromName} <${this.fromEmail}>`,
+        to: to,
+        subject: subject,
+        html: htmlContent,
+      };
+
+      const result = await this.transporter.sendMail(mailOptions);
 
       this.logger.log(`✅ Email enviado a ${to}`);
       
       return {
         success: true,
-        messageId: response.data.data?.transactionid || response.data.success,
+        messageId: result.messageId,
       };
     } catch (error) {
-      this.logger.error(`❌ Error enviando email a ${to}:`, error.response?.data || error.message);
+      this.logger.error(`❌ Error enviando email a ${to}:`, error.message);
       return {
         success: false,
-        error: error.response?.data?.error || error.message,
+        error: error.message,
       };
     }
   }
