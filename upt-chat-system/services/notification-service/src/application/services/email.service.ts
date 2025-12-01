@@ -5,14 +5,15 @@
  */
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as ElasticEmail from '@elasticemail/elasticemail-client';
+import axios from 'axios';
 
 @Injectable()
 export class EmailService {
-  private client: any;
+  private apiKey: string;
   private readonly logger = new Logger(EmailService.name);
   private fromEmail: string;
   private fromName: string;
+  private readonly apiUrl = 'https://api.elasticemail.com/v2/email/send';
 
   constructor(private configService: ConfigService) {
     this.initializeElasticEmail();
@@ -22,19 +23,14 @@ export class EmailService {
    * Inicializa el cliente de Elastic Email
    */
   private initializeElasticEmail() {
-    const apiKey = this.configService.get<string>('ELASTIC_API_KEY');
+    this.apiKey = this.configService.get<string>('ELASTIC_API_KEY');
     this.fromEmail = this.configService.get<string>('FROM_EMAIL') || 'angelxhernandezxcruz@gmail.com';
     this.fromName = this.configService.get<string>('FROM_NAME') || 'Sistema UPT Chat';
 
-    if (!apiKey) {
+    if (!this.apiKey) {
       this.logger.error('❌ ELASTIC_API_KEY es requerida');
       throw new Error('ELASTIC_API_KEY es requerida');
     }
-
-    const defaultClient = ElasticEmail.ApiClient.instance;
-    const apikey = defaultClient.authentications['apikey'];
-    apikey.apiKey = apiKey;
-    this.client = new ElasticEmail.EmailsApi();
 
     this.logger.log(`📧 Elastic Email configurado: ${this.fromEmail}`);
     this.logger.log(`✅ Sistema de emails listo con Elastic Email (100 emails/día gratis)`);
@@ -49,34 +45,31 @@ export class EmailService {
     confirmationUrl: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const emailMessageData = ElasticEmail.EmailMessageData.constructFromObject({
-        Recipients: [new ElasticEmail.EmailRecipient(to, userName)],
-        Content: {
-          Body: [
-            ElasticEmail.BodyPart.constructFromObject({
-              ContentType: 'HTML',
-              Content: this.getPasswordResetConfirmationTemplate(userName, confirmationUrl),
-            }),
-          ],
-          Subject: 'Confirmación de Recuperación de Contraseña - UPT',
-          From: `${this.fromName} <${this.fromEmail}>`,
-        },
-      });
+      const params = new URLSearchParams();
+      params.append('apikey', this.apiKey);
+      params.append('from', this.fromEmail);
+      params.append('fromName', this.fromName);
+      params.append('to', to);
+      params.append('subject', 'Confirmación de Recuperación de Contraseña - UPT');
+      params.append('bodyHtml', this.getPasswordResetConfirmationTemplate(userName, confirmationUrl));
+      params.append('isTransactional', 'true');
 
-      const result = await this.client.emailsPost(emailMessageData);
+      const response = await axios.post(this.apiUrl, params, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      });
       
       this.logger.log(`✅ Email de confirmación enviado a ${to}`);
-      this.logger.log(`📧 Elastic Email Response - TransactionID: ${result.TransactionID}`);
+      this.logger.log(`📧 Elastic Email Response - TransactionID: ${response.data.data?.transactionid || 'success'}`);
       
       return {
         success: true,
-        messageId: result.TransactionID,
+        messageId: response.data.data?.transactionid || response.data.success,
       };
     } catch (error) {
-      this.logger.error(`❌ Error enviando email de confirmación a ${to}:`, error);
+      this.logger.error(`❌ Error enviando email de confirmación a ${to}:`, error.response?.data || error.message);
       return {
         success: false,
-        error: error.message,
+        error: error.response?.data?.error || error.message,
       };
     }
   }
@@ -90,34 +83,31 @@ export class EmailService {
     newPassword: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const emailMessageData = ElasticEmail.EmailMessageData.constructFromObject({
-        Recipients: [new ElasticEmail.EmailRecipient(to, userName)],
-        Content: {
-          Body: [
-            ElasticEmail.BodyPart.constructFromObject({
-              ContentType: 'HTML',
-              Content: this.getNewPasswordTemplate(userName, newPassword),
-            }),
-          ],
-          Subject: 'Tu Nueva Contraseña - UPT',
-          From: `${this.fromName} <${this.fromEmail}>`,
-        },
-      });
+      const params = new URLSearchParams();
+      params.append('apikey', this.apiKey);
+      params.append('from', this.fromEmail);
+      params.append('fromName', this.fromName);
+      params.append('to', to);
+      params.append('subject', 'Tu Nueva Contraseña - UPT');
+      params.append('bodyHtml', this.getNewPasswordTemplate(userName, newPassword));
+      params.append('isTransactional', 'true');
 
-      const result = await this.client.emailsPost(emailMessageData);
+      const response = await axios.post(this.apiUrl, params, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      });
       
       this.logger.log(`✅ Nueva contraseña enviada a ${to}`);
-      this.logger.log(`📧 Elastic Email Response - TransactionID: ${result.TransactionID}`);
+      this.logger.log(`📧 Elastic Email Response - TransactionID: ${response.data.data?.transactionid || 'success'}`);
       
       return {
         success: true,
-        messageId: result.TransactionID,
+        messageId: response.data.data?.transactionid || response.data.success,
       };
     } catch (error) {
-      this.logger.error(`❌ Error enviando nueva contraseña a ${to}:`, error);
+      this.logger.error(`❌ Error enviando nueva contraseña a ${to}:`, error.response?.data || error.message);
       return {
         success: false,
-        error: error.message,
+        error: error.response?.data?.error || error.message,
       };
     }
   }
@@ -251,33 +241,30 @@ export class EmailService {
     htmlContent: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const emailMessageData = ElasticEmail.EmailMessageData.constructFromObject({
-        Recipients: [new ElasticEmail.EmailRecipient(to)],
-        Content: {
-          Body: [
-            ElasticEmail.BodyPart.constructFromObject({
-              ContentType: 'HTML',
-              Content: htmlContent,
-            }),
-          ],
-          Subject: subject,
-          From: `${this.fromName} <${this.fromEmail}>`,
-        },
-      });
+      const params = new URLSearchParams();
+      params.append('apikey', this.apiKey);
+      params.append('from', this.fromEmail);
+      params.append('fromName', this.fromName);
+      params.append('to', to);
+      params.append('subject', subject);
+      params.append('bodyHtml', htmlContent);
+      params.append('isTransactional', 'true');
 
-      const result = await this.client.emailsPost(emailMessageData);
+      const response = await axios.post(this.apiUrl, params, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      });
 
       this.logger.log(`✅ Email enviado a ${to}`);
       
       return {
         success: true,
-        messageId: result.TransactionID,
+        messageId: response.data.data?.transactionid || response.data.success,
       };
     } catch (error) {
-      this.logger.error(`❌ Error enviando email a ${to}:`, error);
+      this.logger.error(`❌ Error enviando email a ${to}:`, error.response?.data || error.message);
       return {
         success: false,
-        error: error.message,
+        error: error.response?.data?.error || error.message,
       };
     }
   }
@@ -293,33 +280,30 @@ export class EmailService {
     sessionId?: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const emailMessageData = ElasticEmail.EmailMessageData.constructFromObject({
-        Recipients: [new ElasticEmail.EmailRecipient(to, userName)],
-        Content: {
-          Body: [
-            ElasticEmail.BodyPart.constructFromObject({
-              ContentType: 'HTML',
-              Content: this.getChatTranscriptionTemplate(userName, messages, sessionEndTime, sessionId),
-            }),
-          ],
-          Subject: 'Transcripción de tu Conversación con el Asistente Virtual UPT',
-          From: `${this.fromName} <${this.fromEmail}>`,
-        },
-      });
+      const params = new URLSearchParams();
+      params.append('apikey', this.apiKey);
+      params.append('from', this.fromEmail);
+      params.append('fromName', this.fromName);
+      params.append('to', to);
+      params.append('subject', 'Transcripción de tu Conversación con el Asistente Virtual UPT');
+      params.append('bodyHtml', this.getChatTranscriptionTemplate(userName, messages, sessionEndTime, sessionId));
+      params.append('isTransactional', 'true');
 
-      const result = await this.client.emailsPost(emailMessageData);
+      const response = await axios.post(this.apiUrl, params, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      });
 
       this.logger.log(`✅ Transcripción enviada a ${to}`);
       
       return {
         success: true,
-        messageId: result.TransactionID,
+        messageId: response.data.data?.transactionid || response.data.success,
       };
     } catch (error) {
-      this.logger.error(`❌ Error enviando transcripción a ${to}:`, error);
+      this.logger.error(`❌ Error enviando transcripción a ${to}:`, error.response?.data || error.message);
       return {
         success: false,
-        error: error.message,
+        error: error.response?.data?.error || error.message,
       };
     }
   }
