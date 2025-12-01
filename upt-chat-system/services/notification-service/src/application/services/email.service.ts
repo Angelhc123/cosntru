@@ -22,41 +22,56 @@ export class EmailService {
    * Inicializa Gmail SMTP
    */
   private initializeGmailSMTP() {
-    this.fromEmail = this.configService.get<string>('FROM_EMAIL') || 'dragonfaita@gmail.com';
-    this.fromName = this.configService.get<string>('FROM_NAME') || 'Sistema UPT Chat';
-
     const gmailUser = this.configService.get<string>('GMAIL_USER');
     const gmailPassword = this.configService.get<string>('GMAIL_APP_PASSWORD');
+    
+    this.logger.error('🚨🚨🚨 DEBUGGING EMAIL CONFIGURATION');
+    this.logger.error(`📧 GMAIL_USER: ${gmailUser ? gmailUser : '❌ UNDEFINED'}`);
+    this.logger.error(`🔑 GMAIL_APP_PASSWORD: ${gmailPassword ? '✅ PRESENT' : '❌ UNDEFINED'}`);
+    
+    // IMPORTANTE: Usar GMAIL_USER como fromEmail para autenticación correcta
+    this.fromEmail = gmailUser || 'dragonfaita@gmail.com';
+    this.fromName = this.configService.get<string>('FROM_NAME') || 'Sistema UPT Chat';
 
     if (!gmailUser || !gmailPassword) {
       this.logger.error('❌ Gmail SMTP credentials missing');
       throw new Error('Gmail SMTP credentials required');
     }
 
-    // Configurar transporter con configuración robusta para Railway
-    this.transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true, // SSL para puerto 465
+    // Configurar transporter - Usar 587 STARTTLS en caso Railway bloquee 465
+    this.transporter = nodemailer.createTransporter({
+      service: 'gmail', // Usar service para evitar problemas de Railway
       auth: {
         user: gmailUser,
         pass: gmailPassword,
       },
-      connectionTimeout: 60000, // 60 segundos
-      greetingTimeout: 30000,   // 30 segundos
-      socketTimeout: 60000,     // 60 segundos  
       debug: true,
-      logger: true,
-      tls: {
-        rejectUnauthorized: false
-      }
+      logger: true
     });
+    
+    this.logger.error(`🚨 USANDO GMAIL_USER COMO FROM: ${this.fromEmail}`);
+    this.logger.error(`🚨 CONFIGURACIÓN: service=gmail, user=${gmailUser}`);
 
-    this.logger.log(`📧 Gmail SMTP configurado: ${this.fromEmail}`);
-    this.logger.log(`✅ Sistema de emails listo con Gmail SMTP`);
+    this.logger.error(`🚨🚨🚨 GMAIL SMTP CONFIGURADO CON: ${this.fromEmail}`);
+    this.logger.error(`✅✅✅ SISTEMA LISTO - VERIFICANDO CONEXIÓN...`);
+    
+    // Verificar conexión inmediatamente
+    this.verifyConnection();
   }
 
-
+  /**
+   * Verifica la conexión SMTP
+   */
+  private async verifyConnection() {
+    try {
+      this.logger.error('🔍🔍🔍 VERIFICANDO CONEXIÓN SMTP...');
+      await this.transporter.verify();
+      this.logger.error('✅✅✅ CONEXIÓN SMTP VERIFICADA - READY TO SEND!');
+    } catch (error) {
+      this.logger.error('❌❌❌ ERROR EN VERIFICACIÓN SMTP:', error.message);
+      this.logger.error('SMTP Verify Error Details:', error);
+    }
+  }
 
   /**
    * Envía email de confirmación para recuperación de contraseña
