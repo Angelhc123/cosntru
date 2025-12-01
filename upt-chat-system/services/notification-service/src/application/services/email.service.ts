@@ -5,37 +5,39 @@
  */
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as Mailjet from 'node-mailjet';
+const SibApiV3Sdk = require('sib-api-v3-sdk');
 
 @Injectable()
 export class EmailService {
-  private mailjet: any;
+  private apiInstance: any;
   private readonly logger = new Logger(EmailService.name);
   private fromEmail: string;
   private fromName: string;
 
   constructor(private configService: ConfigService) {
-    this.initializeMailjet();
+    this.initializeBrevo();
   }
 
   /**
-   * Inicializa el cliente de Mailjet
+   * Inicializa el cliente de Brevo
    */
-  private initializeMailjet() {
-    const apiKey = this.configService.get<string>('MAILJET_API_KEY');
-    const secretKey = this.configService.get<string>('MAILJET_SECRET_KEY');
-    this.fromEmail = this.configService.get<string>('FROM_EMAIL') || 'noreply@mailjet.com';
+  private initializeBrevo() {
+    const apiKey = this.configService.get<string>('BREVO_API_KEY');
+    this.fromEmail = this.configService.get<string>('FROM_EMAIL') || 'xxdescixx@gmail.com';
     this.fromName = this.configService.get<string>('FROM_NAME') || 'UPT Chat System';
 
-    if (!apiKey || !secretKey) {
-      this.logger.error('❌ MAILJET_API_KEY y MAILJET_SECRET_KEY son requeridas');
-      throw new Error('MAILJET_API_KEY y MAILJET_SECRET_KEY son requeridas');
+    if (!apiKey) {
+      this.logger.error('❌ BREVO_API_KEY es requerida');
+      throw new Error('BREVO_API_KEY es requerida');
     }
 
-    this.mailjet = Mailjet.Client.apiConnect(apiKey, secretKey);
+    const defaultClient = SibApiV3Sdk.ApiClient.instance;
+    const apiKeyAuth = defaultClient.authentications['api-key'];
+    apiKeyAuth.apiKey = apiKey;
+    this.apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
-    this.logger.log(`📧 Mailjet configurado: ${this.fromEmail}`);
-    this.logger.log(`✅ Email service listo con Mailjet API`);
+    this.logger.log(`📧 Brevo configurado: ${this.fromEmail}`);
+    this.logger.log(`✅ Email service listo con Brevo API`);
   }
 
   /**
@@ -47,39 +49,24 @@ export class EmailService {
     confirmationUrl: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const result = await this.mailjet.post('send', { version: 'v3.1' }).request({
-        Messages: [
-          {
-            From: {
-              Email: this.fromEmail,
-              Name: this.fromName
-            },
-            To: [
-              {
-                Email: to,
-                Name: userName
-              }
-            ],
-            Subject: 'Confirmación de Recuperación de Contraseña - UPT',
-            HTMLPart: this.getPasswordResetConfirmationTemplate(userName, confirmationUrl)
-          }
-        ]
-      });
+      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+      sendSmtpEmail.sender = { email: this.fromEmail, name: this.fromName };
+      sendSmtpEmail.to = [{ email: to, name: userName }];
+      sendSmtpEmail.subject = 'Confirmación de Recuperación de Contraseña - UPT';
+      sendSmtpEmail.htmlContent = this.getPasswordResetConfirmationTemplate(userName, confirmationUrl);
 
-      // Log detallado de la respuesta de Mailjet
-      const messageData = result.body.Messages[0];
-      const toData = messageData.To[0];
+      const result = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
       
       this.logger.log(`✅ Email de confirmación enviado a ${to}`);
-      this.logger.log(`📧 Mailjet Response - Status: ${messageData.Status}, MessageID: ${toData.MessageID}, MessageUUID: ${toData.MessageUUID}`);
+      this.logger.log(`📧 Brevo Response - MessageID: ${result.messageId}`);
       
       return {
         success: true,
-        messageId: toData.MessageID,
+        messageId: result.messageId,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando email de confirmación a ${to}:`, error);
-      this.logger.error(`❌ Mailjet Error Details:`, error.response?.body || error.message);
+      this.logger.error(`❌ Brevo Error Details:`, error.response?.body || error.message);
       return {
         success: false,
         error: error.message,
@@ -96,39 +83,24 @@ export class EmailService {
     newPassword: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const result = await this.mailjet.post('send', { version: 'v3.1' }).request({
-        Messages: [
-          {
-            From: {
-              Email: this.fromEmail,
-              Name: this.fromName
-            },
-            To: [
-              {
-                Email: to,
-                Name: userName
-              }
-            ],
-            Subject: 'Tu Nueva Contraseña - UPT',
-            HTMLPart: this.getNewPasswordTemplate(userName, newPassword)
-          }
-        ]
-      });
+      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+      sendSmtpEmail.sender = { email: this.fromEmail, name: this.fromName };
+      sendSmtpEmail.to = [{ email: to, name: userName }];
+      sendSmtpEmail.subject = 'Tu Nueva Contraseña - UPT';
+      sendSmtpEmail.htmlContent = this.getNewPasswordTemplate(userName, newPassword);
 
-      // Log detallado de la respuesta de Mailjet
-      const messageData = result.body.Messages[0];
-      const toData = messageData.To[0];
+      const result = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
       
       this.logger.log(`✅ Nueva contraseña enviada a ${to}`);
-      this.logger.log(`📧 Mailjet Response - Status: ${messageData.Status}, MessageID: ${toData.MessageID}, MessageUUID: ${toData.MessageUUID}`);
+      this.logger.log(`📧 Brevo Response - MessageID: ${result.messageId}`);
       
       return {
         success: true,
-        messageId: toData.MessageID,
+        messageId: result.messageId,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando nueva contraseña a ${to}:`, error);
-      this.logger.error(`❌ Mailjet Error Details:`, error.response?.body || error.message);
+      this.logger.error(`❌ Brevo Error Details:`, error.response?.body || error.message);
       return {
         success: false,
         error: error.message,
@@ -265,29 +237,19 @@ export class EmailService {
     htmlContent: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const result = await this.mailjet.post('send', { version: 'v3.1' }).request({
-        Messages: [
-          {
-            From: {
-              Email: this.fromEmail,
-              Name: this.fromName
-            },
-            To: [
-              {
-                Email: to
-              }
-            ],
-            Subject: subject,
-            HTMLPart: htmlContent
-          }
-        ]
-      });
+      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+      sendSmtpEmail.sender = { email: this.fromEmail, name: this.fromName };
+      sendSmtpEmail.to = [{ email: to }];
+      sendSmtpEmail.subject = subject;
+      sendSmtpEmail.htmlContent = htmlContent;
+
+      const result = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
 
       this.logger.log(`✅ Email enviado a ${to}`);
       
       return {
         success: true,
-        messageId: result.body.Messages[0].To[0].MessageID,
+        messageId: result.messageId,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando email a ${to}:`, error);
@@ -309,30 +271,19 @@ export class EmailService {
     sessionId?: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const result = await this.mailjet.post('send', { version: 'v3.1' }).request({
-        Messages: [
-          {
-            From: {
-              Email: this.fromEmail,
-              Name: this.fromName
-            },
-            To: [
-              {
-                Email: to,
-                Name: userName
-              }
-            ],
-            Subject: 'Transcripción de tu Conversación con el Asistente Virtual UPT',
-            HTMLPart: this.getChatTranscriptionTemplate(userName, messages, sessionEndTime, sessionId)
-          }
-        ]
-      });
+      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+      sendSmtpEmail.sender = { email: this.fromEmail, name: this.fromName };
+      sendSmtpEmail.to = [{ email: to, name: userName }];
+      sendSmtpEmail.subject = 'Transcripción de tu Conversación con el Asistente Virtual UPT';
+      sendSmtpEmail.htmlContent = this.getChatTranscriptionTemplate(userName, messages, sessionEndTime, sessionId);
+
+      const result = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
 
       this.logger.log(`✅ Transcripción enviada a ${to}`);
       
       return {
         success: true,
-        messageId: result.body.Messages[0].To[0].MessageID,
+        messageId: result.messageId,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando transcripción a ${to}:`, error);
