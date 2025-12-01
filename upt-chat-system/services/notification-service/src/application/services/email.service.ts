@@ -5,39 +5,39 @@
  */
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-const SibApiV3Sdk = require('sib-api-v3-sdk');
+import * as ElasticEmail from '@elasticemail/elasticemail-client';
 
 @Injectable()
 export class EmailService {
-  private apiInstance: any;
+  private client: any;
   private readonly logger = new Logger(EmailService.name);
   private fromEmail: string;
   private fromName: string;
 
   constructor(private configService: ConfigService) {
-    this.initializeBrevo();
+    this.initializeElasticEmail();
   }
 
   /**
-   * Inicializa el cliente de Brevo
+   * Inicializa el cliente de Elastic Email
    */
-  private initializeBrevo() {
-    const apiKey = this.configService.get<string>('BREVO_API_KEY');
-    this.fromEmail = this.configService.get<string>('FROM_EMAIL') || 'xxdescixx@gmail.com';
-    this.fromName = this.configService.get<string>('FROM_NAME') || 'UPT Chat System';
+  private initializeElasticEmail() {
+    const apiKey = this.configService.get<string>('ELASTIC_API_KEY');
+    this.fromEmail = this.configService.get<string>('FROM_EMAIL') || 'angelxhernandezxcruz@gmail.com';
+    this.fromName = this.configService.get<string>('FROM_NAME') || 'Sistema UPT Chat';
 
     if (!apiKey) {
-      this.logger.error('❌ BREVO_API_KEY es requerida');
-      throw new Error('BREVO_API_KEY es requerida');
+      this.logger.error('❌ ELASTIC_API_KEY es requerida');
+      throw new Error('ELASTIC_API_KEY es requerida');
     }
 
-    const defaultClient = SibApiV3Sdk.ApiClient.instance;
-    const apiKeyAuth = defaultClient.authentications['api-key'];
-    apiKeyAuth.apiKey = apiKey;
-    this.apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+    const defaultClient = ElasticEmail.ApiClient.instance;
+    const apikey = defaultClient.authentications['apikey'];
+    apikey.apiKey = apiKey;
+    this.client = new ElasticEmail.EmailsApi();
 
-    this.logger.log(`📧 Brevo configurado: ${this.fromEmail}`);
-    this.logger.log(`✅ Email service listo con Brevo API`);
+    this.logger.log(`📧 Elastic Email configurado: ${this.fromEmail}`);
+    this.logger.log(`✅ Sistema de emails listo con Elastic Email (100 emails/día gratis)`);
   }
 
   /**
@@ -49,24 +49,31 @@ export class EmailService {
     confirmationUrl: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-      sendSmtpEmail.sender = { email: this.fromEmail, name: this.fromName };
-      sendSmtpEmail.to = [{ email: to, name: userName }];
-      sendSmtpEmail.subject = 'Confirmación de Recuperación de Contraseña - UPT';
-      sendSmtpEmail.htmlContent = this.getPasswordResetConfirmationTemplate(userName, confirmationUrl);
+      const emailMessageData = ElasticEmail.EmailMessageData.constructFromObject({
+        Recipients: [new ElasticEmail.EmailRecipient(to, userName)],
+        Content: {
+          Body: [
+            ElasticEmail.BodyPart.constructFromObject({
+              ContentType: 'HTML',
+              Content: this.getPasswordResetConfirmationTemplate(userName, confirmationUrl),
+            }),
+          ],
+          Subject: 'Confirmación de Recuperación de Contraseña - UPT',
+          From: `${this.fromName} <${this.fromEmail}>`,
+        },
+      });
 
-      const result = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
+      const result = await this.client.emailsPost(emailMessageData);
       
       this.logger.log(`✅ Email de confirmación enviado a ${to}`);
-      this.logger.log(`📧 Brevo Response - MessageID: ${result.messageId}`);
+      this.logger.log(`📧 Elastic Email Response - TransactionID: ${result.TransactionID}`);
       
       return {
         success: true,
-        messageId: result.messageId,
+        messageId: result.TransactionID,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando email de confirmación a ${to}:`, error);
-      this.logger.error(`❌ Brevo Error Details:`, error.response?.body || error.message);
       return {
         success: false,
         error: error.message,
@@ -83,24 +90,31 @@ export class EmailService {
     newPassword: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-      sendSmtpEmail.sender = { email: this.fromEmail, name: this.fromName };
-      sendSmtpEmail.to = [{ email: to, name: userName }];
-      sendSmtpEmail.subject = 'Tu Nueva Contraseña - UPT';
-      sendSmtpEmail.htmlContent = this.getNewPasswordTemplate(userName, newPassword);
+      const emailMessageData = ElasticEmail.EmailMessageData.constructFromObject({
+        Recipients: [new ElasticEmail.EmailRecipient(to, userName)],
+        Content: {
+          Body: [
+            ElasticEmail.BodyPart.constructFromObject({
+              ContentType: 'HTML',
+              Content: this.getNewPasswordTemplate(userName, newPassword),
+            }),
+          ],
+          Subject: 'Tu Nueva Contraseña - UPT',
+          From: `${this.fromName} <${this.fromEmail}>`,
+        },
+      });
 
-      const result = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
+      const result = await this.client.emailsPost(emailMessageData);
       
       this.logger.log(`✅ Nueva contraseña enviada a ${to}`);
-      this.logger.log(`📧 Brevo Response - MessageID: ${result.messageId}`);
+      this.logger.log(`📧 Elastic Email Response - TransactionID: ${result.TransactionID}`);
       
       return {
         success: true,
-        messageId: result.messageId,
+        messageId: result.TransactionID,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando nueva contraseña a ${to}:`, error);
-      this.logger.error(`❌ Brevo Error Details:`, error.response?.body || error.message);
       return {
         success: false,
         error: error.message,
