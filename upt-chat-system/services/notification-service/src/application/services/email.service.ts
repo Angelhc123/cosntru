@@ -33,13 +33,23 @@ export class EmailService {
       throw new Error('Gmail SMTP credentials required');
     }
 
-    // Configurar transporter
-    this.transporter = nodemailer.createTransport({
-      service: 'gmail',
+    // Configurar transporter con configuración robusta para Railway
+    this.transporter = nodemailer.createTransporter({
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true, // SSL para puerto 465
       auth: {
         user: gmailUser,
         pass: gmailPassword,
       },
+      connectionTimeout: 60000, // 60 segundos
+      greetingTimeout: 30000,   // 30 segundos
+      socketTimeout: 60000,     // 60 segundos  
+      debug: true,
+      logger: true,
+      tls: {
+        rejectUnauthorized: false
+      }
     });
 
     this.logger.log(`📧 Gmail SMTP configurado: ${this.fromEmail}`);
