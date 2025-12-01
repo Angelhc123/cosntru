@@ -33,8 +33,8 @@ export class EmailService {
       this.logger.error('BREVO credentials missing - using defaults');
     }
     
-    // Usar email configurado o dragonfaita como fallback 
-    this.fromEmail = 'dragonfaita@gmail.com';
+    // USAR MISMO EMAIL DE BREVO COMO FROM - Dominio verificado
+    this.fromEmail = brevoLogin || '9d0e57001@smtp-brevo.com';
     this.fromName = 'UPT Chat System';
 
     // Configurar SOLO Brevo SMTP
