@@ -6,6 +6,10 @@ from fastapi import APIRouter, Request, HTTPException
 from typing import Dict, Any, Optional
 import httpx
 import re
+import smtplib
+import os
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from infrastructure.logging.logger_config import logger
 from config import settings
 
@@ -34,6 +38,65 @@ def extract_email_from_text(text: str, parameters: Dict[str, Any]) -> Optional[s
         return matches[0]
     
     return None
+
+
+async def send_password_reset_email_direct(to_email: str, user_name: str, session_id: str) -> bool:
+    """
+    Envía email de recuperación de contraseña directamente usando SMTP.
+    Bypasses notification-service para evitar timeouts.
+    """
+    try:
+        logger.info(f"📧 ENVIANDO EMAIL DIRECTO A: {to_email}")
+        
+        # Configuración SMTP desde variables de entorno
+        smtp_host = os.getenv('SMTP_HOST', 'smtp-relay.brevo.com')
+        smtp_port = int(os.getenv('SMTP_PORT', '587'))
+        smtp_user = os.getenv('SMTP_USER', 'dragonfaita@gmail.com') 
+        smtp_password = os.getenv('SMTP_PASSWORD')
+        
+        logger.info(f"📧 SMTP CONFIG: {smtp_host}:{smtp_port}, user: {smtp_user}")
+        
+        if not smtp_password:
+            logger.error("❌ SMTP_PASSWORD no configurado")
+            return False
+            
+        # Crear mensaje
+        msg = MIMEMultipart()
+        msg['From'] = f"UPT Chat System <{smtp_user}>"
+        msg['To'] = to_email
+        msg['Subject'] = "Recuperación de Contraseña - UPT"
+        
+        # Template del email
+        reset_url = f"{API_GATEWAY_BASE_URL}/api/v1/password-reset/confirm/{session_id}"
+        
+        html_body = f"""
+        <html>
+        <body>
+        <h2>Recuperación de Contraseña - UPT</h2>
+        <p>Hola {user_name},</p>
+        <p>Recibimos una solicitud para recuperar tu contraseña.</p>
+        <p>Haz clic en el siguiente enlace para continuar:</p>
+        <p><a href="{reset_url}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Recuperar Contraseña</a></p>
+        <p>Si no solicitaste este cambio, ignora este mensaje.</p>
+        <p>Saludos,<br>Equipo UPT</p>
+        </body>
+        </html>
+        """
+        
+        msg.attach(MIMEText(html_body, 'html'))
+        
+        # Enviar email
+        with smtplib.SMTP(smtp_host, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_password)
+            server.send_message(msg)
+            
+        logger.info(f"✅ EMAIL ENVIADO EXITOSAMENTE A {to_email}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"❌ ERROR ENVIANDO EMAIL DIRECTO: {str(e)}")
+        return False
 
 
 @router.post("/webhook")
@@ -546,31 +609,18 @@ async def handle_password_recovery_with_email(email_personal: str, session: str)
                 # Formato: "projects/PROJECT_ID/agent/sessions/SESSION_ID"
                 session_id = session.split("/")[-1] if session else "unknown"
                 
-                async with httpx.AsyncClient(timeout=20.0) as client:
-                    initiate_url = f"{API_GATEWAY_BASE_URL}/api/v1/password-reset/initiate"
-                    
-                    payload = {
-                        "email": email_personal,
-                        "session_id": session_id
-                    }
-                    
-                    logger.info(f"🚀 Iniciando recuperación de contraseña...")
-                    logger.debug(f"URL: {initiate_url}")
-                    logger.debug(f"Payload: {payload}")
-                    
-                    initiate_response = await client.post(
-                        initiate_url,
-                        json=payload
-                    )
-                    
-                    logger.info(f"📤 Response status: {initiate_response.status_code}")
-                    logger.info(f"📤 Response body: {initiate_response.text}")
-                    
-                    initiate_response.raise_for_status()
-                    initiate_result = initiate_response.json()
+                # Enviar email directo (bypass API Gateway)
+                logger.info(f"🚀 Enviando email directo (bypass API Gateway)...")
                 
-                if initiate_result.get("success"):
-                    logger.info(f"✅ Proceso de recuperación iniciado exitosamente")
+                # Enviar email directamente
+                email_sent = await send_password_reset_email_direct(
+                    to_email=email_personal,
+                    user_name=nombre_completo,
+                    session_id=session_id
+                )
+                
+                if email_sent:
+                    logger.info(f"✅ Email de recuperación enviado exitosamente")
                     
                     # Respuesta exitosa para DialogFlow
                     return {
@@ -583,7 +633,7 @@ async def handle_password_recovery_with_email(email_personal: str, session: str)
                         ),
                     }
                 else:
-                    logger.error(f"❌ Error al iniciar recuperación: {initiate_result.get('message')}")
+                    logger.error(f"❌ Error enviando email directo")
                     return {
                         "fulfillmentText": (
                             "Hubo un problema al procesar tu solicitud de recuperación de contraseña. "
