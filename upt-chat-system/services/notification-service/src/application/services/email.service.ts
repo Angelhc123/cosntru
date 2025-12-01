@@ -48,7 +48,7 @@ export class EmailService {
     }
 
     // Configurar transporter
-    this.transporter = nodemailer.createTransporter({
+    this.transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         type: 'OAuth2',
@@ -88,7 +88,7 @@ export class EmailService {
     try {
       // Renovar access token si es necesario
       const accessToken = await this.getAccessToken();
-      this.transporter.options.auth.accessToken = accessToken;
+      (this.transporter as any).options.auth.accessToken = accessToken;
 
       const mailOptions = {
         from: `${this.fromName} <${this.fromEmail}>`,
@@ -126,7 +126,7 @@ export class EmailService {
     try {
       // Renovar access token si es necesario
       const accessToken = await this.getAccessToken();
-      this.transporter.options.auth.accessToken = accessToken;
+      (this.transporter as any).options.auth.accessToken = accessToken;
 
       const mailOptions = {
         from: `${this.fromName} <${this.fromEmail}>`,
@@ -284,7 +284,7 @@ export class EmailService {
     try {
       // Renovar access token si es necesario
       const accessToken = await this.getAccessToken();
-      this.transporter.options.auth.accessToken = accessToken;
+      (this.transporter as any).options.auth.accessToken = accessToken;
 
       const mailOptions = {
         from: `${this.fromName} <${this.fromEmail}>`,
@@ -321,30 +321,30 @@ export class EmailService {
     sessionId?: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const params = new URLSearchParams();
-      params.append('apikey', this.apiKey);
-      params.append('from', this.fromEmail);
-      params.append('fromName', this.fromName);
-      params.append('to', to);
-      params.append('subject', 'Transcripción de tu Conversación con el Asistente Virtual UPT');
-      params.append('bodyHtml', this.getChatTranscriptionTemplate(userName, messages, sessionEndTime, sessionId));
-      params.append('isTransactional', 'true');
+      // Renovar access token si es necesario
+      const accessToken = await this.getAccessToken();
+      (this.transporter as any).options.auth.accessToken = accessToken;
 
-      const response = await axios.post(this.apiUrl, params, {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      });
+      const mailOptions = {
+        from: `${this.fromName} <${this.fromEmail}>`,
+        to: to,
+        subject: 'Transcripción de tu Conversación con el Asistente Virtual UPT',
+        html: this.getChatTranscriptionTemplate(userName, messages, sessionEndTime, sessionId),
+      };
+
+      const result = await this.transporter.sendMail(mailOptions);
 
       this.logger.log(`✅ Transcripción enviada a ${to}`);
       
       return {
         success: true,
-        messageId: response.data.data?.transactionid || response.data.success,
+        messageId: result.messageId,
       };
     } catch (error) {
-      this.logger.error(`❌ Error enviando transcripción a ${to}:`, error.response?.data || error.message);
+      this.logger.error(`❌ Error enviando transcripción a ${to}:`, error.message);
       return {
         success: false,
-        error: error.response?.data?.error || error.message,
+        error: error.message,
       };
     }
   }
