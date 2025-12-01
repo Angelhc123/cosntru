@@ -34,7 +34,7 @@ export class EmailService {
     }
 
     // Configurar transporter con configuración robusta para Railway
-    this.transporter = nodemailer.createTransporter({
+    this.transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 465,
       secure: true, // SSL para puerto 465
