@@ -251,19 +251,27 @@ export class EmailService {
     htmlContent: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-      sendSmtpEmail.sender = { email: this.fromEmail, name: this.fromName };
-      sendSmtpEmail.to = [{ email: to }];
-      sendSmtpEmail.subject = subject;
-      sendSmtpEmail.htmlContent = htmlContent;
+      const emailMessageData = ElasticEmail.EmailMessageData.constructFromObject({
+        Recipients: [new ElasticEmail.EmailRecipient(to)],
+        Content: {
+          Body: [
+            ElasticEmail.BodyPart.constructFromObject({
+              ContentType: 'HTML',
+              Content: htmlContent,
+            }),
+          ],
+          Subject: subject,
+          From: `${this.fromName} <${this.fromEmail}>`,
+        },
+      });
 
-      const result = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
+      const result = await this.client.emailsPost(emailMessageData);
 
       this.logger.log(`✅ Email enviado a ${to}`);
       
       return {
         success: true,
-        messageId: result.messageId,
+        messageId: result.TransactionID,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando email a ${to}:`, error);
@@ -285,19 +293,27 @@ export class EmailService {
     sessionId?: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-      sendSmtpEmail.sender = { email: this.fromEmail, name: this.fromName };
-      sendSmtpEmail.to = [{ email: to, name: userName }];
-      sendSmtpEmail.subject = 'Transcripción de tu Conversación con el Asistente Virtual UPT';
-      sendSmtpEmail.htmlContent = this.getChatTranscriptionTemplate(userName, messages, sessionEndTime, sessionId);
+      const emailMessageData = ElasticEmail.EmailMessageData.constructFromObject({
+        Recipients: [new ElasticEmail.EmailRecipient(to, userName)],
+        Content: {
+          Body: [
+            ElasticEmail.BodyPart.constructFromObject({
+              ContentType: 'HTML',
+              Content: this.getChatTranscriptionTemplate(userName, messages, sessionEndTime, sessionId),
+            }),
+          ],
+          Subject: 'Transcripción de tu Conversación con el Asistente Virtual UPT',
+          From: `${this.fromName} <${this.fromEmail}>`,
+        },
+      });
 
-      const result = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
+      const result = await this.client.emailsPost(emailMessageData);
 
       this.logger.log(`✅ Transcripción enviada a ${to}`);
       
       return {
         success: true,
-        messageId: result.messageId,
+        messageId: result.TransactionID,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando transcripción a ${to}:`, error);
