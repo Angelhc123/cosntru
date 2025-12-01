@@ -5,11 +5,11 @@
  */
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Mailjet from 'node-mailjet';
+import * as Mailjet from 'node-mailjet';
 
 @Injectable()
 export class EmailService {
-  private mailjet: Mailjet.Client;
+  private mailjet: any;
   private readonly logger = new Logger(EmailService.name);
   private fromEmail: string;
   private fromName: string;
@@ -32,10 +32,7 @@ export class EmailService {
       throw new Error('MAILJET_API_KEY y MAILJET_SECRET_KEY son requeridas');
     }
 
-    this.mailjet = new Mailjet.Client({
-      apiKey: apiKey,
-      apiSecret: secretKey
-    });
+    this.mailjet = Mailjet.Client.apiConnect(apiKey, secretKey);
 
     this.logger.log(`📧 Mailjet configurado: ${this.fromEmail}`);
     this.logger.log(`✅ Email service listo con Mailjet API`);
