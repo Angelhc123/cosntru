@@ -56,6 +56,11 @@ export class EmailService {
     userName: string,
     confirmationUrl: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    this.logger.warn('🚨🚨🚨 INICIANDO ENVÍO DE EMAIL DE CONFIRMACIÓN');
+    this.logger.warn(`📧 DESTINATARIO: ${to}`);
+    this.logger.warn(`👤 USUARIO: ${userName}`);
+    this.logger.warn(`🔗 URL: ${confirmationUrl}`);
+    
     try {
       const mailOptions = {
         from: `${this.fromName} <${this.fromEmail}>`,
@@ -64,17 +69,30 @@ export class EmailService {
         html: this.getPasswordResetConfirmationTemplate(userName, confirmationUrl),
       };
 
+      this.logger.warn('📮 MAIL OPTIONS CONFIGURADAS:');
+      this.logger.warn(`FROM: ${mailOptions.from}`);
+      this.logger.warn(`TO: ${mailOptions.to}`);
+      this.logger.warn(`SUBJECT: ${mailOptions.subject}`);
+      this.logger.warn('HTML CONTENT LENGTH:', mailOptions.html.length);
+      
+      this.logger.warn('🚀 ENVIANDO EMAIL...');
       const result = await this.transporter.sendMail(mailOptions);
       
-      this.logger.log(`✅ Email de confirmación enviado a ${to}`);
-      this.logger.log(`📧 Gmail Response - MessageID: ${result.messageId}`);
+      this.logger.warn('✅✅✅ EMAIL ENVIADO EXITOSAMENTE!');
+      this.logger.warn(`📧 GMAIL RESPONSE - MessageID: ${result.messageId}`);
+      this.logger.warn(`📤 RESPONSE OBJECT:`, JSON.stringify(result, null, 2));
       
       return {
         success: true,
         messageId: result.messageId,
       };
     } catch (error) {
-      this.logger.error(`❌ Error enviando email de confirmación a ${to}:`, error.message);
+      this.logger.error('❌❌❌ ERROR CRÍTICO ENVIANDO EMAIL!');
+      this.logger.error(`DESTINATARIO: ${to}`);
+      this.logger.error(`ERROR MESSAGE: ${error.message}`);
+      this.logger.error(`ERROR CODE: ${error.code}`);
+      this.logger.error(`ERROR COMMAND: ${error.command}`);
+      this.logger.error(`FULL ERROR:`, error);
       return {
         success: false,
         error: error.message,
@@ -244,6 +262,10 @@ export class EmailService {
     subject: string,
     htmlContent: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    this.logger.warn('🚨 ENVIANDO EMAIL GENÉRICO');
+    this.logger.warn(`📧 TO: ${to}`);
+    this.logger.warn(`📋 SUBJECT: ${subject}`);
+    
     try {
       const mailOptions = {
         from: `${this.fromName} <${this.fromEmail}>`,
@@ -252,16 +274,23 @@ export class EmailService {
         html: htmlContent,
       };
 
+      this.logger.warn('📮 ENVIANDO CON OPCIONES:');
+      this.logger.warn(`FROM: ${mailOptions.from}`);
+      this.logger.warn(`TO: ${mailOptions.to}`);
+      
       const result = await this.transporter.sendMail(mailOptions);
 
-      this.logger.log(`✅ Email enviado a ${to}`);
+      this.logger.warn(`✅✅✅ EMAIL GENÉRICO ENVIADO A ${to}`);
+      this.logger.warn(`📧 MessageID: ${result.messageId}`);
       
       return {
         success: true,
         messageId: result.messageId,
       };
     } catch (error) {
-      this.logger.error(`❌ Error enviando email a ${to}:`, error.message);
+      this.logger.error(`❌❌❌ ERROR ENVIANDO EMAIL GENÉRICO A ${to}:`);
+      this.logger.error('ERROR:', error.message);
+      this.logger.error('FULL ERROR:', error);
       return {
         success: false,
         error: error.message,
