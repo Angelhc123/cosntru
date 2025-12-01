@@ -94,8 +94,17 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             email = extract_email_from_text(query_text, parameters)
             
             if email:
-                logger.info(f"✅ Email detectado: {email}")
-                return await handle_password_recovery_with_email(email, session)
+                logger.info(f"✅ Email detectado en contexto: {email}")
+                logger.info("🚀 Retornando metadata para que API Gateway procese")
+                return {
+                    "fulfillmentText": "Procesando tu solicitud de recuperación de contraseña...",
+                    "outputContexts": [],
+                    "payload": {
+                        "action": "PASSWORD_RECOVERY",
+                        "email": email,
+                        "session_id": session
+                    }
+                }
             else:
                 logger.warning("⚠️ No se pudo extraer email del texto")
                 return {
@@ -117,8 +126,16 @@ async def dialogflow_webhook(request: Request) -> Dict[str, Any]:
             
             if email:
                 logger.info(f"✅ Email detectado en intent de recuperación: {email}")
-                logger.info("🚀 Procesando directamente - Todo en un mensaje")
-                return await handle_password_recovery_with_email(email, session)
+                logger.info("🚀 Retornando metadata para que API Gateway procese")
+                return {
+                    "fulfillmentText": "Procesando tu solicitud de recuperación de contraseña...",
+                    "outputContexts": [],
+                    "payload": {
+                        "action": "PASSWORD_RECOVERY",
+                        "email": email,
+                        "session_id": session
+                    }
+                }
             else:
                 logger.info("📧 Iniciando flujo - Pidiendo email al usuario")
                 return {

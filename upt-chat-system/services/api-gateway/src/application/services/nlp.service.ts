@@ -58,7 +58,46 @@ export class NlpService {
 
             console.log('✅ Respuesta de NLP Service:', response.data);
 
-            // 3. Detectar si requiere escalamiento a soporte humano
+            // 3. Verificar si hay acción especial de PASSWORD_RECOVERY
+            const payload = response.data?.payload || response.data?.data?.payload;
+            if (payload?.action === 'PASSWORD_RECOVERY') {
+                console.log('🔐 Acción PASSWORD_RECOVERY detectada, procesando...');
+                const { email, session_id } = payload;
+                
+                try {
+                    // Llamar al endpoint de password-reset/initiate
+                    const resetResponse = await axios.post(
+                        `${process.env.API_GATEWAY_URL || 'http://localhost:3000'}/api/v1/password-reset/initiate`,
+                        {
+                            email: email,
+                            session_id: session_id
+                        },
+                        {
+                            timeout: 30000
+                        }
+                    );
+                    
+                    if (resetResponse.data.success) {
+                        console.log('✅ Password recovery iniciado exitosamente');
+                        return {
+                            response: 'Perfecto! He enviado un correo electrónico con las instrucciones para recuperar tu contraseña. Por favor revisa tu bandeja de entrada y sigue los pasos indicados.',
+                            confidence: 1.0,
+                            intent: { name: 'Password Recovery', id: 'password_recovery' },
+                            escalate: false
+                        };
+                    }
+                } catch (resetError) {
+                    console.error('❌ Error en password recovery:', resetError.message);
+                    return {
+                        response: 'Lo siento, hubo un problema al procesar tu solicitud de recuperación de contraseña. Por favor intenta nuevamente más tarde o contacta con soporte técnico.',
+                        confidence: 1.0,
+                        intent: { name: 'Password Recovery Error', id: 'password_recovery_error' },
+                        escalate: false
+                    };
+                }
+            }
+
+            // 4. Detectar si requiere escalamiento a soporte humano
             // REGLA: Solo escalar si confidence < 0.5 (muy bajo) o 2+ mensajes consecutivos < 0.7
             // TAMBIÉN: Intents específicos que siempre escalan sin importar la confianza
             const confidence = response.data?.confidence || response.data?.data?.confidence || 1.0;
