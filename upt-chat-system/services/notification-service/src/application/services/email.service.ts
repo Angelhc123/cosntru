@@ -39,7 +39,7 @@ export class EmailService {
     }
 
     // Configurar transporter - Usar 587 STARTTLS en caso Railway bloquee 465
-    this.transporter = nodemailer.createTransporter({
+    this.transporter = nodemailer.createTransport({
       service: 'gmail', // Usar service para evitar problemas de Railway
       auth: {
         user: gmailUser,
