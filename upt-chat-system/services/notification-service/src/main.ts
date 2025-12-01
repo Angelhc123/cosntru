@@ -34,9 +34,9 @@ async function bootstrap() {
   await app.listen(port);
 
   logger.log(`🚀 Notification Service corriendo en puerto ${port}`);
-  logger.log(`📧 Gmail SMTP configurado: ${process.env.GMAIL_USER}`);
+  logger.log(`📧 Resend API configurado: ${process.env.FROM_EMAIL || 'onboarding@resend.dev'}`);
   logger.log(`🔗 API Gateway: ${process.env.API_GATEWAY_URL}`);
-  logger.log(`✅ Sistema de emails listo con Gmail SMTP`);
+  logger.log(`✅ Sistema de emails listo con Resend API`);
 }
 
 bootstrap();

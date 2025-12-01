@@ -4,36 +4,36 @@
  * Responsable de enviar TODOS los emails del sistema
  */
 import { Injectable, Logger } from '@nestjs/common';
-import * as nodemailer from 'nodemailer';
-import { Transporter } from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
+import { Resend } from 'resend';
 
 @Injectable()
 export class EmailService {
-  private transporter: Transporter;
+  private resend: Resend;
   private readonly logger = new Logger(EmailService.name);
+  private fromEmail: string;
+  private fromName: string;
 
   constructor(private configService: ConfigService) {
-    this.initializeTransporter();
+    this.initializeResend();
   }
 
   /**
-   * Inicializa el transporter de nodemailer con Gmail SMTP
+   * Inicializa el cliente de Resend
    */
-  private initializeTransporter() {
-    const gmailUser = this.configService.get<string>('GMAIL_USER');
-    const gmailPassword = this.configService.get<string>('GMAIL_APP_PASSWORD');
+  private initializeResend() {
+    const resendApiKey = this.configService.get<string>('RESEND_API_KEY');
+    this.fromEmail = this.configService.get<string>('FROM_EMAIL') || 'onboarding@resend.dev';
+    this.fromName = this.configService.get<string>('FROM_NAME') || 'UPT Chat System';
 
-    this.transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: gmailUser,
-        pass: gmailPassword,
-      },
-    });
+    if (!resendApiKey) {
+      this.logger.error('❌ RESEND_API_KEY no configurada');
+      throw new Error('RESEND_API_KEY es requerida');
+    }
 
-    this.logger.log(`📧 Gmail SMTP configurado: ${gmailUser}`);
-    this.logger.log(`✅ Email service listo con Gmail SMTP`);
+    this.resend = new Resend(resendApiKey);
+    this.logger.log(`📧 Resend configurado: ${this.fromEmail}`);
+    this.logger.log(`✅ Email service listo con Resend API`);
   }
 
   /**
@@ -45,22 +45,22 @@ export class EmailService {
     confirmationUrl: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const fromEmail = this.configService.get<string>('FROM_EMAIL') || this.configService.get<string>('GMAIL_USER');
-      const fromName = this.configService.get<string>('FROM_NAME') || 'Sistema UPT';
-
-      const mailOptions = {
-        from: `"${fromName}" <${fromEmail}>`,
-        to: to,
+      const { data, error } = await this.resend.emails.send({
+        from: `${this.fromName} <${this.fromEmail}>`,
+        to: [to],
         subject: 'Confirmación de Recuperación de Contraseña - UPT',
         html: this.getPasswordResetConfirmationTemplate(userName, confirmationUrl),
-      };
+      });
 
-      const info = await this.transporter.sendMail(mailOptions);
-      this.logger.log(`✅ Email de confirmación enviado a ${to} via Gmail SMTP: ${info.messageId}`);
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      this.logger.log(`✅ Email de confirmación enviado a ${to}: ${data.id}`);
       
       return {
         success: true,
-        messageId: info.messageId,
+        messageId: data.id,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando email de confirmación a ${to}:`, error);
@@ -80,22 +80,22 @@ export class EmailService {
     newPassword: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const fromEmail = this.configService.get<string>('FROM_EMAIL') || this.configService.get<string>('GMAIL_USER');
-      const fromName = this.configService.get<string>('FROM_NAME') || 'Sistema UPT';
-
-      const mailOptions = {
-        from: `"${fromName}" <${fromEmail}>`,
-        to: to,
+      const { data, error } = await this.resend.emails.send({
+        from: `${this.fromName} <${this.fromEmail}>`,
+        to: [to],
         subject: 'Tu Nueva Contraseña - UPT',
         html: this.getNewPasswordTemplate(userName, newPassword),
-      };
+      });
 
-      const info = await this.transporter.sendMail(mailOptions);
-      this.logger.log(`✅ Email con nueva contraseña enviado a ${to} via Gmail SMTP: ${info.messageId}`);
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      this.logger.log(`✅ Nueva contraseña enviada a ${to}: ${data.id}`);
       
       return {
         success: true,
-        messageId: info.messageId,
+        messageId: data.id,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando nueva contraseña a ${to}:`, error);
@@ -235,22 +235,22 @@ export class EmailService {
     htmlContent: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const fromEmail = this.configService.get<string>('FROM_EMAIL') || this.configService.get<string>('GMAIL_USER');
-      const fromName = this.configService.get<string>('FROM_NAME') || 'Sistema UPT';
-
-      const mailOptions = {
-        from: `"${fromName}" <${fromEmail}>`,
-        to: to,
+      const { data, error } = await this.resend.emails.send({
+        from: `${this.fromName} <${this.fromEmail}>`,
+        to: [to],
         subject: subject,
         html: htmlContent,
-      };
+      });
 
-      const info = await this.transporter.sendMail(mailOptions);
-      this.logger.log(`✅ Email enviado a ${to} via Gmail SMTP: ${info.messageId}`);
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      this.logger.log(`✅ Email enviado a ${to}: ${data.id}`);
       
       return {
         success: true,
-        messageId: info.messageId,
+        messageId: data.id,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando email a ${to}:`, error);
@@ -272,22 +272,22 @@ export class EmailService {
     sessionId?: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const fromEmail = this.configService.get<string>('FROM_EMAIL') || this.configService.get<string>('GMAIL_USER');
-      const fromName = this.configService.get<string>('FROM_NAME') || 'Sistema UPT';
-
-      const mailOptions = {
-        from: `"${fromName}" <${fromEmail}>`,
-        to: to,
+      const { data, error } = await this.resend.emails.send({
+        from: `${this.fromName} <${this.fromEmail}>`,
+        to: [to],
         subject: 'Transcripción de tu Conversación con el Asistente Virtual UPT',
         html: this.getChatTranscriptionTemplate(userName, messages, sessionEndTime, sessionId),
-      };
+      });
 
-      const info = await this.transporter.sendMail(mailOptions);
-      this.logger.log(`✅ Transcripción enviada a ${to} via Gmail SMTP: ${info.messageId}`);
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      this.logger.log(`✅ Transcripción enviada a ${to}: ${data.id}`);
       
       return {
         success: true,
-        messageId: info.messageId,
+        messageId: data.id,
       };
     } catch (error) {
       this.logger.error(`❌ Error enviando transcripción a ${to}:`, error);
