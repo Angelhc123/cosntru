@@ -19,45 +19,39 @@ export class EmailService {
   }
 
   /**
-   * Inicializa Gmail SMTP
+   * Inicializa Brevo SMTP
    */
   private initializeGmailSMTP() {
-    const gmailUser = this.configService.get<string>('GMAIL_USER');
-    const gmailPassword = this.configService.get<string>('GMAIL_APP_PASSWORD');
-    
     const brevoLogin = this.configService.get<string>('BREVO_LOGIN');
     const brevoPassword = this.configService.get<string>('BREVO_PASSWORD');
     
-    this.logger.error('USANDO BREVO SMTP - Railway permite Brevo');
-    this.logger.error(`BREVO_LOGIN: ${brevoLogin ? brevoLogin : 'USANDO DEFAULT'}`);
-    this.logger.error(`BREVO_PASSWORD: ${brevoPassword ? 'PRESENT' : 'USANDO DEFAULT'}`);
+    this.logger.error('CONFIGURANDO BREVO SMTP SOLAMENTE');
+    this.logger.error(`BREVO_LOGIN: ${brevoLogin || 'NOT SET'}`);
+    this.logger.error(`BREVO_PASSWORD: ${brevoPassword ? 'PRESENT' : 'NOT SET'}`);
     
-    // IMPORTANTE: Usar GMAIL_USER como fromEmail para autenticación correcta
-    this.fromEmail = gmailUser || 'dragonfaita@gmail.com';
-    this.fromName = this.configService.get<string>('FROM_NAME') || 'Sistema UPT Chat';
+    if (!brevoLogin || !brevoPassword) {
+      this.logger.error('BREVO credentials missing - using defaults');
+    }
+    
+    // Usar email configurado o dragonfaita como fallback 
+    this.fromEmail = 'dragonfaita@gmail.com';
+    this.fromName = 'UPT Chat System';
 
-    // Brevo no requiere validación estricta - tiene defaults
-    this.logger.error('Brevo configurado - continuando...');
-
-    // Usar Brevo API por HTTPS - Railway permite HTTPS
+    // Configurar SOLO Brevo SMTP
     this.transporter = nodemailer.createTransport({
       host: 'smtp-relay.brevo.com',
       port: 587,
       secure: false,
       auth: {
-        user: this.configService.get<string>('BREVO_LOGIN') || 'dragonfaita@gmail.com',
-        pass: this.configService.get<string>('BREVO_PASSWORD') || 'xkeysib-YOUR_API_KEY',
+        user: brevoLogin,
+        pass: brevoPassword,
       },
       debug: true,
       logger: true
     });
     
-    this.logger.error(`🚨 USING GMAIL API OAuth2 (Railway blocks SMTP)`);
-    this.logger.error(`🚨 FROM EMAIL: ${this.fromEmail}`);
-    this.logger.error(`🚨 OAUTH2 CONFIG: user=${gmailUser}`);
-
-    this.logger.error(`🚨🚨🚨 GMAIL SMTP CONFIGURADO CON: ${this.fromEmail}`);
-    this.logger.error(`✅✅✅ SISTEMA LISTO - VERIFICANDO CONEXIÓN...`);
+    this.logger.error(`BREVO SMTP CONFIGURADO - FROM: ${this.fromEmail}`);
+    this.logger.error(`VERIFICANDO CONEXION BREVO...`);
     
     // Verificar conexión inmediatamente
     this.verifyConnection();
