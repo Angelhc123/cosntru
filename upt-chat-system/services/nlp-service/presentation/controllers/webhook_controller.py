@@ -545,6 +545,10 @@ async def handle_password_recovery_with_email(email_personal: str, session: str)
                         initiate_url,
                         json=payload
                     )
+                    
+                    logger.info(f"📤 Response status: {initiate_response.status_code}")
+                    logger.info(f"📤 Response body: {initiate_response.text}")
+                    
                     initiate_response.raise_for_status()
                     initiate_result = initiate_response.json()
                 
@@ -570,8 +574,25 @@ async def handle_password_recovery_with_email(email_personal: str, session: str)
                         ),
                     }
                     
+            except httpx.HTTPStatusError as e:
+                logger.error(f"❌ HTTP Error al iniciar recuperación: {e.response.status_code}")
+                logger.error(f"❌ Response body: {e.response.text}")
+                return {
+                    "fulfillmentText": (
+                        "Hubo un problema técnico al procesar tu solicitud. "
+                        "Por favor intenta nuevamente en unos minutos."
+                    ),
+                }
+            except httpx.TimeoutException as e:
+                logger.error(f"❌ Timeout al iniciar recuperación: {str(e)}")
+                return {
+                    "fulfillmentText": (
+                        "La solicitud está tardando más de lo esperado. "
+                        "Por favor intenta nuevamente en unos momentos."
+                    ),
+                }
             except httpx.HTTPError as e:
-                logger.error(f"❌ Error al iniciar recuperación: {str(e)}")
+                logger.error(f"❌ Error HTTP al iniciar recuperación: {str(e)}", exc_info=True)
                 return {
                     "fulfillmentText": (
                         "Hubo un problema técnico al enviar el correo de recuperación. "
