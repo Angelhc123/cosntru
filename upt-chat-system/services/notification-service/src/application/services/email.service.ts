@@ -5,7 +5,6 @@
  */
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { google } from 'googleapis';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()
@@ -14,7 +13,6 @@ export class EmailService {
   private readonly logger = new Logger(EmailService.name);
   private fromEmail: string;
   private fromName: string;
-  private oauth2Client: any;
 
   constructor(private configService: ConfigService) {
     this.initializeGmailSMTP();
@@ -59,10 +57,6 @@ export class EmailService {
     confirmationUrl: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      // Renovar access token si es necesario
-      const accessToken = await this.getAccessToken();
-      (this.transporter as any).options.auth.accessToken = accessToken;
-
       const mailOptions = {
         from: `${this.fromName} <${this.fromEmail}>`,
         to: to,
@@ -97,10 +91,6 @@ export class EmailService {
     newPassword: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      // Renovar access token si es necesario
-      const accessToken = await this.getAccessToken();
-      (this.transporter as any).options.auth.accessToken = accessToken;
-
       const mailOptions = {
         from: `${this.fromName} <${this.fromEmail}>`,
         to: to,
@@ -255,10 +245,6 @@ export class EmailService {
     htmlContent: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      // Renovar access token si es necesario
-      const accessToken = await this.getAccessToken();
-      (this.transporter as any).options.auth.accessToken = accessToken;
-
       const mailOptions = {
         from: `${this.fromName} <${this.fromEmail}>`,
         to: to,
@@ -294,10 +280,6 @@ export class EmailService {
     sessionId?: string,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      // Renovar access token si es necesario
-      const accessToken = await this.getAccessToken();
-      (this.transporter as any).options.auth.accessToken = accessToken;
-
       const mailOptions = {
         from: `${this.fromName} <${this.fromEmail}>`,
         to: to,
