@@ -17,65 +17,38 @@ export class EmailService {
   private oauth2Client: any;
 
   constructor(private configService: ConfigService) {
-    this.initializeGmailOAuth2();
+    this.initializeGmailSMTP();
   }
 
   /**
-   * Inicializa Gmail OAuth2
+   * Inicializa Gmail SMTP
    */
-  private async initializeGmailOAuth2() {
+  private initializeGmailSMTP() {
     this.fromEmail = this.configService.get<string>('FROM_EMAIL') || 'dragonfaita@gmail.com';
     this.fromName = this.configService.get<string>('FROM_NAME') || 'Sistema UPT Chat';
 
-    const clientId = this.configService.get<string>('GOOGLE_CLIENT_ID');
-    const clientSecret = this.configService.get<string>('GOOGLE_CLIENT_SECRET');
-    const refreshToken = this.configService.get<string>('GMAIL_REFRESH_TOKEN');
+    const gmailUser = this.configService.get<string>('GMAIL_USER');
+    const gmailPassword = this.configService.get<string>('GMAIL_APP_PASSWORD');
 
-    if (!clientId || !clientSecret) {
-      this.logger.error('❌ Gmail OAuth2 credentials missing');
-      throw new Error('Gmail OAuth2 credentials required');
-    }
-
-    // Configurar OAuth2
-    this.oauth2Client = new google.auth.OAuth2(
-      clientId,
-      clientSecret,
-      'https://developers.google.com/oauthplayground'
-    );
-
-    if (refreshToken) {
-      this.oauth2Client.setCredentials({ refresh_token: refreshToken });
+    if (!gmailUser || !gmailPassword) {
+      this.logger.error('❌ Gmail SMTP credentials missing');
+      throw new Error('Gmail SMTP credentials required');
     }
 
     // Configurar transporter
     this.transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        type: 'OAuth2',
-        user: this.fromEmail,
-        clientId: clientId,
-        clientSecret: clientSecret,
-        refreshToken: refreshToken,
-        accessToken: await this.getAccessToken(),
+        user: gmailUser,
+        pass: gmailPassword,
       },
     });
 
-    this.logger.log(`📧 Gmail OAuth2 configurado: ${this.fromEmail}`);
-    this.logger.log(`✅ Sistema de emails listo con Gmail API`);
+    this.logger.log(`📧 Gmail SMTP configurado: ${this.fromEmail}`);
+    this.logger.log(`✅ Sistema de emails listo con Gmail SMTP`);
   }
 
-  /**
-   * Obtiene access token usando refresh token
-   */
-  private async getAccessToken(): Promise<string> {
-    try {
-      const { credentials } = await this.oauth2Client.refreshAccessToken();
-      return credentials.access_token;
-    } catch (error) {
-      this.logger.error('❌ Error obteniendo access token:', error.message);
-      throw error;
-    }
-  }
+
 
   /**
    * Envía email de confirmación para recuperación de contraseña
