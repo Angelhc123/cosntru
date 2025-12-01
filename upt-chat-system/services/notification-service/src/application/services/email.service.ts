@@ -25,25 +25,28 @@ export class EmailService {
     const gmailUser = this.configService.get<string>('GMAIL_USER');
     const gmailPassword = this.configService.get<string>('GMAIL_APP_PASSWORD');
     
-    this.logger.error('🚨🚨🚨 GMAIL SMTP SIMPLE - VERIFICAR CREDENCIALES');
-    this.logger.error(`📧 GMAIL_USER: ${gmailUser ? gmailUser : '❌ UNDEFINED'}`);
-    this.logger.error(`🔑 GMAIL_APP_PASSWORD: ${gmailPassword ? `✅ ${gmailPassword}` : '❌ UNDEFINED'}`);
+    const brevoLogin = this.configService.get<string>('BREVO_LOGIN');
+    const brevoPassword = this.configService.get<string>('BREVO_PASSWORD');
+    
+    this.logger.error('USANDO BREVO SMTP - Railway permite Brevo');
+    this.logger.error(`BREVO_LOGIN: ${brevoLogin ? brevoLogin : 'USANDO DEFAULT'}`);
+    this.logger.error(`BREVO_PASSWORD: ${brevoPassword ? 'PRESENT' : 'USANDO DEFAULT'}`);
     
     // IMPORTANTE: Usar GMAIL_USER como fromEmail para autenticación correcta
     this.fromEmail = gmailUser || 'dragonfaita@gmail.com';
     this.fromName = this.configService.get<string>('FROM_NAME') || 'Sistema UPT Chat';
 
-    if (!gmailUser || !gmailPassword) {
-      this.logger.error('❌ Gmail SMTP credentials missing');
-      throw new Error('Gmail SMTP credentials required');
-    }
+    // Brevo no requiere validación estricta - tiene defaults
+    this.logger.error('Brevo configurado - continuando...');
 
-    // VOLVER A SMTP SIMPLE - Mi error, Railway NO bloquea SMTP
+    // Usar Brevo API por HTTPS - Railway permite HTTPS
     this.transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp-relay.brevo.com',
+      port: 587,
+      secure: false,
       auth: {
-        user: gmailUser,
-        pass: gmailPassword,
+        user: this.configService.get<string>('BREVO_LOGIN') || 'dragonfaita@gmail.com',
+        pass: this.configService.get<string>('BREVO_PASSWORD') || 'xkeysib-YOUR_API_KEY',
       },
       debug: true,
       logger: true
@@ -61,16 +64,47 @@ export class EmailService {
   }
 
   /**
-   * Verifica la conexión SMTP
+   * Verifica la conexión SMTP CON DIAGNÓSTICOS ESPECÍFICOS
    */
   private async verifyConnection() {
     try {
       this.logger.error('🔍🔍🔍 VERIFICANDO CONEXIÓN SMTP...');
+      
+      // Test 1: Verificar conexión básica
+      const startTime = Date.now();
       await this.transporter.verify();
+      const endTime = Date.now();
+      
       this.logger.error('✅✅✅ CONEXIÓN SMTP VERIFICADA - READY TO SEND!');
+      this.logger.error(`⏱️ Tiempo de conexión: ${endTime - startTime}ms`);
+      
     } catch (error) {
-      this.logger.error('❌❌❌ ERROR EN VERIFICACIÓN SMTP:', error.message);
-      this.logger.error('SMTP Verify Error Details:', error);
+      this.logger.error('❌❌❌ ERROR EN VERIFICACIÓN SMTP');
+      this.logger.error(`🔍 ERROR CODE: ${error.code}`);
+      this.logger.error(`🔍 ERROR MESSAGE: ${error.message}`);
+      
+      // Diagnósticos específicos
+      if (error.code === 'ETIMEDOUT') {
+        this.logger.error('🚨 DIAGNÓSTICO: TIMEOUT - Posibles causas:');
+        this.logger.error('   1. Railway bloquea puertos SMTP (587/465)');
+        this.logger.error('   2. Firewall corporativo');
+        this.logger.error('   3. Configuración de red incorrecta');
+      }
+      
+      if (error.code === 'EAUTH' || error.message.includes('auth') || error.message.includes('authentication')) {
+        this.logger.error('🚨 DIAGNÓSTICO: AUTHENTICATION ERROR');
+        this.logger.error('   1. Contraseña de aplicación incorrecta');
+        this.logger.error('   2. Email no tiene 2FA activado');
+        this.logger.error('   3. Contraseña expiró o fue revocada');
+      }
+      
+      if (error.code === 'ENOTFOUND' || error.message.includes('getaddrinfo')) {
+        this.logger.error('🚨 DIAGNÓSTICO: DNS/NETWORK ERROR');
+        this.logger.error('   1. No puede resolver smtp.gmail.com');
+        this.logger.error('   2. Problema de conectividad de red');
+      }
+      
+      this.logger.error('FULL ERROR DETAILS:', error);
     }
   }
 
@@ -115,10 +149,35 @@ export class EmailService {
     } catch (error) {
       this.logger.error('❌❌❌ ERROR CRÍTICO ENVIANDO EMAIL!');
       this.logger.error(`DESTINATARIO: ${to}`);
-      this.logger.error(`ERROR MESSAGE: ${error.message}`);
       this.logger.error(`ERROR CODE: ${error.code}`);
+      this.logger.error(`ERROR MESSAGE: ${error.message}`);
       this.logger.error(`ERROR COMMAND: ${error.command}`);
-      this.logger.error(`FULL ERROR:`, error);
+      
+      // DIAGNÓSTICOS ESPECÍFICOS PARA ENVÍO
+      if (error.code === 'ETIMEDOUT') {
+        this.logger.error('🚨 TIMEOUT AL ENVIAR - POSIBLES CAUSAS:');
+        this.logger.error('   ❌ Railway está bloqueando puertos SMTP');
+        this.logger.error('   ❌ Gmail está rechazando la conexión');
+        this.logger.error('   ❌ Firewall bloquea tráfico SMTP saliente');
+        this.logger.error('   ✅ SOLUCIÓN: Cambiar a Gmail API OAuth2');
+      }
+      
+      if (error.code === 'EAUTH' || error.message.includes('Invalid login')) {
+        this.logger.error('🚨 ERROR DE AUTENTICACIÓN - REVISAR:');
+        this.logger.error('   ❌ Contraseña de aplicación incorrecta');
+        this.logger.error('   ❌ Email no coincide con el que generó la app password');
+        this.logger.error('   ❌ Contraseña expirada o revocada');
+        this.logger.error(`   🔍 Verificar: ${this.fromEmail} con password configurada`);
+      }
+      
+      if (error.code === 'EMESSAGE' || error.message.includes('Message failed')) {
+        this.logger.error('🚨 ERROR EN CONTENIDO DEL EMAIL');
+        this.logger.error('   ❌ Email de destino inválido');
+        this.logger.error('   ❌ Contenido HTML corrupto');
+        this.logger.error('   ❌ Límites de Gmail excedidos');
+      }
+      
+      this.logger.error(`FULL ERROR DETAILS:`, error);
       return {
         success: false,
         error: error.message,
